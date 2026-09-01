@@ -265,6 +265,9 @@ body.stale #statusbar .dot{background:#fff5f0; animation:pulse 1.4s ease-in-out 
 #readouts{transition:filter .2s linear, opacity .2s linear;}
 body.stale #readouts{filter:grayscale(.92) brightness(.52); opacity:.55;}
 
+/* the rail and header only exist on wide screens */
+.rail, .head{display:none;}
+
 /* --- what the house is running on --------------------------------------- */
 .hero{position:relative; overflow:hidden; padding:26px 18px 23px; border-bottom:1px solid var(--rule);}
 .hero::before{
@@ -292,6 +295,7 @@ body.stale #readouts{filter:grayscale(.92) brightness(.52); opacity:.55;}
   display:block; height:100%; width:0; border-radius:5px; background:var(--ok);
   transition:width .4s ease, background .3s linear;
 }
+.ring, .ringwhy{display:none;}
 
 /* --- voltage, water, draw ------------------------------------------------ */
 .strip{
@@ -356,7 +360,123 @@ body.stale .load{cursor:not-allowed;}
 #toast.show{opacity:1; transform:translate(-50%,0);}
 #toast.rules{background:var(--gold); color:#241a08;}
 
-@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important;}}
+/* ======================================================================== */
+/* Desktop. Same readings, laid out the way the reference does it: a status  */
+/* rail down the left, a header, then a card grid with one dominant panel    */
+/* and a full-width strip of switches along the bottom.                      */
+/* ======================================================================== */
+@media (min-width:1024px){
+  body{max-width:none; padding-bottom:0;}
+
+  .shell{
+    display:grid; grid-template-columns:78px minmax(0,1fr);
+    max-width:1560px; margin:0 auto; min-height:100vh;
+  }
+
+  /* The whole left edge carries the source colour, so you can see what the
+     house is on from the corner of your eye, and see it die when stale. */
+  .rail{
+    display:flex; flex-direction:column; align-items:center; gap:20px;
+    padding:24px 0 26px; border-right:1px solid var(--rule); background:#100d0a;
+  }
+  .rail .mark{width:25px; height:25px; color:var(--dim); flex:none;}
+  .rail .spine{
+    flex:1; width:3px; border-radius:2px; background:var(--src);
+    box-shadow:0 0 18px var(--src); opacity:.9;
+    transition:background .3s linear, box-shadow .3s linear;
+  }
+  .rail .raillamp{
+    width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none;
+    transition:background .3s linear;
+  }
+  body.stale .rail .spine{background:#463a2e; box-shadow:none;}
+  body.stale .rail .raillamp{background:var(--bad);}
+
+  .head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    padding:26px 30px 18px;
+  }
+  .head .title{font:400 21px var(--serif); color:var(--ink);}
+  .head .clock{font:500 21px var(--sans); color:var(--dim);}
+  body.stale .head{opacity:.5; filter:grayscale(.9);}
+
+  #statusbar{padding:13px 30px; font-size:14px;}
+  body.stale #statusbar{padding:15px 30px; font-size:15px;}
+
+  #readouts{
+    display:grid; gap:16px; padding:0 30px 30px;
+    grid-template-columns:1.32fr 1fr 1.12fr;
+    grid-template-rows:1fr auto auto;
+    grid-template-areas:
+      "source battery log"
+      "reads  battery log"
+      "loads  loads   loads";
+  }
+  #readouts > section{
+    background:var(--panel); border:1px solid var(--rule);
+    border-radius:16px; box-shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+
+  /* Not five equal cards: the source panel is the big one and it glows. */
+  .hero{
+    grid-area:source; padding:34px 30px 34px;
+    display:flex; flex-direction:column; justify-content:center; min-height:268px;
+  }
+  .hero::before{inset:-40% -20% auto -20%; opacity:.19;}
+  .hero .eyebrow{font-size:16px;}
+  .hero .source{font-size:clamp(48px,4.6vw,70px); margin-top:8px;}
+  .hero .sourcenote{margin-top:14px; font-size:17px;}
+
+  .batt{
+    grid-area:battery; padding:20px 22px 24px;
+    display:flex; flex-direction:column;
+  }
+  .battmid{flex:1; display:flex; flex-direction:column; justify-content:center;}
+  .bigrow, .bar{display:none;}
+  .ring{display:block; position:relative; width:178px; height:178px; margin:0 auto;}
+  .ring svg{width:100%; height:100%; transform:rotate(-90deg); display:block;}
+  .ring .track{fill:none; stroke:var(--sunk); stroke-width:11;}
+  .ring .fill{
+    fill:none; stroke:var(--ok); stroke-width:11; stroke-linecap:round;
+    stroke-dasharray:339.292; stroke-dashoffset:339.292;
+    transition:stroke-dashoffset .5s ease, stroke .3s linear;
+  }
+  .ringtext{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font:600 44px var(--sans); letter-spacing:-.02em;
+  }
+  .ringtext i{font:500 18px var(--sans); font-style:normal; color:var(--dim); margin-left:2px;}
+  .ringwhy{display:block; margin-top:14px; text-align:center; font:400 15px var(--serif); color:var(--dim); min-height:21px;}
+
+  .strip{grid-area:reads; padding:20px 22px 22px; gap:18px;}
+
+  .logcard{grid-area:log; display:flex; flex-direction:column; overflow:hidden; max-height:520px;}
+  .logcard .sec{padding:19px 22px 11px;}
+  .logcard .log{flex:1; overflow-y:auto;}
+  .log li{padding:11px 22px;}
+  .log li:last-child{border-bottom:0;}
+
+  /* The switches become the full-width row of tiles along the bottom. */
+  .loadscard{grid-area:loads; overflow:hidden;}
+  .loadscard .sec{padding:19px 22px 4px;}
+  .loads{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+    gap:12px; padding:8px 22px 20px; border-top:0;
+  }
+  .load{
+    display:grid; grid-template-columns:auto 1fr; align-content:start;
+    grid-template-areas:"lamp state" "name name" "watts watts";
+    gap:9px 8px; min-height:106px; padding:15px 15px 14px;
+    border:1px solid var(--rule); border-radius:13px; background:var(--bg);
+    transition:border-color .18s linear, background .18s linear;
+  }
+  .load:hover{border-color:#3d3327; background:#1f1a14;}
+  .load[aria-pressed="true"]{border-color:#3a4a37;}
+  .load .lamp{grid-area:lamp;}
+  .load .lname{grid-area:name; flex:none; font-size:16px;}
+  .load .lwatts{grid-area:watts;}
+  .load .lstate{grid-area:state; width:auto; justify-self:end;}
+}
 </style>
 </head>
 <body class="stale">
@@ -365,46 +485,78 @@ body.stale .load{cursor:not-allowed;}
   <span class="dot"></span><span id="statusmsg">Trying to reach the hub…</span>
 </div>
 
-<main id="readouts">
-  <section class="hero">
-    <div class="eyebrow">The house is running on</div>
-    <div class="source" id="source">…</div>
-    <div class="sourcenote" id="sourcenote">Nothing has come back from the hub yet.</div>
-  </section>
+<div class="shell">
+  <aside class="rail" aria-hidden="true">
+    <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+         stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 10.5 12 3l9 7.5"></path><path d="M5.5 9.6V20h13V9.6"></path>
+    </svg>
+    <span class="spine"></span>
+    <span class="raillamp"></span>
+  </aside>
 
-  <section class="batt">
-    <div class="k">Battery in the inverter</div>
-    <div class="bigrow">
-      <span class="big" id="battery">--</span><span class="pct">%</span>
-      <span class="battwhy" id="battwhy"></span>
-    </div>
-    <div class="bar"><i id="battbar"></i></div>
-  </section>
+  <div class="col">
+    <header class="head">
+      <div class="title">The house</div>
+      <div class="clock" id="headclock">--:--</div>
+    </header>
 
-  <section class="strip">
-    <div class="cell" id="voltcell">
-      <div class="k">Voltage</div>
-      <div class="val"><span id="voltage">--</span><span class="u">V</span></div>
-      <div class="note" id="voltnote"></div>
-    </div>
-    <div class="cell" id="tankcell">
-      <div class="k">Water</div>
-      <div class="val"><span id="tank">--</span><span class="u">%</span></div>
-      <div class="note" id="tanknote"></div>
-    </div>
-    <div class="cell">
-      <div class="k">Using</div>
-      <div class="val"><span id="draw">--</span><span class="u">W</span></div>
-      <div class="note" id="drawnote"></div>
-    </div>
-  </section>
+    <main id="readouts">
+      <section class="hero">
+        <div class="eyebrow">The house is running on</div>
+        <div class="source" id="source">…</div>
+        <div class="sourcenote" id="sourcenote">Nothing has come back from the hub yet.</div>
+      </section>
 
-  <h2 class="sec">Around the house</h2>
-  <div class="loads" id="loads"></div>
+      <section class="batt">
+        <div class="k">Battery in the inverter</div>
+        <div class="bigrow">
+          <span class="big" id="battery">--</span><span class="pct">%</span>
+          <span class="battwhy" id="battwhy"></span>
+        </div>
+        <div class="bar"><i id="battbar"></i></div>
+        <div class="battmid">
+        <div class="ring" aria-hidden="true">
+          <svg viewBox="0 0 128 128">
+            <circle class="track" cx="64" cy="64" r="54"></circle>
+            <circle class="fill" id="ringfill" cx="64" cy="64" r="54"></circle>
+          </svg>
+          <div class="ringtext"><span id="ringpct">--</span><i>%</i></div>
+        </div>
+        <div class="ringwhy" id="ringwhy"></div>
+        </div>
+      </section>
 
-  <h2 class="sec">What happened</h2>
-  <ol class="log" id="log"></ol>
-</main>
+      <section class="strip">
+        <div class="cell" id="voltcell">
+          <div class="k">Voltage</div>
+          <div class="val"><span id="voltage">--</span><span class="u">V</span></div>
+          <div class="note" id="voltnote"></div>
+        </div>
+        <div class="cell" id="tankcell">
+          <div class="k">Water</div>
+          <div class="val"><span id="tank">--</span><span class="u">%</span></div>
+          <div class="note" id="tanknote"></div>
+        </div>
+        <div class="cell">
+          <div class="k">Using</div>
+          <div class="val"><span id="draw">--</span><span class="u">W</span></div>
+          <div class="note" id="drawnote"></div>
+        </div>
+      </section>
+
+      <section class="loadscard">
+        <h2 class="sec">Around the house</h2>
+        <div class="loads" id="loads"></div>
+      </section>
+
+      <section class="logcard">
+        <h2 class="sec">What happened</h2>
+        <ol class="log" id="log"></ol>
+      </section>
+    </main>
+  </div>
+</div>
 
 <div id="toast" role="status" aria-live="assertive"></div>
 
@@ -413,6 +565,7 @@ body.stale .load{cursor:not-allowed;}
   'use strict';
 
   var POLL_MS = 1000, STALE_MS = 5000, TIMEOUT_MS = 2500;
+  var RING = 339.292;       // 2 * pi * r, with r = 54 in the svg above
 
   var lastOkAt = null;      // when the last good /state actually arrived
   var triedOnce = false;
@@ -494,16 +647,20 @@ body.stale .load{cursor:not-allowed;}
     document.body.dataset.source = d.source;
     el('source').textContent = SRC_LABEL[d.source] || d.source;
     el('sourcenote').textContent = SRC_NOTE[d.source] || '';
+    el('headclock').textContent = d.clock;
+
+    var pct = Math.max(0, Math.min(100, d.battery));
+    var col = d.battery <= 20 ? 'var(--bad)' : d.battery <= 50 ? 'var(--warn)' : 'var(--ok)';
+    var why = d.source === 'inverter' ? 'draining' : d.source === 'none' ? '' : 'charging';
 
     el('battery').textContent = Math.round(d.battery);
-    el('battwhy').textContent =
-        d.source === 'inverter' ? 'draining'
-      : d.source === 'none'     ? ''
-      :                           'charging';
-    var bb = el('battbar');
-    bb.style.width = Math.max(0, Math.min(100, d.battery)) + '%';
-    bb.style.background = d.battery <= 20 ? 'var(--bad)'
-                        : d.battery <= 50 ? 'var(--warn)' : 'var(--ok)';
+    el('ringpct').textContent = Math.round(d.battery);
+    el('battwhy').textContent = why;
+    el('ringwhy').textContent = why;
+    el('battbar').style.width = pct + '%';
+    el('battbar').style.background = col;
+    el('ringfill').style.strokeDashoffset = RING * (1 - pct / 100);
+    el('ringfill').style.stroke = col;
 
     el('voltage').textContent = Math.round(d.voltage);
     el('voltcell').classList.toggle('alarm', !d.voltage_ok);
