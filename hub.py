@@ -205,198 +205,204 @@ class Hub(BaseHTTPRequestHandler):
 
 # ---------------------------------------------------------------- dashboard
 
-PAGE = """<!doctype html>
+PAGE = r"""<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
-<title>A.D.A. hub</title>
+<title>The house</title>
 <style>
 :root{
-  --bg:#08090b; --panel:#0e1015; --rule:#1c1f26; --sunk:#181c23;
-  --ink:#eef1f5; --dim:#828b98;
-  --ok:#12b76a; --warn:#f79009; --bad:#f04438; --inv:#4a9eff;
-  --src:#828b98;
+  --bg:#14110d;          /* a dim room, not a black screen */
+  --panel:#1b1712;
+  --rule:#2a231b;
+  --sunk:#241e17;
+  --ink:#f2e9dc;         /* warm paper, not clinical white */
+  --dim:#9c8f7f;
+  --ok:#7cb27c;
+  --warn:#dd8b45;
+  --bad:#c8544a;
+  --gold:#d9b25c;
+  --src:#9c8f7f;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,"Times New Roman",serif;
 }
 body[data-source="grid"]{--src:var(--ok);}
 body[data-source="gen"]{--src:var(--warn);}
-body[data-source="inverter"]{--src:var(--inv);}
+body[data-source="inverter"]{--src:var(--gold);}
 body[data-source="none"]{--src:var(--bad);}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{background:var(--bg);}
 body{
-  margin:0 auto; max-width:560px;
+  margin:0 auto; max-width:540px;
   background:var(--bg); color:var(--ink);
-  font:400 16px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font:400 16px/1.4 var(--sans);
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
-  padding-bottom:calc(30px + env(safe-area-inset-bottom));
+  padding-bottom:calc(34px + env(safe-area-inset-bottom));
 }
-.label{font-size:11px; letter-spacing:.14em; color:var(--dim); text-transform:uppercase;}
-.unit{font-size:.40em; color:var(--dim); margin-left:.16em; letter-spacing:.05em; font-weight:600;}
 
-/* --- the liveness bar is the first thing on screen and never hides ------ */
+/* --- how old this is. never hidden, and it speaks in sentences ---------- */
 #statusbar{
   position:sticky; top:0; z-index:20;
-  display:flex; align-items:center; gap:9px;
-  padding:10px 14px; padding-top:calc(10px + env(safe-area-inset-top));
-  background:#0b0d11; border-bottom:1px solid var(--rule);
-  font-size:12px; letter-spacing:.09em; text-transform:uppercase; color:var(--dim);
+  display:flex; align-items:center; gap:10px;
+  padding:12px 18px; padding-top:calc(12px + env(safe-area-inset-top));
+  background:#100d0a; border-bottom:1px solid var(--rule);
+  font:400 13.5px/1.35 var(--serif); color:var(--dim);
 }
-#statusbar .dot{
-  width:8px; height:8px; border-radius:50%; background:var(--ok); flex:none;
-  box-shadow:0 0 0 3px rgba(18,183,106,.16);
-}
+#statusbar .dot{width:7px; height:7px; border-radius:50%; background:var(--ok); flex:none;}
 body.stale #statusbar{
-  background:var(--bad); color:#fff; font-weight:800; font-size:13px;
-  letter-spacing:.05em; border-bottom-color:var(--bad);
+  background:var(--bad); color:#fff5f0; font-size:14.5px;
+  border-bottom-color:var(--bad);
+  padding-top:calc(14px + env(safe-area-inset-top)); padding-bottom:14px;
 }
-body.stale #statusbar .dot{
-  background:#fff; box-shadow:0 0 0 3px rgba(255,255,255,.3);
-  animation:blink 1s steps(1,end) infinite;
-}
-@keyframes blink{50%{opacity:.2}}
+body.stale #statusbar .dot{background:#fff5f0; animation:pulse 1.4s ease-in-out infinite;}
+@keyframes pulse{50%{opacity:.25}}
 
-/* --- stale: the whole readout visibly stops being live ------------------ */
-#readouts{transition:filter .18s linear, opacity .18s linear;}
-body.stale #readouts{filter:grayscale(1) brightness(.5) contrast(.92); opacity:.6;}
+/* --- stale: the readings stop looking like readings --------------------- */
+#readouts{transition:filter .2s linear, opacity .2s linear;}
+body.stale #readouts{filter:grayscale(.92) brightness(.52); opacity:.55;}
 
-/* --- source: the one fact everything else depends on -------------------- */
-.hero{
-  padding:22px 16px 20px 18px;
-  border-left:6px solid var(--src);
-  background:var(--panel);
-  border-bottom:1px solid var(--rule);
+/* --- what the house is running on --------------------------------------- */
+.hero{position:relative; overflow:hidden; padding:26px 18px 23px; border-bottom:1px solid var(--rule);}
+.hero::before{
+  content:""; position:absolute; inset:-50% -30% auto -30%; height:220%;
+  background:radial-gradient(58% 48% at 24% 0%, var(--src), transparent 70%);
+  opacity:.14; pointer-events:none;
 }
+.hero > *{position:relative; z-index:1;}
+.eyebrow{font:400 14.5px var(--serif); color:var(--dim);}
 .source{
-  margin-top:7px; font-size:clamp(40px,13vw,58px); line-height:1;
-  font-weight:800; letter-spacing:-.025em; color:var(--src);
+  margin-top:5px; color:var(--src);
+  font:600 clamp(42px,13.5vw,60px)/1.02 var(--sans); letter-spacing:-.015em;
 }
-.sourcenote{margin-top:8px; color:var(--dim); font-size:13.5px;}
+.sourcenote{margin-top:11px; font:400 15.5px/1.45 var(--serif); color:var(--dim);}
 
-/* --- battery: the other three-second fact ------------------------------- */
-.batt{padding:18px 16px 17px; border-bottom:1px solid var(--rule);}
-.bigrow{display:flex; align-items:baseline; margin-top:3px;}
-.big{font-size:clamp(44px,15vw,64px); line-height:1; font-weight:800; letter-spacing:-.03em;}
-.bar{margin-top:13px; height:12px; background:var(--sunk); border-radius:2px; overflow:hidden;}
-.bar>i{display:block; height:100%; width:0; background:var(--ok); border-radius:2px;
-  transition:width .35s ease, background .25s linear;}
+/* --- the battery --------------------------------------------------------- */
+.batt{padding:20px 18px 19px; border-bottom:1px solid var(--rule);}
+.k{font:400 14.5px var(--serif); color:var(--dim);}
+.bigrow{display:flex; align-items:baseline; margin-top:4px;}
+.big{font:600 clamp(46px,15vw,62px)/1 var(--sans); letter-spacing:-.02em;}
+.pct{margin-left:3px; font-size:22px; font-weight:500; color:var(--dim);}
+.battwhy{margin-left:auto; font:400 15px var(--serif); color:var(--dim);}
+.bar{margin-top:15px; height:9px; background:var(--sunk); border-radius:5px; overflow:hidden;}
+.bar > i{
+  display:block; height:100%; width:0; border-radius:5px; background:var(--ok);
+  transition:width .4s ease, background .3s linear;
+}
 
-/* --- voltage / tank / draw --------------------------------------------- */
-.strip{display:grid; grid-template-columns:repeat(3,1fr); border-bottom:1px solid var(--rule);}
-.cell{padding:14px 12px 15px; border-right:1px solid var(--rule);}
-.cell:last-child{border-right:0;}
-.val{margin-top:6px; font-size:26px; font-weight:700; line-height:1.05;}
-.note{margin-top:7px; min-height:15px; font-size:10.5px; letter-spacing:.08em;
-  text-transform:uppercase; color:var(--dim);}
+/* --- voltage, water, draw ------------------------------------------------ */
+.strip{
+  display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
+  padding:19px 18px 20px; border-bottom:1px solid var(--rule);
+}
+.cell .val{margin-top:5px; font:600 25px/1.05 var(--sans);}
+.cell .u{margin-left:2px; font-size:14px; font-weight:500; color:var(--dim);}
+.cell .note{margin-top:6px; min-height:17px; font:400 13px/1.3 var(--serif); color:var(--dim);}
 .cell.alarm .val, .cell.alarm .note{color:var(--bad);}
 .cell.warn .val, .cell.warn .note{color:var(--warn);}
-.minibar{height:5px; background:var(--sunk); border-radius:2px; overflow:hidden; margin-top:3px;}
-.minibar>i{display:block; height:100%; width:0; background:var(--inv); transition:width .35s ease;}
 
-.sec{margin:0; padding:17px 16px 9px; font-size:11px; letter-spacing:.16em;
-  color:var(--dim); text-transform:uppercase; font-weight:600;}
+.sec{margin:0; padding:23px 18px 9px; font:400 15.5px var(--serif); color:var(--dim);}
 
-/* --- loads -------------------------------------------------------------- */
-.loads{
-  display:grid; grid-template-columns:1fr 1fr; gap:1px;
-  background:var(--rule); border-top:1px solid var(--rule); border-bottom:1px solid var(--rule);
-}
+/* --- the switches, as a list rather than a wall of tiles ----------------- */
+.loads{border-top:1px solid var(--rule);}
 .load{
-  appearance:none; -webkit-appearance:none; border:0; margin:0; font:inherit;
-  text-align:left; cursor:pointer; color:var(--ink); background:var(--panel);
-  padding:13px 13px 12px; min-height:78px;
-  display:grid; grid-template-columns:1fr auto;
-  grid-template-areas:"n s" "w s"; align-items:center; gap:3px 8px;
-  border-left:4px solid #262b33;
-  transition:border-color .18s linear;
+  display:flex; align-items:center; gap:14px; width:100%;
+  appearance:none; -webkit-appearance:none; border:0; margin:0;
+  background:transparent; color:var(--ink); font:inherit; text-align:left;
+  padding:15px 18px; min-height:62px; cursor:pointer;
+  border-bottom:1px solid var(--rule);
 }
-.load .lname{grid-area:n; font-size:15.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;}
-.load .lwatts{grid-area:w; font-size:11.5px; color:var(--dim); letter-spacing:.05em;}
-.load .lstate{grid-area:s; font-size:11px; font-weight:800; letter-spacing:.12em; color:var(--dim);}
-.load[aria-pressed="true"]{border-left-color:var(--ok);}
+.load .lamp{
+  width:10px; height:10px; border-radius:50%; flex:none; background:#3b3128;
+  transition:background .2s linear, box-shadow .2s linear;
+}
+.load[aria-pressed="true"] .lamp{background:var(--ok); box-shadow:0 0 11px rgba(124,178,124,.55);}
+.load .lname{flex:1; font-size:16.5px; font-weight:500;}
+.load .lwatts{font:400 13.5px var(--serif); color:var(--dim);}
+.load .lstate{width:36px; text-align:right; font-size:13.5px; font-weight:600; color:var(--dim);}
 .load[aria-pressed="true"] .lstate{color:var(--ok);}
-.load.pending{opacity:.5;}
-.load:active{background:#151920;}
+.load:active{background:var(--panel);}
+.load.pending{opacity:.45;}
 body.stale .load{cursor:not-allowed;}
 
-/* --- event log ---------------------------------------------------------- */
+/* --- what happened ------------------------------------------------------- */
 .log{list-style:none; margin:0; padding:0;}
 .log li{
-  display:grid; grid-template-columns:auto 1fr; gap:11px;
-  padding:9px 16px; border-bottom:1px solid #14171d; font-size:13px;
+  display:grid; grid-template-columns:auto 1fr; gap:13px;
+  padding:11px 18px; border-bottom:1px solid var(--rule);
 }
-.log time{
-  color:var(--dim); font-size:12.5px;
-  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
-}
-.log .what{font-weight:600;}
-.log .why{color:var(--dim); margin-left:.5em;}
-.log li.alert .what{color:var(--warn);}
-.log li.empty{color:var(--dim); grid-template-columns:1fr;}
+.log time{font:400 13.5px/1.5 var(--sans); color:var(--dim);}
+.log .line{font-size:15px; line-height:1.45;}
+.log .st{font-weight:600;}
+.log .st.on{color:var(--ok);}
+.log .why{display:block; margin-top:1px; font:400 14px/1.4 var(--serif); color:var(--dim);}
+.log li.alert .subj{color:var(--warn);}
+.log li.empty{grid-template-columns:1fr; font:400 15px var(--serif); color:var(--dim);}
 
-/* --- refusals ----------------------------------------------------------- */
+/* --- when a tap cannot be delivered -------------------------------------- */
 #toast{
-  position:fixed; left:50%; bottom:calc(18px + env(safe-area-inset-bottom));
-  transform:translate(-50%,14px); z-index:40;
-  width:max-content; max-width:min(520px,calc(100% - 24px));
-  padding:12px 16px; border-radius:3px; text-align:center;
-  background:var(--bad); color:#fff; line-height:1.32;
-  font-size:12.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase;
-  box-shadow:0 10px 30px rgba(0,0,0,.55);
-  opacity:0; pointer-events:none; transition:opacity .16s, transform .16s;
+  position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom));
+  transform:translate(-50%,12px); z-index:40;
+  width:max-content; max-width:min(460px,calc(100% - 28px));
+  padding:14px 19px; border-radius:11px; text-align:center;
+  background:var(--bad); color:#fff6f3;
+  font:400 15px/1.4 var(--serif);
+  box-shadow:0 12px 34px rgba(0,0,0,.6);
+  opacity:0; pointer-events:none; transition:opacity .18s, transform .18s;
 }
 #toast.show{opacity:1; transform:translate(-50%,0);}
-#toast.rules{background:var(--warn); color:#1b1200;}
+#toast.rules{background:var(--gold); color:#241a08;}
 
-@media (prefers-reduced-motion:reduce){
-  *{transition:none !important; animation:none !important;}
-}
+@media (prefers-reduced-motion:reduce){*{transition:none !important; animation:none !important;}}
 </style>
 </head>
 <body class="stale">
 
 <div id="statusbar" role="status" aria-live="polite">
-  <span class="dot"></span><span id="statusmsg">Connecting&hellip;</span>
+  <span class="dot"></span><span id="statusmsg">Trying to reach the hub…</span>
 </div>
 
 <main id="readouts">
   <section class="hero">
-    <div class="label">Running on</div>
-    <div class="source" id="source">&mdash;</div>
-    <div class="sourcenote" id="sourcenote">waiting for the hub</div>
+    <div class="eyebrow">The house is running on</div>
+    <div class="source" id="source">…</div>
+    <div class="sourcenote" id="sourcenote">Nothing has come back from the hub yet.</div>
   </section>
 
   <section class="batt">
-    <div class="label">Inverter battery</div>
-    <div class="bigrow"><span class="big" id="battery">--</span><span class="unit">%</span></div>
+    <div class="k">Battery in the inverter</div>
+    <div class="bigrow">
+      <span class="big" id="battery">--</span><span class="pct">%</span>
+      <span class="battwhy" id="battwhy"></span>
+    </div>
     <div class="bar"><i id="battbar"></i></div>
   </section>
 
   <section class="strip">
     <div class="cell" id="voltcell">
-      <div class="label">Voltage</div>
-      <div class="val"><span id="voltage">--</span><span class="unit">V</span></div>
+      <div class="k">Voltage</div>
+      <div class="val"><span id="voltage">--</span><span class="u">V</span></div>
       <div class="note" id="voltnote"></div>
     </div>
     <div class="cell" id="tankcell">
-      <div class="label">Tank</div>
-      <div class="val"><span id="tank">--</span><span class="unit">%</span></div>
-      <div class="note"><div class="minibar"><i id="tankbar"></i></div></div>
+      <div class="k">Water</div>
+      <div class="val"><span id="tank">--</span><span class="u">%</span></div>
+      <div class="note" id="tanknote"></div>
     </div>
     <div class="cell">
-      <div class="label">Draw</div>
-      <div class="val"><span id="draw">--</span><span class="unit">W</span></div>
+      <div class="k">Using</div>
+      <div class="val"><span id="draw">--</span><span class="u">W</span></div>
       <div class="note" id="drawnote"></div>
     </div>
   </section>
 
-  <h2 class="sec">Loads</h2>
+  <h2 class="sec">Around the house</h2>
   <div class="loads" id="loads"></div>
 
-  <h2 class="sec">Event log</h2>
+  <h2 class="sec">What happened</h2>
   <ol class="log" id="log"></ol>
 </main>
 
@@ -416,39 +422,55 @@ body.stale .load{cursor:not-allowed;}
   var logSig = '';
   var inflight = false, timer = null, toastTimer = null;
 
-  var SRC_LABEL = {grid:'GRID', gen:'GENERATOR', inverter:'INVERTER', none:'NO POWER'};
+  var SRC_LABEL = {grid:'Grid', gen:'Generator', inverter:'Inverter', none:'No power'};
   var SRC_NOTE = {
-    grid:'NEPA is on \\u2014 battery charging',
-    gen:'generator running \\u2014 burning fuel',
-    inverter:'on battery \\u2014 heavy loads shed',
-    none:'nothing is powering the house'
+    grid:'NEPA is on, and the battery is charging.',
+    gen:'The generator is running, and burning fuel.',
+    inverter:'On battery. The heavy loads are already off.',
+    none:'Nothing is powering the house right now.'
   };
+  var NAMES = {tv:'TV'};
   var ALERTY = /SPIKE|ALERT|FLAT|OVERFLOW|TOOK LIGHT|shed|restored/i;
 
   function el(id){ return document.getElementById(id); }
 
+  function nameOf(n){
+    return NAMES[n] || n.charAt(0).toUpperCase() + n.slice(1);
+  }
+
+  /* house_sim shouts its events in caps for a terminal. Same words, read
+     back the way a person would say them. */
+  function spoken(s){
+    var t = s.toLowerCase().replace(/\bnepa\b/g, 'NEPA').replace(/\btv\b/g, 'TV');
+    return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+
   function ago(ms){
     var s = Math.floor(ms / 1000);
-    if (s < 60) return s + 's';
-    return Math.floor(s / 60) + 'm ' + String(s % 60).padStart(2,'0') + 's';
+    if (s < 60) return s + (s === 1 ? ' second' : ' seconds');
+    var m = Math.floor(s / 60);
+    if (m < 60) return m + (m === 1 ? ' minute' : ' minutes');
+    var h = Math.floor(m / 60);
+    return h + (h === 1 ? ' hour' : ' hours');
   }
 
   function isStale(){
     return lastOkAt === null || (Date.now() - lastOkAt) > STALE_MS;
   }
 
-  /* The freshness clock runs independently of the poll, so the display goes
-     stale on time even when no response is coming back at all. */
+  /* Runs on its own clock, not the poll's, so the page still ages correctly
+     when nothing is coming back at all. */
   function freshness(){
     var stale = isStale();
     document.body.classList.toggle('stale', stale);
     var msg;
     if (lastOkAt === null) {
-      msg = triedOnce ? 'No connection \\u2014 never reached the hub' : 'Connecting\\u2026';
+      msg = triedOnce ? 'Can’t reach the hub. Nothing has loaded yet.'
+                      : 'Trying to reach the hub…';
     } else if (stale) {
-      msg = 'Not live \\u2014 data is ' + ago(Date.now() - lastOkAt) + ' old';
+      msg = 'Not live. This is the house as it was ' + ago(Date.now() - lastOkAt) + ' ago.';
     } else {
-      msg = 'Live \\u00b7 house clock ' + (last ? last.clock : '--:--');
+      msg = 'Live · ' + (last ? last.clock : '--:--') + ' in the house';
     }
     el('statusmsg').textContent = msg;
   }
@@ -458,7 +480,7 @@ body.stale .load{cursor:not-allowed;}
     t.textContent = text;
     t.className = 'show' + (kind ? ' ' + kind : '');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function(){ t.className = ''; }, 3600);
+    toastTimer = setTimeout(function(){ t.className = ''; }, 4200);
   }
 
   function accept(data){
@@ -470,34 +492,41 @@ body.stale .load{cursor:not-allowed;}
 
   function render(d){
     document.body.dataset.source = d.source;
-    el('source').textContent = SRC_LABEL[d.source] || d.source.toUpperCase();
+    el('source').textContent = SRC_LABEL[d.source] || d.source;
     el('sourcenote').textContent = SRC_NOTE[d.source] || '';
 
     el('battery').textContent = Math.round(d.battery);
+    el('battwhy').textContent =
+        d.source === 'inverter' ? 'draining'
+      : d.source === 'none'     ? ''
+      :                           'charging';
     var bb = el('battbar');
     bb.style.width = Math.max(0, Math.min(100, d.battery)) + '%';
     bb.style.background = d.battery <= 20 ? 'var(--bad)'
                         : d.battery <= 50 ? 'var(--warn)' : 'var(--ok)';
 
     el('voltage').textContent = Math.round(d.voltage);
-    var vc = el('voltcell');
-    vc.classList.toggle('alarm', !d.voltage_ok);
+    el('voltcell').classList.toggle('alarm', !d.voltage_ok);
     el('voltnote').textContent =
-        d.source === 'none' ? 'no supply'
-      : d.voltage_ok        ? 'safe 200\\u2013260'
-      : d.voltage > 260     ? 'spike \\u2014 over range'
-      :                       'under range';
+        d.source === 'none' ? 'nothing coming in'
+      : d.voltage_ok        ? 'steady'
+      : d.voltage > 260     ? 'too high, sensitive things cut'
+      :                       'too low to be much use';
 
     el('tank').textContent = Math.round(d.tank);
-    el('tankbar').style.width = Math.max(0, Math.min(100, d.tank)) + '%';
     var tc = el('tankcell');
     tc.classList.toggle('alarm', d.tank >= 115 || d.tank <= 20);
     tc.classList.toggle('warn', d.tank < 115 && d.tank >= 100);
+    el('tanknote').textContent =
+        d.tank >= 115 ? 'overflowing'
+      : d.tank >= 100 ? 'full'
+      : d.tank <= 20  ? 'low, the pump should run'
+      :                 '';
 
     el('draw').textContent = d.draw;
     var on = 0;
     for (var i = 0; i < d.loads.length; i++) if (d.loads[i].on) on++;
-    el('drawnote').textContent = on + ' of ' + d.loads.length + ' on';
+    el('drawnote').textContent = on + ' of ' + d.loads.length + ' switched on';
 
     renderLoads(d.loads);
     renderLog(d.events);
@@ -514,12 +543,12 @@ body.stale .load{cursor:not-allowed;}
         b.type = 'button';
         b.className = 'load';
         b.dataset.name = l.name;
-        ['lname','lwatts','lstate'].forEach(function(cls){
+        ['lamp','lname','lwatts','lstate'].forEach(function(cls){
           var s = document.createElement('span');
           s.className = cls;
           b.appendChild(s);
         });
-        b.querySelector('.lname').textContent = l.name;
+        b.querySelector('.lname').textContent = nameOf(l.name);
         b.querySelector('.lwatts').textContent = l.watts + ' W';
         b.addEventListener('click', function(){ toggle(l.name); });
         wrap.appendChild(b);
@@ -530,11 +559,10 @@ body.stale .load{cursor:not-allowed;}
       if (!b) return;
       b.setAttribute('aria-pressed', l.on ? 'true' : 'false');
       b.classList.toggle('pending', !!pending[l.name]);
-      b.querySelector('.lstate').textContent =
-        pending[l.name] ? '\\u2026' : (l.on ? 'ON' : 'OFF');
+      b.querySelector('.lstate').textContent = pending[l.name] ? '…' : (l.on ? 'on' : 'off');
       b.setAttribute('aria-label',
-        l.name + ', ' + l.watts + ' watts, currently ' + (l.on ? 'on' : 'off') +
-        ', tap to turn ' + (l.on ? 'off' : 'on'));
+        nameOf(l.name) + ', ' + l.watts + ' watts, currently ' + (l.on ? 'on' : 'off') +
+        '. Tap to switch it ' + (l.on ? 'off' : 'on') + '.');
     });
   }
 
@@ -550,28 +578,42 @@ body.stale .load{cursor:not-allowed;}
     if (!events.length) {
       var empty = document.createElement('li');
       empty.className = 'empty';
-      empty.textContent = 'nothing has happened yet';
+      empty.textContent = 'Nothing yet.';
       ol.appendChild(empty);
       return;
     }
     events.forEach(function(e){
       var li = document.createElement('li');
       if (ALERTY.test(e.what + ' ' + e.why)) li.className = 'alert';
+
       var t = document.createElement('time');
       t.textContent = e.time;
-      var body = document.createElement('span');
-      var what = document.createElement('span');
-      what.className = 'what';
-      what.textContent = e.what;
-      body.appendChild(what);
+
+      var line = document.createElement('div');
+      line.className = 'line';
+      var m = /^(ON|OFF)\s+(\S+)$/.exec(e.what);
+      var subj = document.createElement('span');
+      subj.className = 'subj';
+      if (m) {
+        subj.textContent = nameOf(m[2]) + ' ';
+        line.appendChild(subj);
+        var st = document.createElement('span');
+        st.className = 'st' + (m[1] === 'ON' ? ' on' : '');
+        st.textContent = m[1].toLowerCase();
+        line.appendChild(st);
+      } else {
+        subj.textContent = spoken(e.what);
+        line.appendChild(subj);
+      }
       if (e.why) {
         var why = document.createElement('span');
         why.className = 'why';
         why.textContent = e.why;
-        body.appendChild(why);
+        line.appendChild(why);
       }
+
       li.appendChild(t);
-      li.appendChild(body);
+      li.appendChild(line);
       ol.appendChild(li);
     });
   }
@@ -593,8 +635,8 @@ body.stale .load{cursor:not-allowed;}
       })
       .then(accept)
       .catch(function(){
-        /* Deliberately leaves lastOkAt alone. The old numbers stay on screen
-           but the freshness clock keeps counting, so they get marked stale
+        /* Deliberately leaves lastOkAt alone. The old numbers stay on screen,
+           but the clock above keeps counting, so they get marked as old
            rather than passed off as current. */
       })
       .then(function(){
@@ -608,8 +650,9 @@ body.stale .load{cursor:not-allowed;}
 
   function toggle(name){
     if (!last) return;
+    var nm = nameOf(name);
     if (isStale()) {
-      toast('Can\\u2019t reach the hub \\u2014 ' + name + ' not switched');
+      toast('Can’t reach the hub. The ' + nm.toLowerCase() + ' did not move.');
       return;
     }
     var current = null;
@@ -636,13 +679,16 @@ body.stale .load{cursor:not-allowed;}
         delete pending[name];
         accept(d);
         if (d.overridden) {
-          toast('Rules overrode \\u2014 ' + name + ' is ' + (d.actual ? 'on' : 'off'), 'rules');
+          var why = d.events.length ? d.events[0].why : '';
+          toast('The rules put the ' + nm.toLowerCase() + ' back ' +
+                (d.actual ? 'on' : 'off') + (why ? ' (' + why + ').' : '.'), 'rules');
         }
       })
       .catch(function(){
         delete pending[name];
-        /* Never queued, never applied optimistically: say so plainly. */
-        toast('Not sent \\u2014 hub unreachable \\u00b7 ' + name + ' unchanged');
+        /* Never queued, never guessed at: say plainly that it did not land. */
+        toast('That did not get through. The ' + nm.toLowerCase() +
+              ' is still ' + (current ? 'on' : 'off') + '.');
         if (last) renderLoads(last.loads);
         freshness();
       })
