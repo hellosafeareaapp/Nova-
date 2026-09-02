@@ -287,73 +287,119 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 /* --- the presence, and the battery -------------------------------------- */
 .batt{padding:20px 18px 19px; border-bottom:1px solid var(--rule);}
 .k{font:400 14.5px var(--serif); color:var(--dim);}
-.battmid{
-  display:grid; grid-template-columns:auto minmax(0,1fr);
-  align-items:center; gap:9px 16px; margin-top:9px;
-}
-.figure{grid-row:span 2; width:64px; height:64px;}
+.battmid{margin-top:10px;}
+.adacard{padding:20px 18px; display:flex; align-items:center; justify-content:center;
+  border-bottom:1px solid var(--rule);}
+.figure{width:152px; height:152px;}
 .figsvg{width:100%; height:100%; display:block; overflow:visible;}
 
+/* Three nested groups so posture, idle motion and the flinch never fight over
+   one transform: .jolt reacts, .posture holds the state, .sway keeps moving. */
 .pulse{
-  fill:none; stroke:var(--src); stroke-width:1.4; opacity:0;
+  fill:none; stroke:var(--src); stroke-width:1.3; opacity:0;
   transform-box:fill-box; transform-origin:center;
   animation:pulsering var(--pulse,3.4s) ease-out infinite;
 }
 @keyframes pulsering{
-  0%{transform:scale(.82); opacity:.45;}
-  75%{transform:scale(1.22); opacity:0;}
-  100%{transform:scale(1.22); opacity:0;}
+  0%{transform:scale(.8); opacity:.4;}
+  75%{transform:scale(1.2); opacity:0;}
+  100%{transform:scale(1.2); opacity:0;}
 }
-.fig{transform-box:fill-box; transform-origin:center; animation:breathe var(--breathe,3.8s) ease-in-out infinite;}
-@keyframes breathe{0%,100%{transform:translateY(0);}50%{transform:translateY(-2.2px);}}
-@keyframes breathesmall{0%,100%{transform:translateY(0);}50%{transform:translateY(-1px);}}
-.shell{fill:var(--sunk); stroke:var(--src); stroke-width:1.8; transition:stroke 600ms linear;}
-.visor{fill:var(--tint); transition:fill 600ms linear;}
-.eyes{transform-box:fill-box; transform-origin:center; animation:blink var(--blink,6.5s) infinite;}
+.jolt{transform-box:fill-box; transform-origin:50% 90%;}
+.posture{transform-box:fill-box; transform-origin:50% 92%;
+  transition:transform .5s cubic-bezier(.2,.7,.3,1);}
+.sway{transform-box:fill-box; transform-origin:50% 92%;
+  animation:sway var(--sway,4.4s) ease-in-out infinite;}
+@keyframes sway{
+  0%,100%{transform:rotate(-1.5deg) translateY(0);}
+  50%{transform:rotate(1.5deg) translateY(-2px);}
+}
+@keyframes swaytiny{        /* conserving: still, but never stopped */
+  0%,100%{transform:rotate(-.35deg) translateY(0);}
+  50%{transform:rotate(.35deg) translateY(-.6px);}
+}
+@keyframes fidget{          /* restless */
+  0%,100%{transform:translateX(0) rotate(0);}
+  18%{transform:translateX(-1.7px) rotate(-1deg);}
+  42%{transform:translateX(1.9px) rotate(1.2deg);}
+  63%{transform:translateX(-1.2px) rotate(-.7deg);}
+  81%{transform:translateX(1px) rotate(.5deg);}
+}
+@keyframes jolt{
+  0%{transform:translateY(0) scale(1);}
+  4%{transform:translateY(3px) scale(.96);}
+  14%{transform:translateY(-9px) scale(1.12);}
+  28%{transform:translateY(3px) scale(.96);}
+  52%{transform:translateY(-3px) scale(1.03);}
+  76%{transform:translateY(1px) scale(.99);}
+  100%{transform:translateY(0) scale(1);}
+}
+
+.head{fill:var(--sunk); stroke:var(--src); stroke-width:2.2; transition:stroke 600ms linear;}
+.gaze{transform-box:fill-box; transform-origin:center;
+  animation:glance var(--glance,9s) ease-in-out infinite;}
+@keyframes glance{
+  0%,34%{transform:translateX(0);}
+  44%,62%{transform:translateX(2.6px);}
+  72%,88%{transform:translateX(-1.8px);}
+  96%,100%{transform:translateX(0);}
+}
+.eyes{transform-box:fill-box; transform-origin:center; animation:blink var(--blink,6.2s) infinite;}
 /* two blinks a cycle, unevenly spaced, so it never reads as a metronome */
 @keyframes blink{
   0%,39%,43%,71%,75%,100%{transform:scaleY(1);}
-  41%,73%{transform:scaleY(.08);}
+  41%,73%{transform:scaleY(.05);}
 }
-.eye{fill:var(--src); transform-box:fill-box; transform-origin:center;
+.ball{fill:var(--src); transform-box:fill-box; transform-origin:center;
+  transform:scale(var(--ball,1));
   transition:transform .35s ease, fill 600ms linear;}
-.brow{stroke:var(--src); stroke-width:2.2; stroke-linecap:round; fill:none;
+/* The lid is head-coloured and slides down over the eye, so the eye changes
+   shape -- round, half-moon, slit -- instead of only moving. */
+.lid{fill:var(--sunk); transform:translateY(var(--lid,2px));
+  transition:transform .35s ease, fill 600ms linear;}
+.brow{stroke:var(--src); stroke-width:2.6; stroke-linecap:round; fill:none;
   transform-box:fill-box; transform-origin:center;
   transition:transform .35s ease, stroke 600ms linear;}
-.base{stroke:var(--src); stroke-width:2; stroke-linecap:round; opacity:.32;
+.mouth{stroke:var(--src); stroke-width:2.8; stroke-linecap:round; fill:none;
+  transform-box:fill-box; transform-origin:center;
+  transform:var(--mouth, scaleY(.5));
+  transition:transform .4s ease, stroke 600ms linear, opacity .4s linear;}
+.base{stroke:var(--src); stroke-width:2.2; stroke-linecap:round; opacity:.3;
   transition:stroke 600ms linear;}
 
-/* Calm on grid: slow idle, brows level. */
-.figure{--breathe:3.8s; --blink:6.5s;}
-/* Alert on generator: faster idle, brows up, a little tension. */
-.figure.alert{--breathe:2s; --blink:3.4s;}
-.figure.alert .browL{transform:rotate(7deg) translateY(-1px);}
-.figure.alert .browR{transform:rotate(-7deg) translateY(-1px);}
-/* Still on inverter: dimmed, doing less on purpose. */
-.figure.still{--breathe:6.5s; --blink:10s; opacity:.55;}
-.figure.still .fig{animation-name:breathesmall;}
-.figure.still .eye{transform:scaleY(.55);}
-.figure.still .brow{transform:translateY(1.5px);}
-/* Worried: battery nearly gone, or nothing powering the house at all. */
-.figure.worried{--breathe:1.7s; --blink:2.6s; --src:var(--bad);}
-.figure.worried .browL{transform:rotate(-13deg) translateY(-1px);}
-.figure.worried .browR{transform:rotate(13deg) translateY(-1px);}
-.figure.worried .eye{transform:scaleY(.72);}
-/* A spike just hit: sharp reaction, then back to whatever it was doing. */
-.figure.startle .fig{animation:startle .6s ease-out;}
-.figure.startle .browL{transform:rotate(15deg) translateY(-2.5px);}
-.figure.startle .browR{transform:rotate(-15deg) translateY(-2.5px);}
-@keyframes startle{
-  0%{transform:translateY(0) scale(1);}
-  16%{transform:translateY(-5px) scale(1.07);}
-  100%{transform:translateY(0) scale(1);}
+/* Grid: relaxed. Slow blink, gentle sway, mouth level. */
+.figure{--sway:4.4s; --blink:6.2s; --glance:9s; --lid:2px; --ball:1; --mouth:scaleY(.5);}
+/* Generator: alert. Eyes wide, brows up, quicker, mouth tight. */
+.figure.alert{--sway:1.6s; --blink:3s; --glance:3.4s; --lid:0px; --ball:1.2; --mouth:scaleY(.16) scaleX(.7);}
+.figure.alert .posture{transform:translateY(-3px) scaleY(1.04);}
+.figure.alert .browL{transform:rotate(7deg) translateY(-4px);}
+.figure.alert .browR{transform:rotate(-7deg) translateY(-4px);}
+/* Inverter: conserving. Half-lidded, slumped, dim, barely moving. */
+.figure.still{--sway:8.5s; --blink:11s; --glance:22s; --lid:9.5px; --ball:1;
+  --mouth:scaleY(.1) scaleX(.45); opacity:.5;}
+.figure.still .sway{animation-name:swaytiny;}
+.figure.still .posture{transform:translateY(5px) scaleY(.94);}
+.figure.still .brow{transform:translateY(3px);}
+.figure.still .mouth{opacity:.6;}
+/* Battery nearly gone, or nothing powering the house: tense and restless. */
+.figure.worried{--sway:1.1s; --blink:2.2s; --glance:2.1s; --lid:0px; --ball:1.14;
+  --mouth:rotate(180deg) scaleY(1.05); --src:var(--bad);}
+.figure.worried .sway{animation-name:fidget;}
+.figure.worried .posture{transform:rotate(2.5deg) translateY(1px);}
+.figure.worried .browL{transform:rotate(-16deg) translateY(-3px);}
+.figure.worried .browR{transform:rotate(16deg) translateY(-3px);}
+/* A spike just hit: flinch, then settle back over a couple of seconds. */
+.figure.startle{--lid:0px; --ball:1.24; --mouth:rotate(180deg) scaleY(1.4) scaleX(.68);}
+.figure.startle .jolt{animation:jolt 1.8s cubic-bezier(.2,.8,.3,1);}
+.figure.startle .browL{transform:rotate(4deg) translateY(-8px);}
+.figure.startle .browR{transform:rotate(-4deg) translateY(-8px);}
 }
 
 .battrow{display:flex; align-items:flex-end; gap:0;}
 .big{font:600 clamp(44px,14vw,58px)/1 var(--sans); letter-spacing:-.01em;}
 .pct{margin-left:3px; padding-bottom:.14em; font-size:21px; font-weight:500; color:var(--dim);}
 .battwhy{margin-left:auto; padding-bottom:.35em; font:400 15px var(--serif); color:var(--dim);}
-.bar{height:9px; background:var(--sunk); border-radius:5px; overflow:hidden;}
+.bar{margin-top:14px; height:9px; background:var(--sunk); border-radius:5px; overflow:hidden;}
 .bar > i{display:block; height:100%; width:0; border-radius:5px; background:var(--ok);
   transition:width .4s ease, background .3s linear;}
 .ring, .ringwhy{display:none;}
@@ -470,12 +516,13 @@ body.stale .load{cursor:not-allowed;}
 
   #readouts{
     display:grid; gap:16px; padding:0 30px 30px;
-    grid-template-columns:1.32fr 1fr 1.12fr;
-    grid-template-rows:1fr auto auto;
+    grid-template-columns:1.2fr .78fr .92fr;
+    grid-template-rows:1fr auto auto auto;
     grid-template-areas:
-      "source battery log"
-      "reads  battery log"
-      "loads  loads   loads";
+      "source ada battery"
+      "reads  ada battery"
+      "log    log log"
+      "loads  loads loads";
   }
   #readouts > section{background:var(--panel); border:1px solid var(--rule); border-radius:16px;}
 
@@ -489,7 +536,8 @@ body.stale .load{cursor:not-allowed;}
 
   .batt{grid-area:battery; padding:20px 22px 24px; display:flex; flex-direction:column;}
   .battmid{display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0;}
-  .figure{grid-row:auto; width:96px; height:96px; margin-bottom:20px;}
+  .adacard{grid-area:ada; padding:20px;}
+  .figure{width:190px; height:190px;}
   .battrow, .bar{display:none;}
   .ring{display:block; position:relative; width:172px; height:172px;}
   .ring svg{width:100%; height:100%; transform:rotate(-90deg); display:block;}
@@ -534,6 +582,16 @@ body.stale .load{cursor:not-allowed;}
   .load.mid{min-height:106px;}
   .load.light{min-height:96px;}
 }
+@media (min-width:1320px){
+  #readouts{
+    grid-template-columns:1.15fr .72fr .8fr 1.05fr;
+    grid-template-rows:1fr auto auto;
+    grid-template-areas:
+      "source ada battery log"
+      "reads  ada battery log"
+      "loads  loads loads  loads";
+  }
+}
 @media (min-width:1366px){
   .loads{grid-template-columns:repeat(8,minmax(0,1fr));}
 }
@@ -572,25 +630,35 @@ body.stale .load{cursor:not-allowed;}
         <div class="sourcenote" id="sourcenote">Nothing has come back from the hub yet.</div>
       </section>
 
+      <section class="adacard">
+        <div class="figure" id="figure" aria-hidden="true">
+          <svg class="figsvg" viewBox="0 0 100 100">
+            <defs><clipPath id="headclip">
+              <rect x="17" y="15" width="66" height="64" rx="20"></rect>
+            </clipPath></defs>
+            <circle class="pulse" cx="50" cy="50" r="42"></circle>
+            <g class="jolt"><g class="posture"><g class="sway">
+              <rect class="head" x="16" y="14" width="68" height="66" rx="21"></rect>
+              <g clip-path="url(#headclip)">
+                <g class="gaze"><g class="eyes">
+                  <circle class="ball" cx="37" cy="44" r="9.5"></circle>
+                  <circle class="ball" cx="63" cy="44" r="9.5"></circle>
+                </g></g>
+                <rect class="lid" x="24" y="8" width="26" height="26.5"></rect>
+                <rect class="lid" x="50" y="8" width="26" height="26.5"></rect>
+              </g>
+              <path class="brow browL" d="M27 27 L46 27"></path>
+              <path class="brow browR" d="M54 27 L73 27"></path>
+              <path class="mouth" d="M38 64 Q50 70 62 64"></path>
+              <path class="base" d="M37 89 L63 89"></path>
+            </g></g></g>
+          </svg>
+        </div>
+      </section>
+
       <section class="batt">
         <div class="k">Battery in the inverter</div>
         <div class="battmid">
-          <div class="figure" id="figure" aria-hidden="true">
-            <svg class="figsvg" viewBox="0 0 100 100">
-              <circle class="pulse" cx="50" cy="50" r="31"></circle>
-              <g class="fig">
-                <rect class="shell" x="22" y="20" width="56" height="56" rx="17"></rect>
-                <rect class="visor" x="31" y="40" width="38" height="16" rx="8"></rect>
-                <g class="eyes">
-                  <rect class="eye" x="38.5" y="42" width="7" height="12" rx="3.5"></rect>
-                  <rect class="eye" x="54.5" y="42" width="7" height="12" rx="3.5"></rect>
-                </g>
-                <path class="brow browL" d="M34 30 L45 30"></path>
-                <path class="brow browR" d="M55 30 L66 30"></path>
-                <path class="base" d="M40 83 L60 83"></path>
-              </g>
-            </svg>
-          </div>
           <div class="battrow">
             <span class="big digits" id="battdigits"></span><span class="pct" aria-hidden="true">%</span>
             <span class="battwhy" id="battwhy"></span>
