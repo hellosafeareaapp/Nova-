@@ -206,50 +206,54 @@ class Hub(BaseHTTPRequestHandler):
 # ---------------------------------------------------------------- dashboard
 
 PAGE = r"""<!doctype html>
-<html lang="en">
+<html lang="en" data-source="none">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <title>The house</title>
 <style>
+/* The whole screen is tinted by what the house is running on. Only these
+   four blocks change; everything else reads the variables. */
 :root{
-  --bg:#14110d;          /* a dim room, not a black screen */
-  --panel:#1b1712;
-  --rule:#2a231b;
-  --sunk:#241e17;
-  --ink:#f2e9dc;         /* warm paper, not clinical white */
-  --dim:#9c8f7f;
-  --ok:#7cb27c;
-  --warn:#dd8b45;
-  --bad:#c8544a;
-  --gold:#d9b25c;
-  --src:#9c8f7f;
+  --ink:#efeae3; --dim:#9a9188;
+  --ok:#7cb27c; --warn:#dd8b45; --bad:#c8544a;
   --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,"Times New Roman",serif;
+  --tint:#101214; --panel:#171a1d; --rule:#252a2e; --sunk:#1f2429; --src:#a6b7c2;
 }
-body[data-source="grid"]{--src:var(--ok);}
-body[data-source="gen"]{--src:var(--warn);}
-body[data-source="inverter"]{--src:var(--gold);}
-body[data-source="none"]{--src:var(--bad);}
+:root[data-source="grid"]{
+  --tint:#101214; --panel:#171a1d; --rule:#252a2e; --sunk:#1f2429; --src:#a6b7c2;
+}
+:root[data-source="gen"]{
+  --tint:#151007; --panel:#1e1710; --rule:#2e2418; --sunk:#271e13; --src:#e0913f;
+}
+:root[data-source="inverter"]{
+  --tint:#0a0e16; --panel:#111621; --rule:#1d2534; --sunk:#18202d; --src:#5b9bd8;
+}
+:root[data-source="none"]{
+  --tint:#170b0a; --panel:#211110; --rule:#331b19; --sunk:#2b1615; --src:#d1554a;
+}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html{background:var(--bg);}
+html{background:var(--tint); transition:background-color 600ms linear;}
 body{
   margin:0 auto; max-width:540px;
-  background:var(--bg); color:var(--ink);
+  background:var(--tint); color:var(--ink);
   font:400 16px/1.4 var(--sans);
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
   padding-bottom:calc(34px + env(safe-area-inset-bottom));
+  transition:background-color 600ms linear;
 }
+section, .load, #statusbar, .log li{transition:background-color 600ms linear, border-color 600ms linear;}
 
 /* --- how old this is. never hidden, and it speaks in sentences ---------- */
 #statusbar{
   position:sticky; top:0; z-index:20;
   display:flex; align-items:center; gap:10px;
   padding:12px 18px; padding-top:calc(12px + env(safe-area-inset-top));
-  background:#100d0a; border-bottom:1px solid var(--rule);
+  background:var(--panel); border-bottom:1px solid var(--rule);
   font:400 13.5px/1.35 var(--serif); color:var(--dim);
 }
 #statusbar .dot{width:7px; height:7px; border-radius:50%; background:var(--ok); flex:none;}
@@ -258,44 +262,109 @@ body.stale #statusbar{
   border-bottom-color:var(--bad);
   padding-top:calc(14px + env(safe-area-inset-top)); padding-bottom:14px;
 }
-body.stale #statusbar .dot{background:#fff5f0; animation:pulse 1.4s ease-in-out infinite;}
-@keyframes pulse{50%{opacity:.25}}
+body.stale #statusbar .dot{background:#fff5f0;}
 
 /* --- stale: the readings stop looking like readings --------------------- */
 #readouts{transition:filter .2s linear, opacity .2s linear;}
-body.stale #readouts{filter:grayscale(.92) brightness(.52); opacity:.55;}
+body.stale #readouts{filter:grayscale(.94) brightness(.5); opacity:.55;}
 
-/* the rail and header only exist on wide screens */
+/* Motion is the liveness signal, so when the data stops, every moving thing
+   on the page freezes exactly where it is. Not reset, not hidden: stopped. */
+body.stale *, body.stale *::before, body.stale *::after{animation-play-state:paused !important;}
+
 .rail, .head{display:none;}
 
 /* --- what the house is running on --------------------------------------- */
-.hero{position:relative; overflow:hidden; padding:26px 18px 23px; border-bottom:1px solid var(--rule);}
-.hero::before{
-  content:""; position:absolute; inset:-50% -30% auto -30%; height:220%;
-  background:radial-gradient(58% 48% at 24% 0%, var(--src), transparent 70%);
-  opacity:.14; pointer-events:none;
-}
-.hero > *{position:relative; z-index:1;}
+.hero{padding:26px 18px 23px; border-bottom:1px solid var(--rule);}
 .eyebrow{font:400 14.5px var(--serif); color:var(--dim);}
 .source{
   margin-top:5px; color:var(--src);
-  font:600 clamp(42px,13.5vw,60px)/1.02 var(--sans); letter-spacing:-.015em;
+  font:600 clamp(42px,13.5vw,60px)/1.02 var(--sans); letter-spacing:-.01em;
+  transition:color 600ms linear;
 }
 .sourcenote{margin-top:11px; font:400 15.5px/1.45 var(--serif); color:var(--dim);}
 
-/* --- the battery --------------------------------------------------------- */
+/* --- the presence, and the battery -------------------------------------- */
 .batt{padding:20px 18px 19px; border-bottom:1px solid var(--rule);}
 .k{font:400 14.5px var(--serif); color:var(--dim);}
-.bigrow{display:flex; align-items:baseline; margin-top:4px;}
-.big{font:600 clamp(46px,15vw,62px)/1 var(--sans); letter-spacing:-.02em;}
-.pct{margin-left:3px; font-size:22px; font-weight:500; color:var(--dim);}
-.battwhy{margin-left:auto; font:400 15px var(--serif); color:var(--dim);}
-.bar{margin-top:15px; height:9px; background:var(--sunk); border-radius:5px; overflow:hidden;}
-.bar > i{
-  display:block; height:100%; width:0; border-radius:5px; background:var(--ok);
-  transition:width .4s ease, background .3s linear;
+.battmid{
+  display:grid; grid-template-columns:auto minmax(0,1fr);
+  align-items:center; gap:9px 16px; margin-top:9px;
 }
+.figure{grid-row:span 2; width:64px; height:64px;}
+.figsvg{width:100%; height:100%; display:block; overflow:visible;}
+
+.pulse{
+  fill:none; stroke:var(--src); stroke-width:1.4; opacity:0;
+  transform-box:fill-box; transform-origin:center;
+  animation:pulsering var(--pulse,3.4s) ease-out infinite;
+}
+@keyframes pulsering{
+  0%{transform:scale(.82); opacity:.45;}
+  75%{transform:scale(1.22); opacity:0;}
+  100%{transform:scale(1.22); opacity:0;}
+}
+.fig{transform-box:fill-box; transform-origin:center; animation:breathe var(--breathe,3.8s) ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:translateY(0);}50%{transform:translateY(-2.2px);}}
+@keyframes breathesmall{0%,100%{transform:translateY(0);}50%{transform:translateY(-1px);}}
+.shell{fill:var(--sunk); stroke:var(--src); stroke-width:1.8; transition:stroke 600ms linear;}
+.visor{fill:var(--tint); transition:fill 600ms linear;}
+.eyes{transform-box:fill-box; transform-origin:center; animation:blink var(--blink,6.5s) infinite;}
+/* two blinks a cycle, unevenly spaced, so it never reads as a metronome */
+@keyframes blink{
+  0%,39%,43%,71%,75%,100%{transform:scaleY(1);}
+  41%,73%{transform:scaleY(.08);}
+}
+.eye{fill:var(--src); transform-box:fill-box; transform-origin:center;
+  transition:transform .35s ease, fill 600ms linear;}
+.brow{stroke:var(--src); stroke-width:2.2; stroke-linecap:round; fill:none;
+  transform-box:fill-box; transform-origin:center;
+  transition:transform .35s ease, stroke 600ms linear;}
+.base{stroke:var(--src); stroke-width:2; stroke-linecap:round; opacity:.32;
+  transition:stroke 600ms linear;}
+
+/* Calm on grid: slow idle, brows level. */
+.figure{--breathe:3.8s; --blink:6.5s;}
+/* Alert on generator: faster idle, brows up, a little tension. */
+.figure.alert{--breathe:2s; --blink:3.4s;}
+.figure.alert .browL{transform:rotate(7deg) translateY(-1px);}
+.figure.alert .browR{transform:rotate(-7deg) translateY(-1px);}
+/* Still on inverter: dimmed, doing less on purpose. */
+.figure.still{--breathe:6.5s; --blink:10s; opacity:.55;}
+.figure.still .fig{animation-name:breathesmall;}
+.figure.still .eye{transform:scaleY(.55);}
+.figure.still .brow{transform:translateY(1.5px);}
+/* Worried: battery nearly gone, or nothing powering the house at all. */
+.figure.worried{--breathe:1.7s; --blink:2.6s; --src:var(--bad);}
+.figure.worried .browL{transform:rotate(-13deg) translateY(-1px);}
+.figure.worried .browR{transform:rotate(13deg) translateY(-1px);}
+.figure.worried .eye{transform:scaleY(.72);}
+/* A spike just hit: sharp reaction, then back to whatever it was doing. */
+.figure.startle .fig{animation:startle .6s ease-out;}
+.figure.startle .browL{transform:rotate(15deg) translateY(-2.5px);}
+.figure.startle .browR{transform:rotate(-15deg) translateY(-2.5px);}
+@keyframes startle{
+  0%{transform:translateY(0) scale(1);}
+  16%{transform:translateY(-5px) scale(1.07);}
+  100%{transform:translateY(0) scale(1);}
+}
+
+.battrow{display:flex; align-items:flex-end; gap:0;}
+.big{font:600 clamp(44px,14vw,58px)/1 var(--sans); letter-spacing:-.01em;}
+.pct{margin-left:3px; padding-bottom:.14em; font-size:21px; font-weight:500; color:var(--dim);}
+.battwhy{margin-left:auto; padding-bottom:.35em; font:400 15px var(--serif); color:var(--dim);}
+.bar{height:9px; background:var(--sunk); border-radius:5px; overflow:hidden;}
+.bar > i{display:block; height:100%; width:0; border-radius:5px; background:var(--ok);
+  transition:width .4s ease, background .3s linear;}
 .ring, .ringwhy{display:none;}
+
+/* rolling digits, so a battery draining on inverter is visible as movement */
+.digits{display:inline-flex;}
+.sr{position:absolute; width:1px; height:1px; margin:-1px; padding:0;
+  overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0;}
+.digit{display:inline-block; height:1em; overflow:hidden; vertical-align:top;}
+.reel{display:block; transition:transform .6s cubic-bezier(.22,.61,.36,1);}
+.reel b{display:block; height:1em; line-height:1; font-weight:inherit;}
 
 /* --- voltage, water, draw ------------------------------------------------ */
 .strip{
@@ -310,21 +379,18 @@ body.stale #readouts{filter:grayscale(.92) brightness(.52); opacity:.55;}
 
 .sec{margin:0; padding:23px 18px 9px; font:400 15.5px var(--serif); color:var(--dim);}
 
-/* --- the switches, as a list rather than a wall of tiles ----------------- */
+/* --- the switches, heaviest first, sized by what they actually draw ------ */
 .loads{border-top:1px solid var(--rule);}
 .load{
   display:flex; align-items:center; gap:14px; width:100%;
   appearance:none; -webkit-appearance:none; border:0; margin:0;
   background:transparent; color:var(--ink); font:inherit; text-align:left;
-  padding:15px 18px; min-height:62px; cursor:pointer;
-  border-bottom:1px solid var(--rule);
+  padding:15px 18px; cursor:pointer; border-bottom:1px solid var(--rule);
 }
-.load .lamp{
-  width:10px; height:10px; border-radius:50%; flex:none; background:#3b3128;
-  transition:background .2s linear, box-shadow .2s linear;
-}
-.load[aria-pressed="true"] .lamp{background:var(--ok); box-shadow:0 0 11px rgba(124,178,124,.55);}
-.load .lname{flex:1; font-size:16.5px; font-weight:500;}
+.load .lamp{width:10px; height:10px; border-radius:50%; flex:none; background:var(--sunk);
+  transition:background .2s linear;}
+.load[aria-pressed="true"] .lamp{background:var(--ok);}
+.load .lname{flex:1; font-weight:500;}
 .load .lwatts{font:400 13.5px var(--serif); color:var(--dim);}
 .load .lstate{width:36px; text-align:right; font-size:13.5px; font-weight:600; color:var(--dim);}
 .load[aria-pressed="true"] .lstate{color:var(--ok);}
@@ -332,19 +398,31 @@ body.stale #readouts{filter:grayscale(.92) brightness(.52); opacity:.55;}
 .load.pending{opacity:.45;}
 body.stale .load{cursor:not-allowed;}
 
-/* --- what happened ------------------------------------------------------- */
+.load.heavy{min-height:74px;}
+.load.heavy .lname{font-size:19px; font-weight:600;}
+.load.heavy .lwatts{font-size:15.5px; color:var(--ink); opacity:.75;}
+.load.mid{min-height:62px;}
+.load.mid .lname{font-size:16px;}
+.load.light{min-height:54px;}
+.load.light .lname{font-size:14.5px; color:var(--dim);}
+.load.light .lwatts{font-size:12.5px;}
+
+/* --- what happened, in the house's own words ---------------------------- */
 .log{list-style:none; margin:0; padding:0;}
 .log li{
   display:grid; grid-template-columns:auto 1fr; gap:13px;
   padding:11px 18px; border-bottom:1px solid var(--rule);
 }
 .log time{font:400 13.5px/1.5 var(--sans); color:var(--dim);}
-.log .line{font-size:15px; line-height:1.45;}
-.log .st{font-weight:600;}
-.log .st.on{color:var(--ok);}
-.log .why{display:block; margin-top:1px; font:400 14px/1.4 var(--serif); color:var(--dim);}
-.log li.alert .subj{color:var(--warn);}
-.log li.empty{grid-template-columns:1fr; font:400 15px var(--serif); color:var(--dim);}
+.log .line{font:400 15px/1.45 var(--serif);}
+.log li.alert .line{color:var(--warn);}
+.log li.empty{grid-template-columns:1fr; color:var(--dim); font:400 15px var(--serif);}
+.log li.fresh{animation:freshin 1.1s ease-out;}
+@keyframes freshin{
+  0%{transform:translateY(-11px); opacity:0; background-color:rgba(255,255,255,.09);}
+  45%{opacity:1;}
+  100%{transform:translateY(0); opacity:1; background-color:transparent;}
+}
 
 /* --- when a tap cannot be delivered -------------------------------------- */
 #toast{
@@ -358,44 +436,31 @@ body.stale .load{cursor:not-allowed;}
   opacity:0; pointer-events:none; transition:opacity .18s, transform .18s;
 }
 #toast.show{opacity:1; transform:translate(-50%,0);}
-#toast.rules{background:var(--gold); color:#241a08;}
+#toast.rules{background:var(--warn); color:#201404;}
 
 /* ======================================================================== */
-/* Desktop. Same readings, laid out the way the reference does it: a status  */
-/* rail down the left, a header, then a card grid with one dominant panel    */
-/* and a full-width strip of switches along the bottom.                      */
+/* Desktop                                                                  */
 /* ======================================================================== */
 @media (min-width:1024px){
   body{max-width:none; padding-bottom:0;}
 
-  .shell{
+  .wrap{
     display:grid; grid-template-columns:78px minmax(0,1fr);
     max-width:1560px; margin:0 auto; min-height:100vh;
   }
-
-  /* The whole left edge carries the source colour, so you can see what the
-     house is on from the corner of your eye, and see it die when stale. */
   .rail{
     display:flex; flex-direction:column; align-items:center; gap:20px;
-    padding:24px 0 26px; border-right:1px solid var(--rule); background:#100d0a;
+    padding:24px 0 26px; border-right:1px solid var(--rule); background:var(--panel);
   }
   .rail .mark{width:25px; height:25px; color:var(--dim); flex:none;}
-  .rail .spine{
-    flex:1; width:3px; border-radius:2px; background:var(--src);
-    box-shadow:0 0 18px var(--src); opacity:.9;
-    transition:background .3s linear, box-shadow .3s linear;
-  }
-  .rail .raillamp{
-    width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none;
-    transition:background .3s linear;
-  }
-  body.stale .rail .spine{background:#463a2e; box-shadow:none;}
+  .rail .spine{flex:1; width:3px; border-radius:2px; background:var(--src); opacity:.9;
+    transition:background-color 600ms linear;}
+  .rail .raillamp{width:9px; height:9px; border-radius:50%; background:var(--ok); flex:none;
+    transition:background .3s linear;}
+  body.stale .rail .spine{background:#4a4640;}
   body.stale .rail .raillamp{background:var(--bad);}
 
-  .head{
-    display:flex; align-items:baseline; justify-content:space-between;
-    padding:26px 30px 18px;
-  }
+  .head{display:flex; align-items:baseline; justify-content:space-between; padding:26px 30px 18px;}
   .head .title{font:400 21px var(--serif); color:var(--ink);}
   .head .clock{font:500 21px var(--sans); color:var(--dim);}
   body.stale .head{opacity:.5; filter:grayscale(.9);}
@@ -412,41 +477,31 @@ body.stale .load{cursor:not-allowed;}
       "reads  battery log"
       "loads  loads   loads";
   }
-  #readouts > section{
-    background:var(--panel); border:1px solid var(--rule);
-    border-radius:16px; box-shadow:0 1px 2px rgba(0,0,0,.3);
-  }
+  #readouts > section{background:var(--panel); border:1px solid var(--rule); border-radius:16px;}
 
-  /* Not five equal cards: the source panel is the big one and it glows. */
   .hero{
     grid-area:source; padding:34px 30px 34px;
     display:flex; flex-direction:column; justify-content:center; min-height:268px;
   }
-  .hero::before{inset:-40% -20% auto -20%; opacity:.19;}
   .hero .eyebrow{font-size:16px;}
   .hero .source{font-size:clamp(48px,4.6vw,70px); margin-top:8px;}
   .hero .sourcenote{margin-top:14px; font-size:17px;}
 
-  .batt{
-    grid-area:battery; padding:20px 22px 24px;
-    display:flex; flex-direction:column;
-  }
-  .battmid{flex:1; display:flex; flex-direction:column; justify-content:center;}
-  .bigrow, .bar{display:none;}
-  .ring{display:block; position:relative; width:178px; height:178px; margin:0 auto;}
+  .batt{grid-area:battery; padding:20px 22px 24px; display:flex; flex-direction:column;}
+  .battmid{display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0;}
+  .figure{grid-row:auto; width:96px; height:96px; margin-bottom:20px;}
+  .battrow, .bar{display:none;}
+  .ring{display:block; position:relative; width:172px; height:172px;}
   .ring svg{width:100%; height:100%; transform:rotate(-90deg); display:block;}
-  .ring .track{fill:none; stroke:var(--sunk); stroke-width:11;}
-  .ring .fill{
-    fill:none; stroke:var(--ok); stroke-width:11; stroke-linecap:round;
+  .ring .track{fill:none; stroke:var(--sunk); stroke-width:11; transition:stroke 600ms linear;}
+  .ring .fill{fill:none; stroke:var(--ok); stroke-width:11; stroke-linecap:round;
     stroke-dasharray:339.292; stroke-dashoffset:339.292;
-    transition:stroke-dashoffset .5s ease, stroke .3s linear;
-  }
-  .ringtext{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    font:600 44px var(--sans); letter-spacing:-.02em;
-  }
-  .ringtext i{font:500 18px var(--sans); font-style:normal; color:var(--dim); margin-left:2px;}
-  .ringwhy{display:block; margin-top:14px; text-align:center; font:400 15px var(--serif); color:var(--dim); min-height:21px;}
+    transition:stroke-dashoffset .6s ease, stroke .3s linear;}
+  .ringtext{position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    font:600 42px var(--sans); letter-spacing:-.01em;}
+  .ringtext i{font:500 18px var(--sans); font-style:normal; color:var(--dim); margin-left:2px;
+    align-self:center; padding-top:.5em;}
+  .ringwhy{display:block; margin-top:14px; font:400 15px var(--serif); color:var(--dim); min-height:21px;}
 
   .strip{grid-area:reads; padding:20px 22px 22px; gap:18px;}
 
@@ -456,26 +511,35 @@ body.stale .load{cursor:not-allowed;}
   .log li{padding:11px 22px;}
   .log li:last-child{border-bottom:0;}
 
-  /* The switches become the full-width row of tiles along the bottom. */
   .loadscard{grid-area:loads; overflow:hidden;}
   .loadscard .sec{padding:19px 22px 4px;}
-  .loads{
-    display:grid; grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
-    gap:12px; padding:8px 22px 20px; border-top:0;
-  }
+  .loads{display:grid; grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:12px; padding:8px 22px 20px; border-top:0;}
   .load{
     display:grid; grid-template-columns:auto 1fr; align-content:start;
     grid-template-areas:"lamp state" "name name" "watts watts";
-    gap:9px 8px; min-height:106px; padding:15px 15px 14px;
-    border:1px solid var(--rule); border-radius:13px; background:var(--bg);
-    transition:border-color .18s linear, background .18s linear;
+    gap:9px 8px; padding:15px 15px 14px;
+    border:1px solid var(--rule); border-radius:13px; background:var(--tint);
+    transition:border-color .18s linear, background-color 600ms linear;
   }
-  .load:hover{border-color:#3d3327; background:#1f1a14;}
-  .load[aria-pressed="true"]{border-color:#3a4a37;}
+  .load:hover{border-color:var(--src);}
   .load .lamp{grid-area:lamp;}
-  .load .lname{grid-area:name; flex:none; font-size:16px;}
+  .load .lname{grid-area:name; flex:none;}
   .load .lwatts{grid-area:watts;}
   .load .lstate{grid-area:state; width:auto; justify-self:end;}
+  /* a 2000W kettle is not the same object as a 120W television */
+  .load.heavy{grid-column:span 2; min-height:118px;}
+  .load.heavy .lname{font-size:22px;}
+  .load.heavy .lwatts{font-size:17px;}
+  .load.mid{min-height:106px;}
+  .load.light{min-height:96px;}
+}
+@media (min-width:1366px){
+  .loads{grid-template-columns:repeat(8,minmax(0,1fr));}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important; animation:none !important;}
 }
 </style>
 </head>
@@ -485,7 +549,7 @@ body.stale .load{cursor:not-allowed;}
   <span class="dot"></span><span id="statusmsg">Trying to reach the hub…</span>
 </div>
 
-<div class="shell">
+<div class="wrap">
   <aside class="rail" aria-hidden="true">
     <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
@@ -510,20 +574,37 @@ body.stale .load{cursor:not-allowed;}
 
       <section class="batt">
         <div class="k">Battery in the inverter</div>
-        <div class="bigrow">
-          <span class="big" id="battery">--</span><span class="pct">%</span>
-          <span class="battwhy" id="battwhy"></span>
-        </div>
-        <div class="bar"><i id="battbar"></i></div>
         <div class="battmid">
-        <div class="ring" aria-hidden="true">
-          <svg viewBox="0 0 128 128">
-            <circle class="track" cx="64" cy="64" r="54"></circle>
-            <circle class="fill" id="ringfill" cx="64" cy="64" r="54"></circle>
-          </svg>
-          <div class="ringtext"><span id="ringpct">--</span><i>%</i></div>
-        </div>
-        <div class="ringwhy" id="ringwhy"></div>
+          <div class="figure" id="figure" aria-hidden="true">
+            <svg class="figsvg" viewBox="0 0 100 100">
+              <circle class="pulse" cx="50" cy="50" r="31"></circle>
+              <g class="fig">
+                <rect class="shell" x="22" y="20" width="56" height="56" rx="17"></rect>
+                <rect class="visor" x="31" y="40" width="38" height="16" rx="8"></rect>
+                <g class="eyes">
+                  <rect class="eye" x="38.5" y="42" width="7" height="12" rx="3.5"></rect>
+                  <rect class="eye" x="54.5" y="42" width="7" height="12" rx="3.5"></rect>
+                </g>
+                <path class="brow browL" d="M34 30 L45 30"></path>
+                <path class="brow browR" d="M55 30 L66 30"></path>
+                <path class="base" d="M40 83 L60 83"></path>
+              </g>
+            </svg>
+          </div>
+          <div class="battrow">
+            <span class="big digits" id="battdigits"></span><span class="pct" aria-hidden="true">%</span>
+            <span class="battwhy" id="battwhy"></span>
+          </div>
+          <div class="bar"><i id="battbar"></i></div>
+          <div class="ring">
+            <svg viewBox="0 0 128 128">
+              <circle class="track" cx="64" cy="64" r="54"></circle>
+              <circle class="fill" id="ringfill" cx="64" cy="64" r="54"></circle>
+            </svg>
+            <div class="ringtext" aria-hidden="true"><span class="digits" id="ringdigits"></span><i>%</i></div>
+          </div>
+          <div class="ringwhy" id="ringwhy"></div>
+          <p class="sr" id="battsr"></p>
         </div>
       </section>
 
@@ -567,13 +648,14 @@ body.stale .load{cursor:not-allowed;}
   var POLL_MS = 1000, STALE_MS = 5000, TIMEOUT_MS = 2500;
   var RING = 339.292;       // 2 * pi * r, with r = 54 in the svg above
 
-  var lastOkAt = null;      // when the last good /state actually arrived
+  var lastOkAt = null;
   var triedOnce = false;
   var last = null;
   var pending = {};
   var loadOrder = '';
-  var logSig = '';
-  var inflight = false, timer = null, toastTimer = null;
+  var seenKeys = null;      // null until the first render, so nothing flashes on load
+  var inflight = false, timer = null, toastTimer = null, startleTimer = null;
+  var lastPulse = '', lastBatt = null;
 
   var SRC_LABEL = {grid:'Grid', gen:'Generator', inverter:'Inverter', none:'No power'};
   var SRC_NOTE = {
@@ -586,16 +668,67 @@ body.stale .load{cursor:not-allowed;}
   var ALERTY = /SPIKE|ALERT|FLAT|OVERFLOW|TOOK LIGHT|shed|restored/i;
 
   function el(id){ return document.getElementById(id); }
-
-  function nameOf(n){
-    return NAMES[n] || n.charAt(0).toUpperCase() + n.slice(1);
-  }
-
-  /* house_sim shouts its events in caps for a terminal. Same words, read
-     back the way a person would say them. */
+  function nameOf(n){ return NAMES[n] || n.charAt(0).toUpperCase() + n.slice(1); }
   function spoken(s){
     var t = s.toLowerCase().replace(/\bnepa\b/g, 'NEPA').replace(/\btv\b/g, 'TV');
     return t.charAt(0).toUpperCase() + t.slice(1);
+  }
+  function keyOf(e){ return e.time + '|' + e.what + '|' + e.why; }
+
+  /* ---- the house talking about itself --------------------------------- */
+  function narrate(e){
+    var what = e.what, why = e.why || '';
+    var m = /^(ON|OFF)\s+(\S+)$/.exec(what);
+    if (m) {
+      var on = m[1] === 'ON', nm = nameOf(m[2]), low = nm === 'TV' ? 'TV' : nm.toLowerCase();
+      var spike = /spike\s+(\d+)V/.exec(why);
+      if (spike) return 'Cut the ' + low + '. That was ' + spike[1] + ' volts.';
+      if (why === 'shed: on inverter') return nm + ' off. We are on battery.';
+      if (why === 'shed: night, on inverter') return nm + ' off for the night. Saving the battery.';
+      if (why === 'restored: mains back') return nm + ' back on. Mains is steady.';
+      if (/tank at/.test(why)) return on ? 'Tank was low. Pump running.' : 'Tank is full. Pump off.';
+      if (why === 'from dashboard') return 'You switched the ' + low + (on ? ' on.' : ' off.');
+      if (why === 'someone in the house') return 'Somebody put ' + (on ? 'on the ' : 'off the ') + low + '.';
+      return nm + (on ? ' on.' : ' off.') + (why ? ' ' + why + '.' : '');
+    }
+    switch (what) {
+      /* nothing playful in an alert about something that costs money or breaks */
+      case 'VOLTAGE SPIKE':    return 'Spike on the line. ' + why.replace(/V$/, ' volts') + '.';
+      case 'BATTERY FLAT':     return 'Battery is finished. Everything is off.';
+      case 'TANK FULL':        return 'Tank is full and the pump is still running.';
+      case 'TANK OVERFLOWING': return 'Tank is overflowing. Water is wasting.';
+      case 'ALERT':            return why ? spoken(why) + '.' : 'Something needs looking at.';
+      case 'GEN STARTED':      return 'Generator is on.';
+      case 'GEN OFF':          return 'Generator off. On battery now.';
+      case 'NEPA TOOK LIGHT':  return 'NEPA don take light.';
+      case 'LIGHT IS BACK':    return 'NEPA don bring light.';
+    }
+    return spoken(what) + (why ? '. ' + why : '') + '.';
+  }
+
+  /* ---- rolling digits -------------------------------------------------- */
+  function setDigits(node, value){
+    var str = String(value);
+    node.setAttribute('aria-hidden', 'true');
+    if (node.childElementCount !== str.length) {
+      node.textContent = '';
+      for (var i = 0; i < str.length; i++) {
+        var d = document.createElement('span');
+        d.className = 'digit';
+        var reel = document.createElement('span');
+        reel.className = 'reel';
+        for (var n = 0; n <= 9; n++) {
+          var b = document.createElement('b');
+          b.textContent = n;
+          reel.appendChild(b);
+        }
+        d.appendChild(reel);
+        node.appendChild(d);
+      }
+    }
+    for (var j = 0; j < str.length; j++) {
+      node.children[j].firstChild.style.transform = 'translateY(-' + str.charAt(j) + 'em)';
+    }
   }
 
   function ago(ms){
@@ -607,19 +740,14 @@ body.stale .load{cursor:not-allowed;}
     return h + (h === 1 ? ' hour' : ' hours');
   }
 
-  function isStale(){
-    return lastOkAt === null || (Date.now() - lastOkAt) > STALE_MS;
-  }
+  function isStale(){ return lastOkAt === null || (Date.now() - lastOkAt) > STALE_MS; }
 
-  /* Runs on its own clock, not the poll's, so the page still ages correctly
-     when nothing is coming back at all. */
   function freshness(){
     var stale = isStale();
     document.body.classList.toggle('stale', stale);
     var msg;
     if (lastOkAt === null) {
-      msg = triedOnce ? 'Can’t reach the hub. Nothing has loaded yet.'
-                      : 'Trying to reach the hub…';
+      msg = triedOnce ? 'Can’t reach the hub. Nothing has loaded yet.' : 'Trying to reach the hub…';
     } else if (stale) {
       msg = 'Not live. This is the house as it was ' + ago(Date.now() - lastOkAt) + ' ago.';
     } else {
@@ -644,7 +772,7 @@ body.stale .load{cursor:not-allowed;}
   }
 
   function render(d){
-    document.body.dataset.source = d.source;
+    document.documentElement.dataset.source = d.source;
     el('source').textContent = SRC_LABEL[d.source] || d.source;
     el('sourcenote').textContent = SRC_NOTE[d.source] || '';
     el('headclock').textContent = d.clock;
@@ -652,15 +780,34 @@ body.stale .load{cursor:not-allowed;}
     var pct = Math.max(0, Math.min(100, d.battery));
     var col = d.battery <= 20 ? 'var(--bad)' : d.battery <= 50 ? 'var(--warn)' : 'var(--ok)';
     var why = d.source === 'inverter' ? 'draining' : d.source === 'none' ? '' : 'charging';
+    var whole = Math.round(d.battery);
 
-    el('battery').textContent = Math.round(d.battery);
-    el('ringpct').textContent = Math.round(d.battery);
+    if (whole !== lastBatt) {
+      setDigits(el('battdigits'), whole);
+      setDigits(el('ringdigits'), whole);
+      lastBatt = whole;
+    }
+    el('battsr').textContent = 'Battery ' + whole + ' percent' + (why ? ', ' + why : '') + '.';
     el('battwhy').textContent = why;
     el('ringwhy').textContent = why;
     el('battbar').style.width = pct + '%';
     el('battbar').style.background = col;
     el('ringfill').style.strokeDashoffset = RING * (1 - pct / 100);
     el('ringfill').style.stroke = col;
+
+    /* the pulse behind the figure carries the load: calm at 300W, urgent at 2000W */
+    var clamped = Math.min(2000, Math.max(300, d.draw));
+    var pulse = (3.8 - (clamped - 300) / 1700 * 2.9).toFixed(1) + 's';
+    if (pulse !== lastPulse) {
+      el('figure').style.setProperty('--pulse', pulse);
+      lastPulse = pulse;
+    }
+
+    var mood = (d.battery <= 20 || d.source === 'none') ? 'worried'
+             : d.source === 'inverter' ? 'still'
+             : d.source === 'gen'      ? 'alert' : '';
+    el('figure').className = 'figure' + (mood ? ' ' + mood : '') +
+      (el('figure').classList.contains('startle') ? ' startle' : '');
 
     el('voltage').textContent = Math.round(d.voltage);
     el('voltcell').classList.toggle('alarm', !d.voltage_ok);
@@ -675,19 +822,19 @@ body.stale .load{cursor:not-allowed;}
     tc.classList.toggle('alarm', d.tank >= 115 || d.tank <= 20);
     tc.classList.toggle('warn', d.tank < 115 && d.tank >= 100);
     el('tanknote').textContent =
-        d.tank >= 115 ? 'overflowing'
-      : d.tank >= 100 ? 'full'
-      : d.tank <= 20  ? 'low, the pump should run'
-      :                 '';
+        d.tank >= 115 ? 'overflowing' : d.tank >= 100 ? 'full'
+      : d.tank <= 20  ? 'low, the pump should run' : '';
 
     el('draw').textContent = d.draw;
     var on = 0;
     for (var i = 0; i < d.loads.length; i++) if (d.loads[i].on) on++;
     el('drawnote').textContent = on + ' of ' + d.loads.length + ' switched on';
 
-    renderLoads(d.loads);
+    renderLoads(d.loads.slice().sort(function(a, b){ return b.watts - a.watts; }));
     renderLog(d.events);
   }
+
+  function tier(w){ return w >= 700 ? 'heavy' : w >= 180 ? 'mid' : 'light'; }
 
   function renderLoads(loads){
     var wrap = el('loads');
@@ -698,7 +845,7 @@ body.stale .load{cursor:not-allowed;}
       loads.forEach(function(l){
         var b = document.createElement('button');
         b.type = 'button';
-        b.className = 'load';
+        b.className = 'load ' + tier(l.watts);
         b.dataset.name = l.name;
         ['lamp','lname','lwatts','lstate'].forEach(function(cls){
           var s = document.createElement('span');
@@ -723,12 +870,23 @@ body.stale .load{cursor:not-allowed;}
     });
   }
 
+  function startle(){
+    var f = el('figure');
+    f.classList.remove('startle');
+    void f.offsetWidth;            // restart the animation if one is already running
+    f.classList.add('startle');
+    clearTimeout(startleTimer);
+    startleTimer = setTimeout(function(){ f.classList.remove('startle'); }, 1100);
+  }
+
   function renderLog(events){
-    var sig = events.length
-      ? events.length + '|' + events[0].time + '|' + events[0].what + '|' + events[0].why
-      : '0';
-    if (sig === logSig) return;
-    logSig = sig;
+    var keys = events.map(keyOf);
+    var known = seenKeys;
+    var fresh = {};
+    if (known) {
+      keys.forEach(function(k){ if (known.indexOf(k) === -1) fresh[k] = true; });
+    }
+    seenKeys = keys;
 
     var ol = el('log');
     ol.textContent = '';
@@ -739,46 +897,25 @@ body.stale .load{cursor:not-allowed;}
       ol.appendChild(empty);
       return;
     }
+    var spiked = false;
     events.forEach(function(e){
+      var k = keyOf(e);
       var li = document.createElement('li');
-      if (ALERTY.test(e.what + ' ' + e.why)) li.className = 'alert';
-
+      li.className = (ALERTY.test(e.what + ' ' + e.why) ? 'alert' : '') + (fresh[k] ? ' fresh' : '');
       var t = document.createElement('time');
       t.textContent = e.time;
-
       var line = document.createElement('div');
       line.className = 'line';
-      var m = /^(ON|OFF)\s+(\S+)$/.exec(e.what);
-      var subj = document.createElement('span');
-      subj.className = 'subj';
-      if (m) {
-        subj.textContent = nameOf(m[2]) + ' ';
-        line.appendChild(subj);
-        var st = document.createElement('span');
-        st.className = 'st' + (m[1] === 'ON' ? ' on' : '');
-        st.textContent = m[1].toLowerCase();
-        line.appendChild(st);
-      } else {
-        subj.textContent = spoken(e.what);
-        line.appendChild(subj);
-      }
-      if (e.why) {
-        var why = document.createElement('span');
-        why.className = 'why';
-        why.textContent = e.why;
-        line.appendChild(why);
-      }
-
+      line.textContent = narrate(e);
       li.appendChild(t);
       li.appendChild(line);
       ol.appendChild(li);
+      if (fresh[k] && /SPIKE/.test(e.what)) spiked = true;
     });
+    if (spiked) startle();
   }
 
-  function schedule(ms){
-    clearTimeout(timer);
-    timer = setTimeout(poll, ms);
-  }
+  function schedule(ms){ clearTimeout(timer); timer = setTimeout(poll, ms); }
 
   function poll(){
     if (inflight) return;
@@ -807,9 +944,9 @@ body.stale .load{cursor:not-allowed;}
 
   function toggle(name){
     if (!last) return;
-    var nm = nameOf(name);
+    var nm = nameOf(name), low = nm === 'TV' ? 'TV' : nm.toLowerCase();
     if (isStale()) {
-      toast('Can’t reach the hub. The ' + nm.toLowerCase() + ' did not move.');
+      toast('Can’t reach the hub. The ' + low + ' did not move.');
       return;
     }
     var current = null;
@@ -818,7 +955,7 @@ body.stale .load{cursor:not-allowed;}
 
     var want = !current;
     pending[name] = true;
-    renderLoads(last.loads);
+    renderLoads(last.loads.slice().sort(function(a, b){ return b.watts - a.watts; }));
 
     var ctl = new AbortController();
     var killer = setTimeout(function(){ ctl.abort(); }, TIMEOUT_MS);
@@ -837,16 +974,14 @@ body.stale .load{cursor:not-allowed;}
         accept(d);
         if (d.overridden) {
           var why = d.events.length ? d.events[0].why : '';
-          toast('The rules put the ' + nm.toLowerCase() + ' back ' +
-                (d.actual ? 'on' : 'off') + (why ? ' (' + why + ').' : '.'), 'rules');
+          toast('The rules put the ' + low + ' back ' + (d.actual ? 'on' : 'off') +
+                (why ? ' (' + why + ').' : '.'), 'rules');
         }
       })
       .catch(function(){
         delete pending[name];
-        /* Never queued, never guessed at: say plainly that it did not land. */
-        toast('That did not get through. The ' + nm.toLowerCase() +
-              ' is still ' + (current ? 'on' : 'off') + '.');
-        if (last) renderLoads(last.loads);
+        toast('That did not get through. The ' + low + ' is still ' + (current ? 'on' : 'off') + '.');
+        if (last) renderLoads(last.loads.slice().sort(function(a, b){ return b.watts - a.watts; }));
         freshness();
       })
       .then(function(){ clearTimeout(killer); });
