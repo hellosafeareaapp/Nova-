@@ -288,135 +288,15 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 .batt{padding:20px 18px 19px; border-bottom:1px solid var(--rule);}
 .k{font:400 14.5px var(--serif); color:var(--dim);}
 .battmid{margin-top:10px;}
-.adacard{padding:16px 18px 4px; display:flex; align-items:flex-end; justify-content:center;}
-.figure{width:130px; height:172px;}
-.figsvg{width:100%; height:100%; display:block; overflow:visible;}
+.adacard{padding:14px 18px; display:flex; align-items:center; justify-content:center;}
+.figure{width:154px; height:154px;}
 
-/* Nova. Nested groups so the flinch, the held posture, the idle rock and the
-   breath never fight over one transform. Shadow and plinth sit outside all of
-   them, so the figure moves and the surface it stands on does not. */
-.pulse{
-  fill:none; stroke:var(--src); stroke-width:1.3; opacity:0;
-  transform-box:fill-box; transform-origin:center;
-  animation:pulsering var(--pulse,3.4s) ease-out infinite;
-}
-@keyframes pulsering{
-  0%{transform:scale(.8); opacity:.34;}
-  75%{transform:scale(1.16); opacity:0;}
-  100%{transform:scale(1.16); opacity:0;}
-}
-.shadow{fill:#000; opacity:.36;}
-.plinth{fill:var(--sunk); stroke:var(--src); stroke-width:2; stroke-linejoin:round;
-  transition:stroke 600ms linear;}
-
-.jolt{transform-box:fill-box; transform-origin:50% 100%;}
-.posture{transform-box:fill-box; transform-origin:50% 100%;
-  transition:transform .5s cubic-bezier(.2,.7,.3,1);}
-.sway{transform-box:fill-box; transform-origin:50% 100%;
-  animation:sway var(--sway,4.4s) ease-in-out infinite;}
-.breath{transform-box:fill-box; transform-origin:50% 100%;
-  animation:breath var(--breath,4s) ease-in-out infinite;}
-@keyframes sway{0%,100%{transform:rotate(-1.3deg);}50%{transform:rotate(1.3deg);}}
-@keyframes swaytiny{0%,100%{transform:rotate(-.3deg);}50%{transform:rotate(.3deg);}}
-@keyframes fidget{
-  0%,100%{transform:translateX(0) rotate(0);}
-  18%{transform:translateX(-1.6px) rotate(-1deg);}
-  42%{transform:translateX(1.8px) rotate(1.1deg);}
-  63%{transform:translateX(-1.1px) rotate(-.7deg);}
-  81%{transform:translateX(.9px) rotate(.5deg);}
-}
-@keyframes breath{0%,100%{transform:scaleY(1) scaleX(1);}50%{transform:scaleY(1.024) scaleX(.994);}}
-@keyframes jolt{
-  0%{transform:translateY(0) scale(1);}
-  4%{transform:translateY(3px) scale(.97);}
-  14%{transform:translateY(-9px) scale(1.1);}
-  28%{transform:translateY(3px) scale(.97);}
-  52%{transform:translateY(-3px) scale(1.03);}
-  76%{transform:translateY(1px) scale(.99);}
-  100%{transform:translateY(0) scale(1);}
-}
-
-.neck, .stem{fill:var(--sunk); stroke:var(--src); stroke-width:2; transition:stroke 600ms linear;}
-.torso{fill:var(--sunk); stroke:var(--src); stroke-width:2.2; transition:stroke 600ms linear;}
-.arm{stroke:var(--src); stroke-width:6; stroke-linecap:round; fill:none;
-  transform-box:fill-box;
-  transition:transform .45s cubic-bezier(.2,.7,.3,1), stroke 600ms linear;}
-.armL{transform-origin:100% 0; transform:rotate(var(--armL,0deg));}
-.armR{transform-origin:0 0;   transform:rotate(var(--armR,0deg));}
-.head{fill:var(--sunk); stroke:var(--src); stroke-width:2.2; transition:stroke 600ms linear;}
-
-/* it turns toward whatever just happened elsewhere on the page */
-.look{transform-box:fill-box; transform-origin:50% 100%;
-  transition:transform .45s cubic-bezier(.2,.7,.3,1);}
-.aim{transform-box:fill-box; transform-origin:center; transition:transform .4s ease;}
-.figure.look-left  .look{transform:rotate(-7deg);}
-.figure.look-right .look{transform:rotate(7deg);}
-.figure.look-down  .look{transform:translateY(2px);}
-.figure.look-left  .aim{transform:translateX(-2.6px);}
-.figure.look-right .aim{transform:translateX(2.6px);}
-.figure.look-down  .aim{transform:translateY(2.4px);}
-
-.gaze{transform-box:fill-box; transform-origin:center;
-  animation:glance var(--glance,9s) ease-in-out infinite;}
-@keyframes glance{
-  0%,34%{transform:translateX(0);}
-  44%,62%{transform:translateX(2px);}
-  72%,88%{transform:translateX(-1.4px);}
-  96%,100%{transform:translateX(0);}
-}
-.eyes{transform-box:fill-box; transform-origin:center; animation:blink var(--blink,6.2s) infinite;}
-/* two blinks a cycle, unevenly spaced, so it never reads as a metronome */
-@keyframes blink{
-  0%,39%,43%,71%,75%,100%{transform:scaleY(1);}
-  41%,73%{transform:scaleY(.05);}
-}
-.ball{fill:var(--src); transform-box:fill-box; transform-origin:center;
-  transform:scale(var(--ball,1));
-  transition:transform .35s ease, fill 600ms linear;}
-/* The lid is head-coloured and slides over the eye, so the eye changes shape
-   -- round, half-moon, slit -- instead of only moving. */
-.lid{fill:var(--sunk); transform:translateY(var(--lid,2px));
-  transition:transform .35s ease, fill 600ms linear;}
-.brow{stroke:var(--src); stroke-width:2.4; stroke-linecap:round; fill:none;
-  transform-box:fill-box; transform-origin:center;
-  transition:transform .35s ease, stroke 600ms linear;}
-.mouth{stroke:var(--src); stroke-width:2.4; stroke-linecap:round; fill:none;
-  transform-box:fill-box; transform-origin:center;
-  transform:var(--mouth, scaleY(.32));
-  transition:transform .4s ease, stroke 600ms linear, opacity .4s linear;}
-
-/* On grid: upright and easy. Face and body are set together in one block, never
-   separately, so a relaxed posture can never turn up wearing an alarmed face. */
-.figure{--sway:4.4s; --breath:4s; --blink:6.2s; --glance:9s;
-  --lid:2px; --ball:1; --mouth:scaleY(.32); --armL:0deg; --armR:0deg;}
-/* On generator: leaning in, arms ready, eyes wide. */
-.figure.alert{--sway:1.6s; --breath:1.9s; --blink:3s; --glance:3.4s;
-  --lid:0px; --ball:1.2; --mouth:scaleY(.16) scaleX(.7); --armL:-10deg; --armR:10deg;}
-.figure.alert .posture{transform:scale(1.045) translateY(-2px);}
-.figure.alert .browL{transform:rotate(7deg) translateY(-2px);}
-.figure.alert .browR{transform:rotate(-7deg) translateY(-2px);}
-/* On inverter: drawn in, arms tucked, half-lidded, dim. Doing less on purpose. */
-.figure.still{--sway:8.5s; --breath:7s; --blink:11s; --glance:22s;
-  --lid:9.5px; --ball:1; --mouth:scaleY(.1) scaleX(.45);
-  --armL:-13deg; --armR:13deg; opacity:.52;}
-.figure.still .sway{animation-name:swaytiny;}
-.figure.still .posture{transform:scale(.93) translateY(5px);}
-.figure.still .brow{transform:translateY(2px);}
-.figure.still .mouth{opacity:.6;}
-/* Battery nearly gone, or nothing powering the house: tense, shifting weight. */
-.figure.worried{--sway:1.1s; --breath:1.2s; --blink:2.2s; --glance:2.1s;
-  --lid:0px; --ball:1.14; --mouth:rotate(180deg) scaleY(1.05);
-  --armL:-5deg; --armR:5deg; --src:var(--bad);}
-.figure.worried .sway{animation-name:fidget;}
-.figure.worried .posture{transform:rotate(2deg) scale(1.01);}
-.figure.worried .browL{transform:rotate(-15deg) translateY(-2px);}
-.figure.worried .browR{transform:rotate(15deg) translateY(-2px);}
-/* A spike just hit: recoil, arms thrown out, then settle over about two seconds. */
-.figure.startle{--lid:0px; --ball:1.24; --mouth:rotate(180deg) scaleY(1.4) scaleX(.68);
-  --armL:26deg; --armR:-26deg;}
-.figure.startle .jolt{animation:jolt 1.9s cubic-bezier(.2,.8,.3,1);}
-.figure.startle .browL{transform:rotate(4deg) translateY(-6px);}
-.figure.startle .browR{transform:rotate(-4deg) translateY(-6px);}
+/* Nova is a sphere of points on a canvas. Every property is a reading: spin
+   from load, radius from battery, colour from source, and it stops dead when
+   the data does. Drawn by hand below -- no library, nothing external. */
+.figure{display:block; position:relative;}
+.novacv{display:block; width:100%; height:100%;}
+.figure.worried{--src:var(--bad);}
 }
 
 .battrow{display:flex; align-items:flex-end; gap:0;}
@@ -562,8 +442,8 @@ body.stale .load{cursor:not-allowed;}
   .battmid{display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0;}
   /* no panel of its own: it occupies the layout directly and stands on it */
   #readouts > .adacard{background:transparent; border:0; border-radius:0;}
-  .adacard{grid-area:ada; padding:0 6px; align-items:flex-end;}
-  .figure{width:174px; height:230px;}
+  .adacard{grid-area:ada; padding:0 6px; align-items:center;}
+  .figure{width:206px; height:206px;}
   .battrow, .bar{display:none;}
   .ring{display:block; position:relative; width:172px; height:172px;}
   .ring svg{width:100%; height:100%; transform:rotate(-90deg); display:block;}
@@ -658,36 +538,7 @@ body.stale .load{cursor:not-allowed;}
 
       <section class="adacard">
         <div class="figure" id="figure" aria-hidden="true">
-            <svg class="figsvg" viewBox="0 0 100 132">
-              <defs><clipPath id="headclip">
-                <rect x="28" y="7" width="44" height="42" rx="14"></rect>
-              </clipPath></defs>
-              <circle class="pulse" cx="50" cy="78" r="36"></circle>
-              <ellipse class="shadow" cx="50" cy="125" rx="28" ry="4"></ellipse>
-              <path class="plinth" d="M29 123 L33 113 L67 113 L71 123 Z"></path>
-              <g class="jolt"><g class="posture"><g class="sway">
-                <rect class="stem" x="44" y="99" width="12" height="15" rx="3"></rect>
-                <g class="breath">
-                <rect class="neck" x="45" y="44" width="10" height="16" rx="4"></rect>
-                <path class="arm armL" d="M33 67 L22 96"></path>
-                <path class="arm armR" d="M67 67 L78 96"></path>
-                <rect class="torso" x="31" y="57" width="38" height="47" rx="15"></rect>
-                <g class="look">
-                  <rect class="head" x="27" y="6" width="46" height="44" rx="15"></rect>
-                  <g clip-path="url(#headclip)">
-                    <g class="aim"><g class="gaze"><g class="eyes">
-                      <circle class="ball" cx="40" cy="28" r="6.5"></circle>
-                      <circle class="ball" cx="60" cy="28" r="6.5"></circle>
-                    </g></g></g>
-                    <rect class="lid" x="31" y="0" width="18" height="21.5"></rect>
-                    <rect class="lid" x="51" y="0" width="18" height="21.5"></rect>
-                  </g>
-                  <path class="brow browL" d="M33 15 L46 15"></path>
-                  <path class="brow browR" d="M54 15 L67 15"></path>
-                  <path class="mouth" d="M42 40 Q50 44 58 40"></path>
-                </g>
-              </g></g></g></g>
-            </svg>
+            <canvas class="novacv" id="novacv"></canvas>
         </div>
       </section>
 
@@ -757,8 +608,8 @@ body.stale .load{cursor:not-allowed;}
   var pending = {};
   var loadOrder = '';
   var seenKeys = null;      // null until the first render, so nothing flashes on load
-  var inflight = false, timer = null, toastTimer = null, startleTimer = null, lookTimer = null;
-  var fig = {mood:'', startle:false, look:''};
+  var inflight = false, timer = null, toastTimer = null;
+  var fig = {mood:''};
   var lastPulse = '', lastBatt = null;
 
   var SRC_LABEL = {grid:'Grid', gen:'Generator', inverter:'Inverter', none:'No power'};
@@ -778,6 +629,189 @@ body.stale .load{cursor:not-allowed;}
     return t.charAt(0).toUpperCase() + t.slice(1);
   }
   function keyOf(e){ return e.time + '|' + e.what + '|' + e.why; }
+
+  /* ---- Nova: a sphere of points, written here, no library -------------- */
+  var Nova = (function(){
+    var PARTICLES = 400;   // budget. Lower it if a slow device struggles.
+    var MAX       = 700;   // hard cap, whatever anything else asks for.
+    var FPS       = 30;    // deliberately not 60. This runs on a Pi and a phone.
+    var FOV = 3.2, SPRING = 12, DAMP = 4.5, TILT = 0.42;
+
+    var cv, ctx, box, W = 0, H = 0, pts = [], n = 0;
+    var rot = 0, raf = 0, spinning = false, isLive = false, last = 0, acc = 0;
+    var reduce = false, ptr = null, col = [166,183,194];
+    var st = {source:'grid', battery:100, draw:0};
+    var bx = [], by = [], bs = [];        // reused every frame; no per-frame garbage
+    for (var q = 0; q < 8; q++) { bx.push([]); by.push([]); bs.push([]); }
+
+    /* Fibonacci sphere: even coverage, no clumping at the poles. */
+    function build(count){
+      n = Math.max(24, Math.min(MAX, count));
+      pts = [];
+      var ga = Math.PI * (3 - Math.sqrt(5));
+      for (var i = 0; i < n; i++) {
+        var y = 1 - (i / (n - 1)) * 2;
+        var r = Math.sqrt(Math.max(0, 1 - y * y));
+        var th = ga * i;
+        pts.push({x:Math.cos(th)*r, y:y, z:Math.sin(th)*r,
+                  rx:0, ry:0, rz:0, ox:0, oy:0, oz:0, vx:0, vy:0, vz:0});
+      }
+    }
+
+    function fit(){
+      if (!cv) return;
+      var r = cv.getBoundingClientRect();
+      if (!r.width) return;
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = Math.round(r.width); H = Math.round(r.height);
+      cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var want = W < 170 ? Math.round(PARTICLES * 0.65) : PARTICLES;
+      if (want !== n) build(want);
+    }
+
+    function colour(){
+      var v = getComputedStyle(box).getPropertyValue('--src').trim();
+      var m = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.exec(v);
+      if (!m) return;
+      var h = m[1];
+      if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+      col = [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+    }
+
+    /* Every number here is a reading, not a preference. */
+    function params(){
+      var s = st.source, low = st.battery <= 20 || s === 'none';
+      var p = {spin:0.16, jitter:0, dim:1, squeeze:1, pulse:0};
+      if (s === 'gen')           { p.spin = 0.40; p.jitter = 0.011; }
+      else if (s === 'inverter') { p.spin = 0.05; p.dim = 0.5; p.squeeze = 0.78; }
+      else if (s === 'none')     { p.spin = 0.12; p.jitter = 0.006; }
+      if (low) { p.pulse = 1; p.spin = Math.max(p.spin, 0.26);
+                 p.jitter = Math.max(p.jitter, 0.008); }
+      p.spin += Math.min(1, st.draw / 3400) * 0.55;   // heavier load, faster spin
+      return p;
+    }
+
+    function step(dt){
+      if (!W) return;
+      var p = params();
+      rot += p.spin * dt;
+      var t = Date.now() / 1000;
+      var beat = p.pulse ? 1 + Math.sin(t * 5.2) * 0.07 : 1;
+      var batt = Math.max(0, Math.min(100, st.battery));
+      /* radius carries the battery: as it falls, the sphere contracts */
+      var R = Math.min(W, H) * 0.29 * p.squeeze * (0.66 + 0.34 * batt / 100) * beat;
+      var cx = W / 2, cy = H / 2;
+      var cs = Math.cos(rot), sn = Math.sin(rot);
+      var ct = Math.cos(TILT), stt = Math.sin(TILT);
+
+      for (var q = 0; q < 8; q++) { bx[q].length = 0; by[q].length = 0; bs[q].length = 0; }
+      ctx.clearRect(0, 0, W, H);
+
+      for (var i = 0; i < n; i++) {
+        var o = pts[i];
+        o.vx += (-SPRING * o.ox - DAMP * o.vx) * dt;
+        o.vy += (-SPRING * o.oy - DAMP * o.vy) * dt;
+        o.vz += (-SPRING * o.oz - DAMP * o.vz) * dt;
+        o.ox += o.vx * dt; o.oy += o.vy * dt; o.oz += o.vz * dt;
+
+        var x = o.x * cs - o.z * sn;
+        var z0 = o.x * sn + o.z * cs;
+        var y = o.y * ct - z0 * stt;
+        var z = o.y * stt + z0 * ct;
+        o.rx = x; o.ry = y; o.rz = z;      // remembered so a spike blows outward
+
+        if (p.jitter) { x += (Math.random()-0.5)*p.jitter; y += (Math.random()-0.5)*p.jitter; }
+        x += o.ox; y += o.oy; z += o.oz;
+
+        var sc = FOV / (FOV + z);
+        var sx = cx + x * R * sc, sy = cy + y * R * sc;
+
+        if (ptr) {                          // the pointer pushes; the spring returns
+          var dx = sx - ptr.x, dy = sy - ptr.y, d2 = dx*dx + dy*dy;
+          if (d2 < 4900 && d2 > 0.5) {
+            var d = Math.sqrt(d2), f = (1 - d/70) * 58 * dt;
+            o.vx += dx/d * f; o.vy += dy/d * f;
+          }
+        }
+
+        var depth = (z + 1) / 2;            // 0 far, 1 near
+        var a = (0.14 + 0.86 * depth) * p.dim;
+        var q2 = a * 8 | 0; if (q2 > 7) q2 = 7; if (q2 < 0) q2 = 0;
+        bx[q2].push(sx); by[q2].push(sy); bs[q2].push((0.7 + 1.35 * depth) * sc);
+      }
+
+      /* eight alpha buckets, so 400 dots cost eight fills instead of 400 */
+      for (var b = 0; b < 8; b++) {
+        var xs = bx[b]; if (!xs.length) continue;
+        ctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ','
+                      + ((b + 1) / 8 * 0.95).toFixed(3) + ')';
+        ctx.beginPath();
+        for (var k = 0; k < xs.length; k++) {
+          ctx.moveTo(xs[k] + bs[b][k], by[b][k]);
+          ctx.arc(xs[k], by[b][k], bs[b][k], 0, 6.2832);
+        }
+        ctx.fill();
+      }
+    }
+
+    function frame(ts){
+      if (!spinning) return;
+      raf = requestAnimationFrame(frame);
+      var dt = (ts - last) / 1000; last = ts;
+      if (dt > 0.25) dt = 0.25;
+      acc += dt;
+      if (acc < 1 / FPS) return;
+      step(acc); acc = 0;
+    }
+    function start(){
+      if (spinning || reduce) return;
+      spinning = true; last = performance.now(); acc = 0;
+      raf = requestAnimationFrame(frame);
+    }
+    function stop(){ spinning = false; cancelAnimationFrame(raf); }
+
+    return {
+      init: function(){
+        cv = el('novacv'); box = el('figure');
+        if (!cv || !cv.getContext) return;
+        ctx = cv.getContext('2d');
+        reduce = window.matchMedia &&
+                 window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        build(PARTICLES); fit(); colour(); step(0);
+        window.addEventListener('resize', function(){ fit(); if (!spinning) step(0); });
+        document.addEventListener('visibilitychange', function(){
+          if (document.hidden) stop(); else if (isLive) start();
+        });
+        cv.addEventListener('pointermove', function(e){
+          var r = cv.getBoundingClientRect();
+          ptr = {x:e.clientX - r.left, y:e.clientY - r.top};
+        });
+        cv.addEventListener('pointerleave', function(){ ptr = null; });
+        cv.addEventListener('pointercancel', function(){ ptr = null; });
+      },
+      state: function(d){
+        st.source = d.source; st.battery = d.battery; st.draw = d.draw;
+        colour();
+        if (!spinning) step(0);          // keeps the static fallback current
+      },
+      /* The whole point: when the data stops, the sphere stops. Not slower --
+         stopped, on whatever frame it was on. */
+      live: function(v){
+        if (v === isLive) return;
+        isLive = v;
+        if (v && !document.hidden) start(); else stop();
+      },
+      spike: function(){
+        if (reduce) return;
+        for (var i = 0; i < n; i++) {
+          var o = pts[i], m = 2.6 + Math.random() * 1.6;
+          o.vx += o.rx * m; o.vy += o.ry * m; o.vz += o.rz * m;
+        }
+      }
+    };
+  })();
+
 
   /* ---- the house talking about itself --------------------------------- */
   function narrate(e){
@@ -849,6 +883,7 @@ body.stale .load{cursor:not-allowed;}
   function freshness(){
     var stale = isStale();
     document.body.classList.toggle('stale', stale);
+    Nova.live(!stale);
     var msg;
     if (lastOkAt === null) {
       msg = triedOnce ? 'Can’t reach the hub. Nothing has loaded yet.' : 'Trying to reach the hub…';
@@ -911,6 +946,7 @@ body.stale .load{cursor:not-allowed;}
              : d.source === 'inverter' ? 'still'
              : d.source === 'gen'      ? 'alert' : '';
     paintFigure();
+    Nova.state({source:d.source, battery:d.battery, draw:d.draw});
 
     el('voltage').textContent = Math.round(d.voltage);
     el('voltcell').classList.toggle('alarm', !d.voltage_ok);
@@ -974,26 +1010,7 @@ body.stale .load{cursor:not-allowed;}
   }
 
   function paintFigure(){
-    el('figure').className = 'figure'
-      + (fig.mood ? ' ' + fig.mood : '')
-      + (fig.startle ? ' startle' : '')
-      + (fig.look ? ' ' + fig.look : '');
-  }
-
-  function startle(){
-    fig.startle = false; paintFigure();
-    void el('figure').offsetWidth;   // restart if one is already running
-    fig.startle = true; paintFigure();
-    clearTimeout(startleTimer);
-    startleTimer = setTimeout(function(){ fig.startle = false; paintFigure(); }, 2000);
-  }
-
-  /* Turn toward whatever just happened. Voltage sits left of Nova, the battery
-     right of it, the switches below, so the head follows the layout. */
-  function orient(dir){
-    fig.look = dir; paintFigure();
-    clearTimeout(lookTimer);
-    lookTimer = setTimeout(function(){ fig.look = ''; paintFigure(); }, 2600);
+    el('figure').className = 'figure' + (fig.mood ? ' ' + fig.mood : '');
   }
 
   function renderLog(events){
@@ -1014,7 +1031,7 @@ body.stale .load{cursor:not-allowed;}
       ol.appendChild(empty);
       return;
     }
-    var spiked = false, dir = '';
+    var spiked = false;
     events.forEach(function(e){
       var k = keyOf(e);
       var li = document.createElement('li');
@@ -1027,14 +1044,9 @@ body.stale .load{cursor:not-allowed;}
       li.appendChild(t);
       li.appendChild(line);
       ol.appendChild(li);
-      if (fresh[k]) {
-        if (/SPIKE/.test(e.what)) { spiked = true; dir = 'look-left'; }
-        else if (/BATTERY|ALERT/.test(e.what)) { if (dir !== 'look-left') dir = 'look-right'; }
-        else if (/^(ON|OFF)\s/.test(e.what)) { if (!dir) dir = 'look-down'; }
-      }
+      if (fresh[k] && /SPIKE/.test(e.what)) spiked = true;
     });
-    if (spiked) startle();
-    if (dir) orient(dir);
+    if (spiked) Nova.spike();
   }
 
   function schedule(ms){ clearTimeout(timer); timer = setTimeout(poll, ms); }
@@ -1113,6 +1125,7 @@ body.stale .load{cursor:not-allowed;}
     if (!document.hidden) { freshness(); schedule(0); }
   });
 
+  Nova.init();
   setInterval(freshness, 250);
   freshness();
   poll();
