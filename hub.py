@@ -632,30 +632,56 @@ body.stale .load{cursor:not-allowed;}
 
   /* ---- Nova: a sphere of points, written here, no library -------------- */
   var Nova = (function(){
-    var PARTICLES = 400;   // budget. Lower it if a slow device struggles.
-    var MAX       = 700;   // hard cap, whatever anything else asks for.
+    var PARTICLES = 2200;  // ceiling. The governor below only ever goes down from here.
+    var FLOOR     = 700;   // it will not thin the lattice past this
+    var MAX       = 4000;  // hard cap, whatever anything else asks for.
     var FPS       = 30;    // deliberately not 60. This runs on a Pi and a phone.
-    var FOV = 3.2, SPRING = 12, DAMP = 4.5, TILT = 0.42;
+    var FOV = 3.2, SPRING = 12, DAMP = 4.5, TILT = 0.10, SPR = 32;
 
-    var cv, ctx, box, W = 0, H = 0, pts = [], n = 0;
+    var cv, ctx, box, spr, sctx, W = 0, H = 0, pts = [], n = 0;
     var rot = 0, raf = 0, spinning = false, isLive = false, last = 0, acc = 0;
     var reduce = false, ptr = null, col = [166,183,194];
+    var cost = 0, slow = 0, fast = 0, want = 0;   // frame-time governor
     var st = {source:'grid', battery:100, draw:0};
     var bx = [], by = [], bs = [];        // reused every frame; no per-frame garbage
     for (var q = 0; q < 8; q++) { bx.push([]); by.push([]); bs.push([]); }
 
-    /* Fibonacci sphere: even coverage, no clumping at the poles. */
-    function build(count){
-      n = Math.max(24, Math.min(MAX, count));
+    /* A latitude/longitude lattice. Every longitude converges at the poles, so
+       they ring up bright and the rows and columns stay legible as it turns --
+       that structure is the point. (An earlier build used a Fibonacci spiral,
+       which spreads evenly and deliberately kills exactly that.) */
+    function build(target){
+      target = Math.max(200, Math.min(MAX, target));
+      var rings = Math.max(8, Math.round(Math.sqrt(target / 2)));
+      var seg = Math.max(8, Math.round(target / rings));
+      n = rings * seg;
+      if (cv) cv.dataset.n = n;      // readable when tuning on the target device
       pts = [];
-      var ga = Math.PI * (3 - Math.sqrt(5));
-      for (var i = 0; i < n; i++) {
-        var y = 1 - (i / (n - 1)) * 2;
-        var r = Math.sqrt(Math.max(0, 1 - y * y));
-        var th = ga * i;
-        pts.push({x:Math.cos(th)*r, y:y, z:Math.sin(th)*r,
-                  rx:0, ry:0, rz:0, ox:0, oy:0, oz:0, vx:0, vy:0, vz:0});
+      for (var i = 0; i < rings; i++) {
+        var phi = Math.PI * (i + 0.5) / rings;
+        var y = Math.cos(phi), r = Math.sin(phi);
+        for (var j = 0; j < seg; j++) {
+          var th = 2 * Math.PI * j / seg;
+          pts.push({x:Math.cos(th)*r, y:y, z:Math.sin(th)*r,
+                    rx:0, ry:0, rz:0, ox:0, oy:0, oz:0, vx:0, vy:0, vz:0});
+        }
       }
+    }
+
+    /* One sprite, redrawn only when the colour changes: a white-hot core
+       falling off into the state colour. Additive blending does the bloom. */
+    function sprite(){
+      if (!spr) { spr = document.createElement('canvas'); spr.width = spr.height = SPR;
+                  sctx = spr.getContext('2d'); }
+      var c = col[0] + ',' + col[1] + ',' + col[2];
+      sctx.clearRect(0, 0, SPR, SPR);
+      var g = sctx.createRadialGradient(SPR/2, SPR/2, 0, SPR/2, SPR/2, SPR/2);
+      g.addColorStop(0,    'rgba(255,255,255,0.90)');
+      g.addColorStop(0.07, 'rgba(255,255,255,0.42)');
+      g.addColorStop(0.17, 'rgba(' + c + ',0.62)');
+      g.addColorStop(0.42, 'rgba(' + c + ',0.15)');
+      g.addColorStop(1,    'rgba(' + c + ',0)');
+      sctx.fillStyle = g; sctx.fillRect(0, 0, SPR, SPR);
     }
 
     function fit(){
@@ -666,8 +692,8 @@ body.stale .load{cursor:not-allowed;}
       W = Math.round(r.width); H = Math.round(r.height);
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      var want = W < 170 ? Math.round(PARTICLES * 0.65) : PARTICLES;
-      if (want !== n) build(want);
+      want = W < 170 ? Math.round(PARTICLES * 0.55) : PARTICLES;
+      if (Math.abs(want - n) > want * 0.5) build(want);
     }
 
     function colour(){
@@ -677,6 +703,7 @@ body.stale .load{cursor:not-allowed;}
       var h = m[1];
       if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
       col = [parseInt(h.slice(0,2),16), parseInt(h.slice(2,4),16), parseInt(h.slice(4,6),16)];
+      sprite();
     }
 
     /* Every number here is a reading, not a preference. */
@@ -705,7 +732,7 @@ body.stale .load{cursor:not-allowed;}
       var cs = Math.cos(rot), sn = Math.sin(rot);
       var ct = Math.cos(TILT), stt = Math.sin(TILT);
 
-      for (var q = 0; q < 8; q++) { bx[q].length = 0; by[q].length = 0; bs[q].length = 0; }
+      bx[0].length = 0; by[0].length = 0; bs[0].length = 0;
       ctx.clearRect(0, 0, W, H);
 
       for (var i = 0; i < n; i++) {
@@ -736,23 +763,23 @@ body.stale .load{cursor:not-allowed;}
         }
 
         var depth = (z + 1) / 2;            // 0 far, 1 near
-        var a = (0.14 + 0.86 * depth) * p.dim;
-        var q2 = a * 8 | 0; if (q2 > 7) q2 = 7; if (q2 < 0) q2 = 0;
-        bx[q2].push(sx); by[q2].push(sy); bs[q2].push((0.7 + 1.35 * depth) * sc);
+        bx[0].push(sx); by[0].push(sy);
+        bs[0].push(depth); bs[0].push(sc);
       }
 
-      /* eight alpha buckets, so 400 dots cost eight fills instead of 400 */
-      for (var b = 0; b < 8; b++) {
-        var xs = bx[b]; if (!xs.length) continue;
-        ctx.fillStyle = 'rgba(' + col[0] + ',' + col[1] + ',' + col[2] + ','
-                      + ((b + 1) / 8 * 0.95).toFixed(3) + ')';
-        ctx.beginPath();
-        for (var k = 0; k < xs.length; k++) {
-          ctx.moveTo(xs[k] + bs[b][k], by[b][k]);
-          ctx.arc(xs[k], by[b][k], bs[b][k], 0, 6.2832);
-        }
-        ctx.fill();
+      /* Additive, so where the lattice crowds -- the poles, the limb -- the
+         glow piles up on itself instead of flattening. One sprite, one
+         drawImage each; no per-particle gradient or fillStyle string. */
+      var xs = bx[0], ys = by[0], ds = bs[0];
+      ctx.globalCompositeOperation = 'lighter';
+      for (var k = 0, m2 = 0; k < xs.length; k++, m2 += 2) {
+        var depth2 = ds[m2], sc2 = ds[m2 + 1];
+        ctx.globalAlpha = (0.05 + 0.52 * depth2) * p.dim;
+        var rad = (0.95 + 1.9 * depth2) * sc2;
+        ctx.drawImage(spr, xs[k] - rad, ys[k] - rad, rad * 2, rad * 2);
       }
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = 'source-over';
     }
 
     function frame(ts){
@@ -762,7 +789,28 @@ body.stale .load{cursor:not-allowed;}
       if (dt > 0.25) dt = 0.25;
       acc += dt;
       if (acc < 1 / FPS) return;
+      govern(acc);           // how long the frame actually took, not just our part
       step(acc); acc = 0;
+    }
+
+    /* A Pi and a phone are not this laptop. Rather than guess a particle count
+       that is safe everywhere, measure how long a frame actually takes here and
+       thin the lattice until it fits the budget. Only ever downward from the
+       configured ceiling, never past FLOOR. */
+    function govern(interval){
+      var target = 1 / FPS;
+      cost = cost * 0.85 + interval * 0.15;
+      if (cost > target * 1.5) {                  // frames arriving late: thin it
+        fast = 0;
+        if (++slow > 20 && n > FLOOR) {
+          build(Math.max(FLOOR, Math.round(n * 0.7))); slow = 0; cost = target;
+        }
+      } else if (cost < target * 1.12) {          // comfortable: creep back up
+        slow = 0;
+        if (++fast > 400 && n < want) {
+          build(Math.min(want, Math.round(n * 1.3))); fast = 0; cost = target;
+        }
+      } else { slow = 0; fast = 0; }
     }
     function start(){
       if (spinning || reduce) return;
@@ -802,6 +850,7 @@ body.stale .load{cursor:not-allowed;}
         isLive = v;
         if (v && !document.hidden) start(); else stop();
       },
+      count: function(){ return n; },
       spike: function(){
         if (reduce) return;
         for (var i = 0; i < n; i++) {
