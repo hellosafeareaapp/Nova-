@@ -289,7 +289,7 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 .k{font:400 14.5px var(--serif); color:var(--dim);}
 .battmid{margin-top:10px;}
 .adacard{padding:14px 18px; display:flex; align-items:center; justify-content:center;}
-.figure{width:154px; height:154px;}
+.figure{width:196px; height:196px;}
 
 /* Nova is a sphere of points on a canvas. Every property is a reading: spin
    from load, radius from battery, colour from source, and it stops dead when
@@ -420,7 +420,7 @@ body.stale .load{cursor:not-allowed;}
 
   #readouts{
     display:grid; gap:16px; padding:0 30px 30px;
-    grid-template-columns:1.2fr .78fr .92fr;
+    grid-template-columns:1.02fr .96fr .86fr;
     grid-template-rows:1fr auto auto auto;
     grid-template-areas:
       "source ada battery"
@@ -443,7 +443,7 @@ body.stale .load{cursor:not-allowed;}
   /* no panel of its own: it occupies the layout directly and stands on it */
   #readouts > .adacard{background:transparent; border:0; border-radius:0;}
   .adacard{grid-area:ada; padding:0 6px; align-items:center;}
-  .figure{width:206px; height:206px;}
+  .figure{width:292px; height:292px;}
   .battrow, .bar{display:none;}
   .ring{display:block; position:relative; width:172px; height:172px;}
   .ring svg{width:100%; height:100%; transform:rotate(-90deg); display:block;}
@@ -490,7 +490,7 @@ body.stale .load{cursor:not-allowed;}
 }
 @media (min-width:1320px){
   #readouts{
-    grid-template-columns:1.15fr .72fr .8fr 1.05fr;
+    grid-template-columns:1.02fr .94fr .78fr 1.0fr;
     grid-template-rows:1fr auto auto;
     grid-template-areas:
       "source ada battery log"
@@ -692,7 +692,7 @@ body.stale .load{cursor:not-allowed;}
       W = Math.round(r.width); H = Math.round(r.height);
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      want = W < 170 ? Math.round(PARTICLES * 0.55) : PARTICLES;
+      want = W < 240 ? Math.round(PARTICLES * 0.55) : PARTICLES;
       if (Math.abs(want - n) > want * 0.5) build(want);
     }
 
