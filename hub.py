@@ -85,9 +85,128 @@ DEFAULTS = {
         "faces": [],
     },
     "wallpaper": {"mode": "none", "image": "", "dim": 0.55, "blur": 0},
+    # how a surface is made, as opposed to what colour it is. "material" is a
+    # named recipe for the knobs under it; any knob set by hand wins over it.
+    "surface": {
+        "material": "card", "radius": 16, "stroke": 1, "lift": "soft",
+        "glow": 0.0, "blur": 0, "fill": 1.0, "strokefrom": "rule",
+    },
+    "mode": "dark",
+    # a whole look in one word. everything below it is still overridable.
+    "look": "instrument",
     "layout": {"preset": "cards", "density": "comfortable"},
     "voice": {"wake": "Hey A.D.A.", "pidgin": True, "style": "plain"},
     "nova": {"particles": 2200, "fps": 30},
+}
+
+# Five ways of making a surface. The dashboard used to have exactly one of
+# these welded into the stylesheet, which is why every recolouring of it still
+# looked like the same dashboard.
+MATERIALS = {
+    # a panel with a hairline and a crisp shadow. what was here before.
+    "card":    {"radius": 16, "stroke": 1, "lift": "soft", "glow": 0.0,
+                "blur": 0, "fill": 1.0, "strokefrom": "rule"},
+    # matte. no border, no shadow: a block of colour separates itself.
+    "chalk":   {"radius": 18, "stroke": 0, "lift": "none", "glow": 0.0,
+                "blur": 0, "fill": 1.0, "strokefrom": "rule"},
+    # no fill to speak of, a lit edge in the source colour. reads as emitted.
+    "neon":    {"radius": 14, "stroke": 1, "lift": "none", "glow": 0.75,
+                "blur": 0, "fill": 0.34, "strokefrom": "src"},
+    # printed. tight corners, one hairline, nothing floating.
+    "paper":   {"radius": 6, "stroke": 1, "lift": "none", "glow": 0.0,
+                "blur": 0, "fill": 1.0, "strokefrom": "rule"},
+    # translucent over whatever is behind it. wants a wallpaper to be worth it.
+    "frosted": {"radius": 22, "stroke": 1, "lift": "soft", "glow": 0.0,
+                "blur": 18, "fill": 0.40, "strokefrom": "ink"},
+}
+
+# A look is a complete set of settings under one name, so a theme can be sent
+# to someone as {"look": "retrowave"} and arrive whole. These sit between the
+# defaults and settings.json: the owner overrides any part of one they like.
+LOOKS = {
+    # the night instrument panel. the dashboard as built.
+    "instrument": {},
+
+    # neon over violet. surfaces stop being filled and start being outlined.
+    "retrowave": {
+        "mode": "dark",
+        "surface": {"material": "neon"},
+        "theme": {
+            "ink": "#f6e9ff", "dim": "#a081c6",
+            "ok": "#2ff2c4", "warn": "#ffb200", "bad": "#ff3d7f",
+            "sources": {
+                "grid":     {"tint": "#140b26", "panel": "#1d1038", "rule": "#3a1f6b",
+                             "sunk": "#241243", "src": "#49e0ff"},
+                "gen":      {"tint": "#1e0d1e", "panel": "#2a1029", "rule": "#5a1f4e",
+                             "sunk": "#331434", "src": "#ffb200"},
+                "inverter": {"tint": "#0e0c2c", "panel": "#17123f", "rule": "#2e2378",
+                             "sunk": "#1c1650", "src": "#b06bff"},
+                "none":     {"tint": "#210a1b", "panel": "#2e0d25", "rule": "#5c1540",
+                             "sunk": "#38112c", "src": "#ff3d7f"},
+            },
+        },
+    },
+
+    # warm, flat, close-packed. amber on near-black, no borders anywhere.
+    "amber": {
+        "mode": "dark",
+        "surface": {"material": "chalk"},
+        "theme": {
+            "ink": "#f2e4ca", "dim": "#9c8a6b",
+            "ok": "#86b06a", "warn": "#e8a33a", "bad": "#d9544a",
+            "sources": {
+                "grid":     {"tint": "#14110c", "panel": "#1e1913", "rule": "#2d2519",
+                             "sunk": "#241d14", "src": "#e8a33a"},
+                "gen":      {"tint": "#17120a", "panel": "#221b0f", "rule": "#352814",
+                             "sunk": "#2a2012", "src": "#f0b24a"},
+                "inverter": {"tint": "#10120f", "panel": "#1a1d17", "rule": "#272c22",
+                             "sunk": "#1f231c", "src": "#9fc27a"},
+                "none":     {"tint": "#1a0f0c", "panel": "#251611", "rule": "#3a1f18",
+                             "sunk": "#2d1813", "src": "#d9544a"},
+            },
+        },
+    },
+
+    # daylight. ink on cream, hairlines, nothing glowing or floating.
+    "paper": {
+        "mode": "light",
+        "surface": {"material": "paper"},
+        "theme": {
+            "ink": "#1c1a17", "dim": "#6f6a62",
+            "ok": "#2f7d4f", "warn": "#9a5a12", "bad": "#a8322a",
+            "sources": {
+                "grid":     {"tint": "#f4f1ea", "panel": "#fffdf8", "rule": "#ddd7cb",
+                             "sunk": "#e7e2d7", "src": "#3a5d8f"},
+                "gen":      {"tint": "#f6f0e4", "panel": "#fffcf4", "rule": "#e2d8c2",
+                             "sunk": "#ebe3d0", "src": "#9a5a12"},
+                "inverter": {"tint": "#eef2f4", "panel": "#fbfdfe", "rule": "#d5dde2",
+                             "sunk": "#e1e8ec", "src": "#2b6f8c"},
+                "none":     {"tint": "#f8eeec", "panel": "#fffbfa", "rule": "#e7cfcb",
+                             "sunk": "#f0dcd9", "src": "#a8322a"},
+            },
+        },
+    },
+
+    # glass. put an image in assets/ and set wallpaper for this to mean much.
+    "frosted": {
+        "mode": "dark",
+        "surface": {"material": "frosted"},
+        "wallpaper": {"dim": 0.34, "blur": 0},
+        "theme": {
+            "ink": "#f2f4f7", "dim": "#a8b0ba",
+            "ok": "#5ec98f", "warn": "#f0a93c", "bad": "#f0655a",
+            "sources": {
+                "grid":     {"tint": "#121519", "panel": "#2b323b", "rule": "#3c4650",
+                             "sunk": "#1c2127", "src": "#bcd0de"},
+                "gen":      {"tint": "#19150f", "panel": "#352d21", "rule": "#473c2c",
+                             "sunk": "#241e16", "src": "#f0a93c"},
+                "inverter": {"tint": "#0f141c", "panel": "#242f3e", "rule": "#34435a",
+                             "sunk": "#18202b", "src": "#79b4e8"},
+                "none":     {"tint": "#1a1211", "panel": "#382423", "rule": "#4b2f2d",
+                             "sunk": "#251817", "src": "#f0655a"},
+            },
+        },
+    },
 }
 
 HEX = re.compile(r"^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$")
@@ -105,10 +224,16 @@ def _merge(base, over):
     """Overlay the owner's settings on the defaults, key by key, so a partial
     or older settings.json still produces a complete set."""
     out = dict(base)
-    for k, v in (over or {}).items():
-        if k in base and isinstance(base[k], dict) and isinstance(v, dict):
-            out[k] = _merge(base[k], v)
-        elif k in base:
+    if not isinstance(over, dict):
+        return out
+    for k, v in over.items():
+        if k not in base:
+            continue
+        if isinstance(base[k], dict):
+            # a non-dict here would blow away a whole branch and take the
+            # boot with it, so a mangled value just loses to the default
+            out[k] = _merge(base[k], v) if isinstance(v, dict) else base[k]
+        else:
             out[k] = v
     return out
 
@@ -152,6 +277,22 @@ def _clean(st):
             nv[k] = int(min(hi, max(lo, float(nv.get(k, d["nova"][k])))))
         except (TypeError, ValueError):
             nv[k] = d["nova"][k]
+    sf = st["surface"]
+    if sf.get("material") not in MATERIALS:
+        sf["material"] = "card"
+    mat = MATERIALS[sf["material"]]
+    if sf.get("strokefrom") not in ("rule", "src", "ink"):
+        sf["strokefrom"] = mat["strokefrom"]
+    if sf.get("lift") not in ("none", "soft", "deep"):
+        sf["lift"] = mat["lift"]
+    for k, lo, hi in (("radius", 0, 32), ("stroke", 0, 3), ("glow", 0.0, 1.0),
+                      ("blur", 0, 30), ("fill", 0.0, 1.0)):
+        try:
+            sf[k] = min(hi, max(lo, float(sf.get(k))))
+        except (TypeError, ValueError):
+            sf[k] = mat[k]
+    if st.get("mode") not in ("dark", "light"):
+        st["mode"] = "dark"
     return st
 
 
@@ -162,13 +303,68 @@ def safe_asset(name):
         and "/" not in name and "\\" not in name and not name.startswith(".")
 
 
-def load_settings():
+def _read_raw():
+    """settings.json as written: sparse, only what the owner departed from."""
     try:
         with open(SETTINGS_FILE, "r", encoding="utf-8") as fh:
             raw = json.load(fh)
     except (OSError, ValueError):
         raw = {}
-    return _clean(_merge(DEFAULTS, raw if isinstance(raw, dict) else {}))
+    return raw if isinstance(raw, dict) else {}
+
+
+def _patch_raw(raw, patch, shape=None):
+    """Deep-update the stored intent, dropping keys the schema does not know.
+
+    This edits the sparse file rather than the composed result. Saving the
+    composed result instead would bake every value a look supplied into the
+    file as though the owner had picked it by hand, and the look could then
+    never change anything again.
+    """
+    shape = DEFAULTS if shape is None else shape
+    out = dict(raw)
+    if not isinstance(patch, dict):
+        return out
+    for k, v in patch.items():
+        if k not in shape:
+            continue
+        if isinstance(shape[k], dict) and isinstance(v, dict):
+            prev = out.get(k)
+            out[k] = _patch_raw(prev if isinstance(prev, dict) else {}, v, shape[k])
+        else:
+            out[k] = v
+    return out
+
+
+def load_settings():
+    """Four layers, each one overridable by the next: the defaults, the named
+    look, the material's surface recipe, and finally settings.json itself.
+
+    The material only fills in surface knobs that neither the look nor the
+    file mentioned, so {"look": "retrowave"} is a complete working theme and
+    {"look": "retrowave", "surface": {"glow": 0.2}} is that theme turned down.
+    """
+    raw = _read_raw()
+
+    look = raw.get("look")
+    if look not in LOOKS:
+        look = DEFAULTS["look"]
+    st = _merge(_merge(DEFAULTS, LOOKS[look]), raw)
+    st["look"] = look
+
+    looksurf = LOOKS[look].get("surface") or {}
+    rawsurf = raw.get("surface") if isinstance(raw.get("surface"), dict) else {}
+    spoken = set(looksurf) | set(rawsurf)
+    # a material nobody has heard of is a typo, not a decision, so the look
+    # keeps the one it chose rather than being demoted to the global default
+    if st["surface"].get("material") not in MATERIALS:
+        st["surface"]["material"] = looksurf.get(
+            "material", DEFAULTS["surface"]["material"])
+    mat = MATERIALS[st["surface"]["material"]]
+    for k, v in mat.items():
+        if k not in spoken:
+            st["surface"][k] = v
+    return _clean(st)
 
 
 def save_settings(st):
@@ -179,6 +375,74 @@ def save_settings(st):
         json.dump(st, fh, indent=2, sort_keys=True)
         fh.write("\n")
     os.replace(tmp, SETTINGS_FILE)
+
+
+def _rgba(hexcol, alpha):
+    """A hex colour at an opacity, composed here rather than with color-mix()
+    so it works on whatever browser the phone happens to have."""
+    h = str(hexcol).lstrip("#")
+    if len(h) == 3:
+        h = "".join(c * 2 for c in h)
+    try:
+        r, g, b = int(h[0:2], 16), int(h[2:4], 16), int(h[4:6], 16)
+    except ValueError:
+        r = g = b = 128
+    if alpha >= 1:
+        return "#%02x%02x%02x" % (r, g, b)
+    return "rgba(%d,%d,%d,%.3f)" % (r, g, b, max(0.0, alpha))
+
+
+# how hard a shadow falls, per mode. a light surface cannot take a black one.
+LIFTS = {
+    "dark":  {"none": None, "soft": "0 10px 28px rgba(0,0,0,.34)",
+              "deep": "0 18px 48px rgba(0,0,0,.55)"},
+    "light": {"none": None, "soft": "0 6px 18px rgba(42,36,26,.09)",
+              "deep": "0 14px 34px rgba(42,36,26,.17)"},
+}
+
+# what "no longer live" looks like. it has to read as wrong in either mode,
+# because this is the one thing on the page that must never be missable.
+STALEFX = {"dark":  "grayscale(.94) brightness(.5) opacity(.62)",
+           "light": "grayscale(.94) brightness(1.04) opacity(.4)"}
+
+STROKE_ALPHA = {"rule": 1.0, "src": 0.55, "ink": 0.20}
+
+
+def _surface_vars(pal, sf, th, mode):
+    """The surface half of the palette: not what colour a card is, but what
+    kind of thing it is. Per source, because a lit edge is the source colour."""
+    fill = sf["fill"]
+    edge = {"rule": pal["rule"], "src": pal["src"], "ink": th["ink"]}[sf["strokefrom"]]
+    big, small = [], []
+    if sf["glow"] > 0:
+        g = sf["glow"]
+        big.append("0 0 %dpx %s" % (int(10 + 26 * g), _rgba(pal["src"], .14 + .40 * g)))
+        big.append("inset 0 0 %dpx %s" % (int(8 + 20 * g), _rgba(pal["src"], .04 + .11 * g)))
+        small.append("0 0 %dpx %s" % (int(6 + 14 * g), _rgba(pal["src"], .10 + .26 * g)))
+    shade = LIFTS[mode][sf["lift"]]
+    if shade:
+        big.append(shade)
+        small.append(shade)
+    glass = ("blur(%dpx) saturate(1.35)" % int(sf["blur"])) if sf["blur"] else "none"
+    return [
+        "--fill:%s" % _rgba(pal["panel"], fill),
+        "--loadfill:%s" % _rgba(pal["tint"], min(1.0, fill + .12)),
+        "--stroke:%s" % _rgba(edge, STROKE_ALPHA[sf["strokefrom"]]),
+        # the separators that hold the phone layout together. always drawn, at
+        # 1px, whatever the material does -- without them the columns merge.
+        "--bandrule:%s" % (_rgba(pal["src"], .42) if sf["strokefrom"] == "src"
+                           else pal["rule"]),
+        "--sw:%gpx" % sf["stroke"],
+        "--r:%dpx" % int(sf["radius"]),
+        "--rs:%dpx" % max(0, int(sf["radius"]) - 3),
+        "--shadow:%s" % (", ".join(big) if big else "none"),
+        "--shadow-sm:%s" % (", ".join(small) if small else "none"),
+        "--glass:%s" % glass,
+        # hover has to land on something: a lit edge where there is an edge,
+        # a shift in the fill where there is not
+        "--hoverfill:%s" % (_rgba(pal["sunk"], min(1.0, fill + .12))
+                            if sf["stroke"] <= 0 else _rgba(pal["tint"], min(1.0, fill + .12))),
+    ]
 
 
 def tokens_css(st):
@@ -192,11 +456,16 @@ def tokens_css(st):
             "--warn:%s" % th["warn"], "--bad:%s" % th["bad"],
             "--sans:%s" % ty["sans"], "--serif:%s" % ty["serif"],
             "--scale:%s" % ty["scale"]]
+    sf, mode = st["surface"], st["mode"]
+    base.append("color-scheme:%s" % mode)
+    base.append("--stalefx:%s" % STALEFX[mode])
     base += ["--%s:%s" % (k, v) for k, v in th["sources"]["grid"].items()]
+    base += _surface_vars(th["sources"]["grid"], sf, th, mode)
     out.append(":root{%s;}" % ";".join(base))
     for name, pal in th["sources"].items():
         out.append(':root[data-source="%s"]{%s;}'
-                   % (name, ";".join("--%s:%s" % (k, v) for k, v in pal.items())))
+                   % (name, ";".join(["--%s:%s" % (k, v) for k, v in pal.items()]
+                                     + _surface_vars(pal, sf, th, mode))))
     if wp["mode"] == "image" and wp["image"]:
         out.append("body{background-image:url('/assets/%s');background-size:cover;"
                    "background-position:center;background-attachment:fixed;}" % wp["image"])
@@ -377,11 +646,12 @@ class Hub(BaseHTTPRequestHandler):
             except (ValueError, TypeError):
                 self._json(400, {"error": "expected a JSON object"}); return
             with SETTINGS_LOCK:
-                st = _clean(_merge(load_settings(), patch))
+                raw = _patch_raw(_read_raw(), patch)
                 try:
-                    save_settings(st)
+                    save_settings(raw)
                 except OSError as err:
                     self._json(500, {"error": "could not save: %s" % err}); return
+                st = load_settings()
             self._json(200, st)
             return
         if route != "/switch":
@@ -424,7 +694,7 @@ PAGE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<meta name="color-scheme" content="dark light">
 <title>The house</title>
 <style id="usertokens">/*TOKENS*/</style>
 <style>
@@ -447,7 +717,8 @@ section, .load, #statusbar, .log li{transition:background-color 600ms linear, bo
   position:sticky; top:0; z-index:20;
   display:flex; align-items:center; gap:10px;
   padding:12px 18px; padding-top:calc(12px + env(safe-area-inset-top));
-  background:var(--panel); border-bottom:1px solid var(--rule);
+  background:var(--fill); backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
+  border-bottom:1px solid var(--bandrule);
   font:400 13.5px/1.35 var(--serif); color:var(--dim);
 }
 #statusbar .dot{width:7px; height:7px; border-radius:50%; background:var(--ok); flex:none;}
@@ -460,7 +731,7 @@ body.stale #statusbar .dot{background:#fff5f0;}
 
 /* --- stale: the readings stop looking like readings --------------------- */
 #readouts{transition:filter .2s linear, opacity .2s linear;}
-body.stale #readouts{filter:grayscale(.94) brightness(.5); opacity:.55;}
+body.stale #readouts{filter:var(--stalefx);}
 
 /* Motion is the liveness signal, so when the data stops, every moving thing
    on the page freezes exactly where it is. Not reset, not hidden: stopped. */
@@ -469,7 +740,7 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 .rail, .head{display:none;}
 
 /* --- what the house is running on --------------------------------------- */
-.hero{padding:26px 18px 23px; border-bottom:1px solid var(--rule);}
+.hero{padding:26px 18px 23px; border-bottom:1px solid var(--bandrule);}
 .eyebrow{font:400 14.5px var(--serif); color:var(--dim);}
 .source{
   margin-top:5px; color:var(--src);
@@ -479,7 +750,7 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 .sourcenote{margin-top:11px; font:400 15.5px/1.45 var(--serif); color:var(--dim);}
 
 /* --- the presence, and the battery -------------------------------------- */
-.batt{padding:20px 18px 19px; border-bottom:1px solid var(--rule);}
+.batt{padding:20px 18px 19px; border-bottom:1px solid var(--bandrule);}
 .k{font:400 14.5px var(--serif); color:var(--dim);}
 .battmid{margin-top:10px;}
 .adacard{padding:14px 18px; display:flex; align-items:center; justify-content:center;}
@@ -513,7 +784,7 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 /* --- voltage, water, draw ------------------------------------------------ */
 .strip{
   display:grid; grid-template-columns:repeat(3,1fr); gap:16px;
-  padding:19px 18px 20px; border-bottom:1px solid var(--rule);
+  padding:19px 18px 20px; border-bottom:1px solid var(--bandrule);
 }
 .cell .val{margin-top:5px; font:600 25px/1.05 var(--sans);}
 .cell .u{margin-left:2px; font-size:14px; font-weight:500; color:var(--dim);}
@@ -524,12 +795,12 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 .sec{margin:0; padding:23px 18px 9px; font:400 15.5px var(--serif); color:var(--dim);}
 
 /* --- the switches, heaviest first, sized by what they actually draw ------ */
-.loads{border-top:1px solid var(--rule);}
+.loads{border-top:1px solid var(--bandrule);}
 .load{
   display:flex; align-items:center; gap:14px; width:100%;
   appearance:none; -webkit-appearance:none; border:0; margin:0;
   background:transparent; color:var(--ink); font:inherit; text-align:left;
-  padding:15px 18px; cursor:pointer; border-bottom:1px solid var(--rule);
+  padding:15px 18px; cursor:pointer; border-bottom:1px solid var(--bandrule);
 }
 .load .lamp{width:10px; height:10px; border-radius:50%; flex:none; background:var(--sunk);
   transition:background .2s linear;}
@@ -538,7 +809,7 @@ body.stale *, body.stale *::before, body.stale *::after{animation-play-state:pau
 .load .lwatts{font:400 13.5px var(--serif); color:var(--dim);}
 .load .lstate{width:36px; text-align:right; font-size:13.5px; font-weight:600; color:var(--dim);}
 .load[aria-pressed="true"] .lstate{color:var(--ok);}
-.load:active{background:var(--panel);}
+.load:active{background:var(--sunk);}
 .load.pending{opacity:.45;}
 body.stale .load{cursor:not-allowed;}
 
@@ -555,7 +826,7 @@ body.stale .load{cursor:not-allowed;}
 .log{list-style:none; margin:0; padding:0;}
 .log li{
   display:grid; grid-template-columns:auto 1fr; gap:13px;
-  padding:11px 18px; border-bottom:1px solid var(--rule);
+  padding:11px 18px; border-bottom:1px solid var(--bandrule);
 }
 .log time{font:400 13.5px/1.5 var(--sans); color:var(--dim);}
 .log .line{font:400 15px/1.45 var(--serif);}
@@ -573,7 +844,7 @@ body.stale .load{cursor:not-allowed;}
   position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom));
   transform:translate(-50%,12px); z-index:40;
   width:max-content; max-width:min(460px,calc(100% - 28px));
-  padding:14px 19px; border-radius:11px; text-align:center;
+  padding:14px 19px; border-radius:var(--rs); text-align:center;
   background:var(--bad); color:#fff6f3;
   font:400 15px/1.4 var(--serif);
   box-shadow:0 12px 34px rgba(0,0,0,.6);
@@ -594,7 +865,8 @@ body.stale .load{cursor:not-allowed;}
   }
   .rail{
     display:flex; flex-direction:column; align-items:center; gap:20px;
-    padding:24px 0 26px; border-right:1px solid var(--rule); background:var(--panel);
+    padding:24px 0 26px; border-right:1px solid var(--bandrule);
+    background:var(--fill); backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
   }
   .rail .mark{width:25px; height:25px; color:var(--dim); flex:none;}
   .rail .spine{flex:1; width:3px; border-radius:2px; background:var(--src); opacity:.9;
@@ -622,7 +894,11 @@ body.stale .load{cursor:not-allowed;}
       "log    log log"
       "loads  loads loads";
   }
-  #readouts > section{background:var(--panel); border:1px solid var(--rule); border-radius:16px;}
+  #readouts > section{
+    background:var(--fill); backdrop-filter:var(--glass); -webkit-backdrop-filter:var(--glass);
+    border:var(--sw) solid var(--stroke); border-radius:var(--r);
+    box-shadow:var(--shadow);
+  }
 
   .hero{
     grid-area:source; padding:34px 30px 34px;
@@ -635,7 +911,8 @@ body.stale .load{cursor:not-allowed;}
   .batt{grid-area:battery; padding:20px 22px 24px; display:flex; flex-direction:column;}
   .battmid{display:flex; flex-direction:column; justify-content:center; align-items:center; gap:0;}
   /* no panel of its own: it occupies the layout directly and stands on it */
-  #readouts > .adacard{background:transparent; border:0; border-radius:0;}
+  #readouts > .adacard{background:transparent; border:0; border-radius:0;
+    box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;}
   .adacard{grid-area:ada; padding:0 6px; align-items:center;}
   .figure{width:292px; height:292px;}
   .battrow, .bar{display:none;}
@@ -667,10 +944,11 @@ body.stale .load{cursor:not-allowed;}
     display:grid; grid-template-columns:auto 1fr; align-content:start;
     grid-template-areas:"lamp state" "name name" "watts watts";
     gap:9px 8px; padding:15px 15px 14px;
-    border:1px solid var(--rule); border-radius:13px; background:var(--tint);
+    border:var(--sw) solid var(--stroke); border-radius:var(--rs);
+    background:var(--loadfill); box-shadow:var(--shadow-sm);
     transition:border-color .18s linear, background-color 600ms linear;
   }
-  .load:hover{border-color:var(--src);}
+  .load:hover{border-color:var(--src); background:var(--hoverfill);}
   .load .lamp{grid-area:lamp;}
   .load .lname{grid-area:name; flex:none;}
   .load .lwatts{grid-area:watts;}
