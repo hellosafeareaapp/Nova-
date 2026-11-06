@@ -49,21 +49,29 @@ second and loops the day continuously.
 
 ## Settings
 
-`settings.json` sits next to `hub.py` and is sparse — it holds only what you
-changed. Four layers resolve it, each overridable by the next: the defaults,
-the named **look**, the **material**'s surface recipe, and the file itself.
-So `{"look": "retrowave"}` is a complete theme in 26 bytes, and
-`{"look": "retrowave", "surface": {"glow": 0.1}}` is that theme turned down.
+`settings.json` sits next to `hub.py` and holds only what you set. There are
+no palettes, no named looks and no materials — those were one person's taste
+and they went out with the design. What is left is the mechanism:
 
-- **looks** — `instrument`, `retrowave`, `amber`, `paper`, `frosted`
-- **materials** — `card`, `chalk`, `neon`, `paper`, `frosted`: fill opacity,
-  where the stroke takes its colour from, width, radius, lift and glow
-- **mode** — `dark` or `light`; each carries its own shadow weights
-- **type** — families, a scale, and `@font-face` for any font file in `assets/`
-- **wallpaper** — an image in `assets/`, with a dim and a blur
+```json
+{ "vars": { "ink": "#111", "panel": "#fff", "radius": "14px" } }
+```
+
+```css
+/* GET /tokens.css */
+:root{--ink:#111;--panel:#fff;--radius:14px;--scale:1.0;}
+```
+
+You name the variables. The server has no opinion about what they are or
+what you call them — link `/tokens.css` from whatever you build and every
+value is yours. `POST /settings` with `{"vars": {"name": null}}` removes one.
+
+- **vars** — any CSS custom property. A name must look like an identifier and
+  a value cannot contain `; { } < > \ @`, so nothing written here can break
+  out of the rule it sits in.
+- **type** — `scale` (0.75–1.6, served as `--scale`) and `faces`, which
+  `@font-face`s any font file you drop in `assets/`
+- **wallpaper** — an image in `assets/`, served as a `body` background
 
 A mangled or hand-broken `settings.json` never stops the server starting;
-anything that does not make sense reverts to its default.
-
-Those names came from a round of design work whose output was thrown away,
-so treat the five looks as starting points, not as a finished set.
+anything that does not make sense is simply left out.
