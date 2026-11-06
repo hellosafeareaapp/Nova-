@@ -1,2 +1,6 @@
 __pycache__/
 *.pyc
+settings.json
+settings.json.tmp
+assets/*
+!assets/README.md

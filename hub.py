@@ -15,6 +15,10 @@ and every switch decision still goes through house_sim.run_rules.
 
 import contextlib
 import json
+import os
+import posixpath
+import re
+import shutil
 import socket
 import sys
 import threading
@@ -28,6 +32,10 @@ except ImportError:
 
 
 # ---------------------------------------------------------------- config
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SETTINGS_FILE = os.path.join(HERE, "settings.json")
+ASSETS_DIR = os.path.join(HERE, "assets")
 
 PORT = 8000
 TICK_SECONDS = 1.0        # one real second is one simulated minute
@@ -45,6 +53,158 @@ SAFE_MAX = 260.0
 # is exactly 24h the clock the dashboard shows never jumps.
 DAY = 24 * 60
 WRAP_AT = 32 * 60         # 08:00 on day two, safely past the 06:15 trigger
+
+
+# ------------------------------------------------------------- what is theirs
+# The house belongs to whoever lives in it, so nothing below is a decision the
+# dashboard gets to keep to itself. These are only the values it starts with:
+# every one of them is overwritten by settings.json, which the owner edits.
+
+DEFAULTS = {
+    "theme": {
+        "ink": "#efeae3", "dim": "#9a9188",
+        "ok": "#7cb27c", "warn": "#dd8b45", "bad": "#c8544a",
+        # one palette per thing the house can be running on
+        "sources": {
+            "grid":     {"tint": "#101214", "panel": "#171a1d", "rule": "#252a2e",
+                         "sunk": "#1f2429", "src": "#a6b7c2"},
+            "gen":      {"tint": "#151007", "panel": "#1e1710", "rule": "#2e2418",
+                         "sunk": "#271e13", "src": "#e0913f"},
+            "inverter": {"tint": "#0a0e16", "panel": "#111621", "rule": "#1d2534",
+                         "sunk": "#18202d", "src": "#5b9bd8"},
+            "none":     {"tint": "#170b0a", "panel": "#211110", "rule": "#331b19",
+                         "sunk": "#2b1615", "src": "#d1554a"},
+        },
+    },
+    "type": {
+        "sans": '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif',
+        "serif": '"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,"Times New Roman",serif',
+        "scale": 1.0,
+        # a font file dropped in assets/ is served and @font-face'd, so this
+        # stays offline: nothing is ever fetched from a network
+        "faces": [],
+    },
+    "wallpaper": {"mode": "none", "image": "", "dim": 0.55, "blur": 0},
+    "layout": {"preset": "cards", "density": "comfortable"},
+    "voice": {"wake": "Hey A.D.A.", "pidgin": True, "style": "plain"},
+    "nova": {"particles": 2200, "fps": 30},
+}
+
+HEX = re.compile(r"^#[0-9a-fA-F]{3}([0-9a-fA-F]{3})?$")
+FONT_EXT = (".woff2", ".woff", ".ttf", ".otf")
+IMAGE_EXT = (".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif")
+ASSET_TYPES = {".woff2": "font/woff2", ".woff": "font/woff", ".ttf": "font/ttf",
+               ".otf": "font/otf", ".jpg": "image/jpeg", ".jpeg": "image/jpeg",
+               ".png": "image/png", ".webp": "image/webp", ".gif": "image/gif",
+               ".avif": "image/avif"}
+
+SETTINGS_LOCK = threading.Lock()
+
+
+def _merge(base, over):
+    """Overlay the owner's settings on the defaults, key by key, so a partial
+    or older settings.json still produces a complete set."""
+    out = dict(base)
+    for k, v in (over or {}).items():
+        if k in base and isinstance(base[k], dict) and isinstance(v, dict):
+            out[k] = _merge(base[k], v)
+        elif k in base:
+            out[k] = v
+    return out
+
+
+def _clean(st):
+    """Keep a hand-edited file from bricking the dashboard. Anything that does
+    not make sense quietly reverts to the default rather than raising: this is
+    read during a blackout, so it has to boot no matter what is in the file."""
+    d = DEFAULTS
+    th = st["theme"]
+    for k in ("ink", "dim", "ok", "warn", "bad"):
+        if not HEX.match(str(th.get(k, ""))):
+            th[k] = d["theme"][k]
+    for name, pal in th["sources"].items():
+        base = d["theme"]["sources"].get(name, d["theme"]["sources"]["grid"])
+        for k in ("tint", "panel", "rule", "sunk", "src"):
+            if not HEX.match(str(pal.get(k, ""))):
+                pal[k] = base[k]
+    ty = st["type"]
+    try:
+        ty["scale"] = min(1.6, max(0.75, float(ty.get("scale", 1))))
+    except (TypeError, ValueError):
+        ty["scale"] = 1.0
+    ty["faces"] = [f for f in (ty.get("faces") or [])
+                   if isinstance(f, dict) and safe_asset(f.get("file", ""))
+                   and str(f.get("file", "")).lower().endswith(FONT_EXT)][:8]
+    wp = st["wallpaper"]
+    if wp.get("mode") not in ("none", "image"):
+        wp["mode"] = "none"
+    if not safe_asset(wp.get("image", "")) or not str(wp.get("image", "")).lower().endswith(IMAGE_EXT):
+        wp["image"] = ""
+        wp["mode"] = "none"
+    for k, lo, hi in (("dim", 0.0, 1.0), ("blur", 0, 40)):
+        try:
+            wp[k] = min(hi, max(lo, float(wp.get(k, 0))))
+        except (TypeError, ValueError):
+            wp[k] = d["wallpaper"][k]
+    nv = st["nova"]
+    for k, lo, hi in (("particles", 200, 4000), ("fps", 10, 60)):
+        try:
+            nv[k] = int(min(hi, max(lo, float(nv.get(k, d["nova"][k])))))
+        except (TypeError, ValueError):
+            nv[k] = d["nova"][k]
+    return st
+
+
+def safe_asset(name):
+    """A single plain filename inside assets/. No paths, no traversal."""
+    name = str(name or "")
+    return bool(name) and name == posixpath.basename(name) and ".." not in name \
+        and "/" not in name and "\\" not in name and not name.startswith(".")
+
+
+def load_settings():
+    try:
+        with open(SETTINGS_FILE, "r", encoding="utf-8") as fh:
+            raw = json.load(fh)
+    except (OSError, ValueError):
+        raw = {}
+    return _clean(_merge(DEFAULTS, raw if isinstance(raw, dict) else {}))
+
+
+def save_settings(st):
+    """Written to a temporary file and moved into place, so a crash mid-write
+    cannot leave the owner with half a settings file."""
+    tmp = SETTINGS_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(st, fh, indent=2, sort_keys=True)
+        fh.write("\n")
+    os.replace(tmp, SETTINGS_FILE)
+
+
+def tokens_css(st):
+    """The :root block the page used to hard-code, generated from settings."""
+    th, ty, wp = st["theme"], st["type"], st["wallpaper"]
+    out = []
+    for f in ty["faces"]:
+        out.append("@font-face{font-family:%s;src:url('/assets/%s');font-display:swap;}"
+                   % (json.dumps(str(f.get("name", "Owner"))), f["file"]))
+    base = ["--ink:%s" % th["ink"], "--dim:%s" % th["dim"], "--ok:%s" % th["ok"],
+            "--warn:%s" % th["warn"], "--bad:%s" % th["bad"],
+            "--sans:%s" % ty["sans"], "--serif:%s" % ty["serif"],
+            "--scale:%s" % ty["scale"]]
+    base += ["--%s:%s" % (k, v) for k, v in th["sources"]["grid"].items()]
+    out.append(":root{%s;}" % ";".join(base))
+    for name, pal in th["sources"].items():
+        out.append(':root[data-source="%s"]{%s;}'
+                   % (name, ";".join("--%s:%s" % (k, v) for k, v in pal.items())))
+    if wp["mode"] == "image" and wp["image"]:
+        out.append("body{background-image:url('/assets/%s');background-size:cover;"
+                   "background-position:center;background-attachment:fixed;}" % wp["image"])
+        out.append(".wallpaper-dim{position:fixed;inset:0;z-index:0;pointer-events:none;"
+                   "background:var(--tint);opacity:%s;%s}"
+                   % (wp["dim"],
+                      ("backdrop-filter:blur(%spx);" % wp["blur"]) if wp["blur"] else ""))
+    return "\n".join(out)
 
 
 # ---------------------------------------------------------------- the house
@@ -159,6 +319,17 @@ class Hub(BaseHTTPRequestHandler):
     def do_GET(self):
         path = self.path.split("?", 1)[0]
         if path == "/":
+            st = load_settings()
+            self._send(200, PAGE.replace("/*TOKENS*/", tokens_css(st)),
+                       "text/html; charset=utf-8")
+            return
+        if path == "/settings":
+            self._json(200, load_settings())
+            return
+        if path.startswith("/assets/"):
+            self._asset(path[len("/assets/"):])
+            return
+        if path == "/__unused__":
             self._send(200, PAGE, "text/html; charset=utf-8")
         elif path == "/state":
             with LOCK:
@@ -169,8 +340,51 @@ class Hub(BaseHTTPRequestHandler):
         else:
             self._json(404, {"error": "not found"})
 
+    def _asset(self, name):
+        """Serves one file out of assets/, by plain name only."""
+        if not safe_asset(name):
+            self._json(404, {"error": "not found"}); return
+        ext = os.path.splitext(name)[1].lower()
+        if ext not in ASSET_TYPES:
+            self._json(404, {"error": "not found"}); return
+        full = os.path.join(ASSETS_DIR, name)
+        # resolve and re-check, so a symlink cannot escape assets/ either
+        if os.path.realpath(os.path.dirname(full)) != os.path.realpath(ASSETS_DIR):
+            self._json(404, {"error": "not found"}); return
+        try:
+            with open(full, "rb") as fh:
+                body = fh.read()
+        except OSError:
+            self._json(404, {"error": "not found"}); return
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", ASSET_TYPES[ext])
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-cache")
+            self.end_headers()
+            self.wfile.write(body)
+        except (BrokenPipeError, ConnectionResetError):
+            pass
+
     def do_POST(self):
-        if self.path.split("?", 1)[0] != "/switch":
+        route = self.path.split("?", 1)[0]
+        if route == "/settings":
+            try:
+                length = int(self.headers.get("Content-Length") or 0)
+                patch = json.loads(self.rfile.read(length) or b"{}")
+                if not isinstance(patch, dict):
+                    raise ValueError
+            except (ValueError, TypeError):
+                self._json(400, {"error": "expected a JSON object"}); return
+            with SETTINGS_LOCK:
+                st = _clean(_merge(load_settings(), patch))
+                try:
+                    save_settings(st)
+                except OSError as err:
+                    self._json(500, {"error": "could not save: %s" % err}); return
+            self._json(200, st)
+            return
+        if route != "/switch":
             self._json(404, {"error": "not found"})
             return
         try:
@@ -212,35 +426,15 @@ PAGE = r"""<!doctype html>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <title>The house</title>
+<style id="usertokens">/*TOKENS*/</style>
 <style>
-/* The whole screen is tinted by what the house is running on. Only these
-   four blocks change; everything else reads the variables. */
-:root{
-  --ink:#efeae3; --dim:#9a9188;
-  --ok:#7cb27c; --warn:#dd8b45; --bad:#c8544a;
-  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-  --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,"Times New Roman",serif;
-  --tint:#101214; --panel:#171a1d; --rule:#252a2e; --sunk:#1f2429; --src:#a6b7c2;
-}
-:root[data-source="grid"]{
-  --tint:#101214; --panel:#171a1d; --rule:#252a2e; --sunk:#1f2429; --src:#a6b7c2;
-}
-:root[data-source="gen"]{
-  --tint:#151007; --panel:#1e1710; --rule:#2e2418; --sunk:#271e13; --src:#e0913f;
-}
-:root[data-source="inverter"]{
-  --tint:#0a0e16; --panel:#111621; --rule:#1d2534; --sunk:#18202d; --src:#5b9bd8;
-}
-:root[data-source="none"]{
-  --tint:#170b0a; --panel:#211110; --rule:#331b19; --sunk:#2b1615; --src:#d1554a;
-}
 
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html{background:var(--tint); transition:background-color 600ms linear;}
 body{
   margin:0 auto; max-width:540px;
   background:var(--tint); color:var(--ink);
-  font:400 16px/1.4 var(--sans);
+  font:400 calc(16px * var(--scale,1))/1.4 var(--sans);
   font-variant-numeric:tabular-nums;
   -webkit-font-smoothing:antialiased;
   padding-bottom:calc(34px + env(safe-area-inset-bottom));
@@ -508,6 +702,7 @@ body.stale .load{cursor:not-allowed;}
 </style>
 </head>
 <body class="stale">
+<div class="wallpaper-dim"></div>
 
 <div id="statusbar" role="status" aria-live="polite">
   <span class="dot"></span><span id="statusmsg">Trying to reach the hub…</span>
