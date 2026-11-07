@@ -4,3 +4,4 @@ settings.json
 settings.json.tmp
 assets/*
 !assets/README.md
+device_key.txt

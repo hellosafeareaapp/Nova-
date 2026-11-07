@@ -20,6 +20,7 @@ import json
 import os
 import posixpath
 import re
+import secrets
 import shutil
 import socket
 import sys
@@ -48,6 +49,19 @@ LOG_LIMIT = 500           # house_sim.log is a display buffer; keep it bounded
 # dashboard marks the same line the rules do rather than inventing its own.
 SAFE_MIN = 200.0
 SAFE_MAX = 260.0
+
+# A real controller (the ESP32 in firmware/) reports here once a second. While
+# it is reporting it owns the power source and mirrors the loads onto its
+# relays; when it goes quiet the hub says so instead of pretending.
+DEVICE_KEY_FILE = os.path.join(HERE, "device_key.txt")
+DEVICE_TIMEOUT = 5.0      # seconds without a report before the device is offline
+SOURCES = ("grid", "gen", "inverter", "none")
+SOURCE_EVENTS = {
+    "grid": ("LIGHT IS BACK", ""),
+    "gen": ("GEN STARTED", ""),
+    "inverter": ("ON INVERTER", "on battery now"),
+    "none": ("NO POWER", ""),
+}
 
 # scenario_night_outage triggers on absolute minutes, from 21:30 on the first
 # day through to 06:15 on the second. Rewinding a whole day once we are past
@@ -259,6 +273,40 @@ def quiet():
 HOUSE = HubHouse()
 LOCK = threading.Lock()
 
+# What the hub knows about the controller. Guarded by LOCK.
+DEVICE = {"id": None, "last": 0.0, "rssi": None, "uptime": None,
+          "relays": {}, "online": False}
+
+
+def device_key():
+    """The shared key the controller must send. Made once, kept next to hub.py."""
+    try:
+        with open(DEVICE_KEY_FILE) as fh:
+            key = fh.read().strip()
+        if key:
+            return key
+    except OSError:
+        pass
+    key = secrets.token_hex(8)
+    try:
+        with open(DEVICE_KEY_FILE, "w") as fh:
+            fh.write(key + "\n")
+    except OSError:
+        pass                        # read-only folder: the key lives for this run only
+    return key
+
+
+DEVICE_KEY = device_key()
+
+
+def device_live():
+    """True while the controller has reported recently. Caller holds LOCK."""
+    live = DEVICE["id"] is not None and time.monotonic() - DEVICE["last"] <= DEVICE_TIMEOUT
+    if DEVICE["online"] and not live:
+        DEVICE["online"] = False
+        HOUSE.event("DEVICE OFFLINE", "no report for {:.0f}s".format(DEVICE_TIMEOUT))
+    return live
+
 
 def simulate():
     """One real second is one simulated minute, looping the day forever."""
@@ -266,9 +314,15 @@ def simulate():
     while True:
         next_tick += TICK_SECONDS
         with LOCK:
+            live = device_live()
+            source = HOUSE.source
             with quiet():
                 HOUSE.tick()
-                house_sim.scenario_night_outage(HOUSE)
+                if live:
+                    # the controller owns the source; the scripted outage waits
+                    HOUSE.source = source
+                else:
+                    house_sim.scenario_night_outage(HOUSE)
                 house_sim.run_rules(HOUSE)
             if HOUSE.minute >= WRAP_AT:
                 HOUSE.minute -= DAY
@@ -295,6 +349,13 @@ def snapshot():
             for name, load in HOUSE.loads.items()
         ],
         "events": list(reversed(HOUSE.events[-EVENT_LIMIT:])),
+        "device": {
+            "id": DEVICE["id"],
+            "online": device_live(),
+            "age": None if DEVICE["id"] is None else round(time.monotonic() - DEVICE["last"], 1),
+            "rssi": DEVICE["rssi"],
+            "relays": DEVICE["relays"],
+        },
     }
 
 
@@ -393,6 +454,9 @@ class Hub(BaseHTTPRequestHandler):
                 st = load_settings()
             self._json(200, st)
             return
+        if route == "/device":
+            self._device()
+            return
         if route != "/switch":
             self._json(404, {"error": "not found"})
             return
@@ -426,6 +490,43 @@ class Hub(BaseHTTPRequestHandler):
         self._json(200, payload)
 
 
+    def _device(self):
+        """The controller's once-a-second report. It sends what it sees (the
+        power source, its relays); the reply says which loads should be on."""
+        if not secrets.compare_digest(self.headers.get("X-Device-Key", ""), DEVICE_KEY):
+            self._json(403, {"error": "wrong or missing X-Device-Key"}); return
+        try:
+            length = int(self.headers.get("Content-Length") or 0)
+            body = json.loads(self.rfile.read(min(length, 4096)) or b"{}")
+            dev_id = str(body["id"])[:40]
+            source = body.get("source")
+            relays = body.get("relays") or {}
+            if source is not None and source not in SOURCES:
+                raise ValueError
+            if not isinstance(relays, dict):
+                raise ValueError
+        except (ValueError, KeyError, TypeError):
+            self._json(400, {"error": "expected JSON {id, source, relays}"}); return
+
+        with LOCK:
+            was_live = device_live()
+            DEVICE.update(id=dev_id, last=time.monotonic(), rssi=body.get("rssi"),
+                          uptime=body.get("uptime"), online=True,
+                          relays={str(k)[:20]: bool(v) for k, v in relays.items()})
+            with quiet():
+                if not was_live:
+                    HOUSE.event("DEVICE ONLINE", dev_id)
+                if source and source != HOUSE.source:
+                    HOUSE.source = source
+                    what, why = SOURCE_EVENTS[source]
+                    HOUSE.event(what, why or "reported by " + dev_id)
+                house_sim.run_rules(HOUSE)
+            loads = {name: load["on"] for name, load in HOUSE.loads.items()}
+        # cmd repeats loads as "name=1;name=0" so the firmware needs no JSON library
+        cmd = ";".join("{}={}".format(n, int(on)) for n, on in loads.items())
+        self._json(200, {"ok": True, "loads": loads, "cmd": cmd})
+
+
 # ------------------------------------------------------------- the client
 
 # The front end was deleted on purpose. Everything below the API line still
@@ -445,6 +546,7 @@ STUB = """<!doctype html>
 <li><a href="/tokens.css">/tokens.css</a> &mdash; those settings as CSS custom properties</li>
 <li>POST /switch &mdash; {"name": "kettle", "state": true}; the rules run after and may overrule it</li>
 <li>POST /settings &mdash; e.g. {"vars": {"ink": "#111", "panel": "#fff"}}</li>
+<li>POST /device &mdash; the ESP32's report, with header X-Device-Key; see firmware/README.md</li>
 </ul>
 <p>One real second is one simulated minute, and the day repeats.</p>
 """
@@ -480,6 +582,7 @@ def main():
     except OSError:
         pass
     print("  one real second = one simulated minute")
+    print("  device key: {}   (put this in the ESP32's config)".format(DEVICE_KEY))
     print("  Ctrl-C to stop")
 
     try:

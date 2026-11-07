@@ -38,11 +38,12 @@ Both files must sit in the same folder.
 |---|---|
 | `GET /` | a placeholder listing these endpoints |
 | `GET /state` | `source`, `voltage`, `tank`, `battery`, `draw`, every load with its state, and the last 30 events with timestamps |
-| `GET /settings` | the resolved settings: look, theme, type, surface, wallpaper |
+| `GET /settings` | the resolved settings: vars, type, wallpaper |
 | `GET /tokens.css` | those settings as CSS custom properties, ready to link |
 | `GET /assets/<name>` | a font or image dropped in `assets/` |
 | `POST /switch` | `{"name": "kettle", "state": true}` — the rules run afterwards and may override the request. The reply carries `requested`, `actual` and `overridden`. |
-| `POST /settings` | a partial settings object, e.g. `{"look": "retrowave"}` |
+| `POST /settings` | a partial settings object, e.g. `{"vars": {"ink": "#111"}}` |
+| `POST /device` | the ESP32's once-a-second report (header `X-Device-Key`). The reply says which loads should be on. See [`firmware/README.md`](firmware/README.md). `GET /state` carries a `device` block with `online` and `age`. |
 
 The simulation runs on a background thread at one simulated minute per real
 second and loops the day continuously.
