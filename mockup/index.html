@@ -415,6 +415,134 @@ html.dark .pic .pv{background:repeating-linear-gradient(45deg,rgba(255,255,255,.
 .pic .act button{flex:1;height:34px;border-radius:10px;font-size:13px;font-weight:650;background:var(--pill);border:1px solid var(--pill-line)}
 .pic .act button.u{background:rgba(var(--accent-rgb),.18);border-color:rgba(var(--accent-rgb),.5)}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ===== Dense panels: Nigerian home, power first ===== */
+body.dense{--d-bg:#ece5d9;--d-pn:250,246,239;--d-ink:#2b261f;--d-ink2:#857b6c;--d-ink3:#b2a796;--d-line:rgba(43,38,31,.09);--d-box:rgba(43,38,31,.045);
+ --d-amber:#b5822a;--d-amber-rgb:181,130,42;--d-ok:#3d8a57;--d-warn:#c2522c;--d-blue:#3f74a8;--d-grey:#b9b0a2;--serif:ui-serif,"Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif}
+html.dark body.dense{--d-bg:#17130f;--d-pn:36,31,26;--d-ink:#efe7da;--d-ink2:#9b9182;--d-ink3:#6d6458;--d-line:rgba(239,231,218,.08);--d-box:rgba(239,231,218,.04);
+ --d-amber:#d9a74c;--d-amber-rgb:217,167,76;--d-ok:#5fb37a;--d-warn:#e07a55;--d-blue:#6ea0d4;--d-grey:#5d554b}
+html body.dense,html.dark body.dense{background:var(--d-bg)}
+body.dense .wall,body.dense .wall-dim{display:none}
+body.dense .main{max-width:1500px}
+#dense{display:flex;flex-direction:column;gap:14px;color:var(--d-ink)}
+.dh{display:flex;flex-wrap:wrap;align-items:center;gap:14px 20px;padding:4px 4px 2px}
+.dh .clock2{display:flex;align-items:baseline;gap:6px}
+.dh .clock2 b{font-family:var(--serif);font-size:clamp(40px,5vw,58px);font-weight:500;letter-spacing:-.02em;line-height:1}
+.dh .clock2 span{font-size:13px;color:var(--d-ink2)}
+.dh .when{font-size:12.5px;color:var(--d-ink2);line-height:1.4}
+.dh .when b{color:var(--d-ink);font-weight:600}
+.dh .right{margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;background:rgba(var(--d-pn),.9);border:1px solid var(--d-line);font-size:12.5px;font-weight:600;color:var(--d-ink);white-space:nowrap}
+.pill .dot{width:7px;height:7px;border-radius:50%;background:var(--d-ok)}
+.pill.warn .dot{background:var(--d-warn)}
+.pill.src-nepa .dot{background:var(--d-ok)}.pill.src-gen .dot{background:var(--d-amber)}.pill.src-inv .dot{background:var(--d-blue)}.pill.src-off .dot{background:var(--d-warn)}
+.avs{display:flex}
+.avs span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:linear-gradient(#e9dfcf,#d6c7b0);color:#5a4a33;border:2px solid var(--d-bg);margin-left:-6px;position:relative}
+.avs span:first-child{margin-left:0}
+.avs span i{position:absolute;right:-1px;bottom:-1px;width:9px;height:9px;border-radius:50%;background:var(--d-ok);border:2px solid var(--d-bg)}
+.avs span.away{opacity:.55}.avs span.away i{background:var(--d-grey)}
+.iconbtn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:rgba(var(--d-pn),.9);border:1px solid var(--d-line);color:var(--d-ink)}
+.cols{display:grid;gap:14px;align-items:start}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+body.dense .pn{--glass-rgb:var(--d-pn);--trgb:var(--d-pn);--ta:.9;--edge-rgb:255,255,255;color:var(--d-ink);border-radius:var(--r);padding:14px 16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+html.dark body.dense .pn{--edge-rgb:255,255,255}
+.pnh{display:flex;align-items:center;gap:8px;min-height:24px}
+.pnh .lb{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--d-ink2)}
+.pnh .lb svg{color:var(--d-ink2)}
+.pnh .sm{font-size:13px;color:var(--d-ink);font-weight:500}
+.pnh .sm i{font-style:normal;font-family:var(--serif);font-size:15px}
+.pnh .end{margin-left:auto;display:flex;gap:6px;align-items:center}
+.mini-b{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--d-line);background:var(--d-box);font-size:12px;font-weight:600;color:var(--d-ink);display:inline-flex;align-items:center;gap:5px}
+.ser{font-family:var(--serif);font-weight:500;letter-spacing:-.01em;font-variant-numeric:tabular-nums lining-nums}
+.boxes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.box{padding:10px 11px;border-radius:12px;background:var(--d-box);border:1px solid var(--d-line);display:flex;flex-direction:column;gap:3px;min-width:0}
+.box .k{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--d-ink2)}
+.box .v{font-family:var(--serif);font-size:21px;line-height:1.1}
+.box .v small{font-family:var(--font);font-size:11px;color:var(--d-ink2);margin-left:2px}
+.box .s{font-size:11.5px;color:var(--d-ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srcs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.srcs div{padding:10px 8px;border-radius:12px;border:1px solid var(--d-line);text-align:center;font-size:12.5px;font-weight:650;color:var(--d-ink2);display:flex;flex-direction:column;align-items:center;gap:4px}
+.srcs div.on{color:var(--d-ink);background:rgba(var(--d-amber-rgb),.14);border-color:rgba(var(--d-amber-rgb),.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)}
+.srcs div.on.nepa{background:rgba(61,138,87,.13);border-color:rgba(61,138,87,.5)}
+.srcs div.on.inv{background:rgba(63,116,168,.13);border-color:rgba(63,116,168,.5)}
+.srcs div.on.off{background:rgba(194,82,44,.12);border-color:rgba(194,82,44,.5)}
+.volt{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;align-items:center}
+.volt .big2{font-family:var(--serif);font-size:44px;line-height:1;font-weight:500}
+.volt .big2 small{font-family:var(--font);font-size:15px;color:var(--d-ink2);margin-left:3px}
+.band{position:relative;height:10px;border-radius:5px;background:var(--d-box);border:1px solid var(--d-line)}
+.band .safe{position:absolute;top:0;bottom:0;background:rgba(61,138,87,.25)}
+.band .mk{position:absolute;top:-4px;width:3px;height:16px;border-radius:2px;background:var(--d-ink);transform:translateX(-1px);transition:left .5s}
+.band.bad .mk{background:var(--d-warn)}
+.bandlab{display:flex;justify-content:space-between;font-size:10.5px;color:var(--d-ink3);font-variant-numeric:tabular-nums;margin-top:3px}
+.spk{width:100%;height:40px;display:block}
+.tl{display:grid;grid-template-columns:repeat(24,minmax(0,1fr));gap:2px;height:22px}
+.tl i{border-radius:3px;background:var(--d-grey)}
+.tl i.nepa{background:var(--d-ok)}.tl i.gen{background:var(--d-amber)}.tl i.inv{background:var(--d-blue)}.tl i.off{background:rgba(194,82,44,.55)}.tl i.now{outline:2px solid var(--d-ink);outline-offset:1px}.tl i.fut{opacity:.18}
+.leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--d-ink2)}
+.leg span{display:flex;align-items:center;gap:6px}.leg b{color:var(--d-ink);font-weight:600}
+.leg i{width:9px;height:9px;border-radius:3px}
+.bar3{height:6px;border-radius:3px;background:var(--d-box);overflow:hidden;border:1px solid var(--d-line)}
+.bar3 i{display:block;height:100%;background:var(--d-ink)}
+.demo{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding-top:10px;border-top:1px dashed var(--d-line);font-size:11.5px;color:var(--d-ink2)}
+.demo button{height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--d-line);font-size:11.5px;font-weight:600;color:var(--d-ink)}
+.demo button[aria-pressed=true]{background:var(--d-ink);color:var(--d-bg)}
+.tank{display:grid;grid-template-columns:62px 1fr;gap:16px;align-items:center}
+.tank .vessel{position:relative;height:96px;border-radius:12px 12px 14px 14px;border:2px solid var(--d-ink3);overflow:hidden;background:var(--d-box)}
+.tank .vessel i{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(rgba(63,116,168,.55),rgba(63,116,168,.85));transition:height .8s}
+.tank .vessel b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--serif);font-size:20px;font-weight:600;color:var(--d-ink);text-shadow:0 1px 4px rgba(255,255,255,.4)}
+.rows2{display:flex;flex-direction:column}
+.r2{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--d-line);font-size:13.5px;min-width:0}
+.r2:first-child{border-top:none;padding-top:2px}
+.r2 .t{flex:1;min-width:0}
+.r2 .t b{font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r2 .t span{font-size:12px;color:var(--d-ink2)}
+.r2 .w{font-family:var(--serif);font-size:15px;color:var(--d-ink2);font-variant-numeric:tabular-nums}
+.tgl{flex:none;position:relative;width:44px;height:26px;border-radius:999px;background:var(--d-box);border:1px solid var(--d-line);transition:background .25s}
+.tgl::after{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .25s}
+.tgl[aria-checked=true]{background:var(--d-amber);border-color:transparent}
+.tgl[aria-checked=true]::after{left:20px}
+.badge2{font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:999px;border:1px solid var(--d-line);color:var(--d-ink2)}
+.badge2.shed{color:var(--d-blue);border-color:rgba(63,116,168,.4)}
+.lgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.lt{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:13px;border:1px solid var(--d-line);background:var(--d-box);text-align:left;min-width:0;transition:background .25s,border-color .25s}
+.lt .bulb2{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;color:var(--d-ink3)}
+.lt b{display:block;font-size:13.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt span{font-size:11.5px;color:var(--d-ink2)}
+.lt[aria-pressed=true]{background:linear-gradient(135deg,rgba(var(--d-amber-rgb),.32),rgba(var(--d-amber-rgb),.14));border-color:rgba(var(--d-amber-rgb),.5)}
+.lt[aria-pressed=true] .bulb2{color:#fff;background:var(--d-amber);box-shadow:0 0 12px rgba(var(--d-amber-rgb),.7)}
+.cams{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.cam2{position:relative;aspect-ratio:1.3;border-radius:12px;overflow:hidden;background:#3c3a36}
+.cam2 .slot{inset:0}
+.cam2 .slot:not(.has){background-image:linear-gradient(160deg,#5b5a55,#2f2e2b)}
+.cam2 em{position:absolute;left:8px;bottom:8px;z-index:2;font-style:normal;font-size:11.5px;font-weight:650;color:#fff;padding:3px 8px;border-radius:999px;background:rgba(0,0,0,.5)}
+.cam2 .up{z-index:3}
+.log{display:flex;flex-direction:column;max-height:300px;overflow:auto}
+.lg{display:grid;grid-template-columns:44px 1fr;gap:10px;padding:7px 0;border-top:1px solid var(--d-line);font-size:13px}
+.lg:first-child{border-top:none}
+.lg time{font-family:var(--serif);color:var(--d-ink2);font-variant-numeric:tabular-nums}
+.lg b{font-weight:600}
+.lg span{color:var(--d-ink2)}
+.lg.rule b{color:var(--d-blue)}
+.lg.bad b{color:var(--d-warn)}
+.wxrow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;text-align:center;font-size:11.5px;color:var(--d-ink2)}
+.wxrow div{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wxrow b{font-family:var(--serif);font-size:14px;color:var(--d-ink);font-weight:500}
+.wxrow .rp{color:var(--d-blue);font-weight:600;font-size:10.5px;height:12px}
+.ac{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ac .box{flex-direction:row;align-items:center;gap:10px}
+.ac .box .t{flex:1;min-width:0}
+.ac .box .t b{display:block;font-size:13.5px;font-weight:600}
+.ac .box .t span{font-size:11.5px;color:var(--d-ink2)}
+.stalebar{display:none;position:sticky;top:calc(8px + env(safe-area-inset-top,0px));z-index:30;padding:12px 16px;border-radius:14px;background:#2b261f;color:#f5efe4;font-size:14px;line-height:1.35;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.stalebar b{color:#ffb38f}
+body.stale .stalebar{display:block}
+body.stale #dense .pn{filter:grayscale(1);opacity:.5;transition:filter .4s,opacity .4s}
+body.stale .live-pill .dot{background:var(--d-warn);animation:none}
+.live-pill .dot{animation:blink 2s ease-in-out infinite}
+@keyframes blink{50%{opacity:.35}}
+@media (max-width:719px){.boxes{grid-template-columns:repeat(2,minmax(0,1fr))}.volt .big2{font-size:38px}.wxrow div:nth-child(n+6){display:none}.wxrow{grid-template-columns:repeat(5,minmax(0,1fr))}}
+
+body.dense .solid{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -493,7 +621,7 @@ const SLOTS=[
  ['Backgrounds',[['wall-day','Day wallpaper','Shown in light mode'],['wall-night','Night wallpaper','Shown in dark mode']]],
  ['Weather & media',[['weather','Weather card','Landscape behind the forecast'],['media-art','Album art','Disc and blurred backdrop']]],
  ['Rooms',[['room-living','Living room'],['room-kitchen','Kitchen'],['room-bedroom','Bedroom'],['room-kids','Kids room'],['room-office','Office']]],
- ['Cameras',[['cam-front','Front door camera'],['cam-driveway','Driveway camera']]],
+ ['Cameras',[['cam-gate','Gate camera'],['cam-compound','Compound camera'],['cam-back','Back yard camera'],['cam-street','Street camera'],['cam-front','Front door camera'],['cam-driveway','Driveway camera']]],
  ['Device cutouts (PNG with transparency works best)',[['prod-ceiling','Ceiling lamp'],['prod-walllamp','Wall lamp'],['prod-door','Door'],['prod-thermostat','Thermostat'],['prod-blinds','Blinds'],['prod-gate','Gate'],['prod-house','House (energy)'],['prod-ev','EV charger'],['prod-washer','Washer'],['prod-lamp','Table lamp']]],
  ['Wall tablet',[['settings-wall','Settings card photo','The tablet on the wall'],['signin-bg','Sign-in background'],['logo','App logo','Big 3D logo on sign-in']]],
  ['Sharing',[['share-preview','Share preview','Picture on the share page']]]
@@ -517,7 +645,7 @@ $('#file').addEventListener('change',async e=>{ const f=e.target.files[0]; e.tar
  IMG[uploadKey]=URL.createObjectURL(blob); const ok=await idbPut(uploadKey,blob); update(); toast(ok?`${SLOTNAME[uploadKey]||'Picture'} saved on this device`:'Shown now, but this browser won’t keep it after a reload'); });
 
 /* ============ state ============ */
-const DASH=[['home','Home','home'],['living','Living room','sofa'],['kitchen','Kitchen','fork'],['bedroom','Bedroom','bed'],['hallway','Hallway','door'],['outside','Outside','tree'],['energy','Energy','bolt']];
+const DASH=[['home','Home','home'],['power','Power','bolt'],['water','Water','drop'],['security','Security','shield'],['living','Living room','sofa'],['bedroom','Bedroom','bed'],['kitchen','Kitchen','fork']];
 let uid=0;
 const DEVS=['phone','tablet','monitor'], COLS={phone:4,tablet:8,monitor:16};
 const SMALL={phone:[2,2],tablet:[2,2]};
@@ -526,16 +654,16 @@ const W=(type,span,rows,p={})=>{ const d=DEVSZ[type]||SMALL; return {id:'w'+(++u
 function orderAll(b,phoneFirst){ for(const k in b){ b[k].forEach((w,i)=>DEVS.forEach(dv=>w.o[dv]=i)); } if(phoneFirst){ const h=b.home, f=t=>h.find(w=>w.type===t); [f('lock'),f('thermo')].forEach((w,j)=>{ if(w) w.o.phone=1.5+j*.1; }); } return b; }
 const curDev=()=>S.edit&&S.device?S.device:autoDev();
 const sz=(w,dv=curDev())=>{ const [c,r]=w.sz[dv]; return {c:Math.min(c,COLS[dv]),rows:r}; };
-const sorted=(k,dv=curDev())=>S.boards[k].slice().sort((a,b)=>(a.o[dv]??99)-(b.o[dv]??99));
-const ROOMCHIPS={living:[['bulb','Off'],['blinds','Closed'],['flame','21°','warm'],['plug','Off']],kitchen:[['bulb','Off'],['blinds','Closed'],['bulb','1 on','green']],bedroom:[['bulb','Off'],['blinds','Closed'],['flame','21°','warm']],kids:[['bulb','Off'],['blinds','Closed']],office:[['bulb','Off'],['plug','Off']]};
+const sorted=(k,dv=curDev())=>(S.boards[k]||[]).slice().sort((a,b)=>(a.o[dv]??99)-(b.o[dv]??99));
+const ROOMCHIPS={living:[['bulb','Off'],['blinds','Closed'],['snow','24°'],['plug','Off']],kitchen:[['bulb','Off'],['blinds','Closed'],['bulb','1 on','green']],bedroom:[['bulb','Off'],['blinds','Closed'],['snow','24°']],kids:[['bulb','Off'],['blinds','Closed']],office:[['bulb','Off'],['plug','Off']]};
 function defaults(){ uid=0; return orderAll({
  home:[W('weather',10,5),W('media',6,5),W('light',4,2,{name:'Hallway',prod:'prod-ceiling',lamps:[['Ceiling',false]]}),W('light',4,2,{name:'Garden',prod:'prod-walllamp',lamps:[['Path Lights',false],['Terrace',false],['Wall lamp',false]]}),
   W('humidity',4,2,{name:'Bathroom',v:51}),W('scenes',4,2,{list:['Good Morning','Away','Movie Night','Good Night']}),
   W('room',5,4,{name:'Living Room',room:'living',ph:'room-living',t:'20.0',h:47,ico:'sofa'}),W('room',5,4,{name:'Kitchen',room:'kitchen',ph:'room-kitchen',t:'19.8',h:48,ico:'fork'}),W('room',6,4,{name:'Bedroom',room:'bedroom',ph:'room-bedroom',t:'19.9',h:45,ico:'bed'}),
-  W('lock',4,2,{name:'Back door',locked:true}),W('thermo',4,2,{name:'Thermostat',target:21,now:21,mode:'heat'}),W('room',4,3,{name:'Kids Room',room:'kids',ph:'room-kids',t:'20.2',h:44,ico:'kids'}),W('room',4,3,{name:'Office',room:'office',ph:'room-office',t:'20.1',h:37,ico:'desk'})],
- living:[W('media',8,4),W('light',4,2,{name:'Lights',prod:'prod-lamp',lamps:[['Ceiling',false],['Floor lamp',false],['Shelf',false]]}),W('thermo',4,2,{name:'Thermostat',target:21,now:21,mode:'heat'}),W('blinds',4,2,{name:'Blinds',pos:0}),W('scenes',4,2,{list:['Movie Night','Reading','All off']})],
+  W('lock',4,2,{name:'Back door',locked:true}),W('thermo',4,2,{name:'Air conditioning',target:24,now:27,mode:'cool'}),W('room',4,3,{name:'Kids Room',room:'kids',ph:'room-kids',t:'20.2',h:44,ico:'kids'}),W('room',4,3,{name:'Office',room:'office',ph:'room-office',t:'20.1',h:37,ico:'desk'})],
+ living:[W('media',8,4),W('light',4,2,{name:'Lights',prod:'prod-lamp',lamps:[['Ceiling',false],['Floor lamp',false],['Shelf',false]]}),W('thermo',4,2,{name:'Air conditioning',target:24,now:27,mode:'cool'}),W('blinds',4,2,{name:'Blinds',pos:0}),W('scenes',4,2,{list:['Movie Night','Reading','All off']})],
  kitchen:[W('light',4,2,{name:'Lights',prod:'prod-ceiling',lamps:[['Island',false],['Under cabinet',false]]}),W('clock',4,3),W('weather',8,4),W('blinds',4,2,{name:'Blinds',pos:0}),W('washer',4,2,{name:'Washer',on:true})],
- bedroom:[W('clock',8,4),W('light',4,2,{name:'Right lamp',prod:'prod-lamp',lamps:[['Right lamp',false]]}),W('thermo',4,2,{name:'Air conditioning',target:21,now:21,mode:'cool'}),W('scenes',8,2,{list:['Good Night','Wake up']})],
+ bedroom:[W('clock',8,4),W('light',4,2,{name:'Right lamp',prod:'prod-lamp',lamps:[['Right lamp',false]]}),W('thermo',4,2,{name:'Air conditioning',target:24,now:27,mode:'cool'}),W('scenes',8,2,{list:['Good Night','Wake up']})],
  hallway:[W('camera',8,4,{name:'Front door',ph:'cam-front'}),W('lock',4,2,{name:'Doors',locked:true,group:true}),W('light',4,2,{name:'Hallway',prod:'prod-ceiling',lamps:[['Ceiling',false]]})],
  outside:[W('camera',8,4,{name:'Driveway',ph:'cam-driveway'}),W('gate',4,2,{name:'Driveway gate',closed:true}),W('lock',4,2,{name:'Patio door',locked:false}),W('light',4,2,{name:'Garden',prod:'prod-walllamp',lamps:[['Path Lights',false],['Terrace',false]]})],
  energy:[W('battery',8,4),W('grid',8,4),W('ev',4,2),W('power',4,2)]
@@ -547,8 +675,8 @@ const S={dash:'home',view:'dash',edit:false,device:null,showSlots:false,sheet:nu
  access:{alex:{},daniel:{},sofia:{bedroom:2,energy:0,hallway:1,kitchen:1,living:1},ktab:{kitchen:2,bedroom:0,energy:0}},accessWho:'sofia',
  accounts:[{name:'Kitchen',pw:'kitchen'}],installed:{},me:'alex'};
 const lv=(p,d)=>S.access[p][d]??(p==='alex'?2:1);
-function save(){ try{ localStorage.setItem('gh-state4',JSON.stringify({boards:S.boards,look:S.look,people:S.people,access:S.access,accounts:S.accounts,installed:S.installed,uid})); }catch(_){} }
-function load(){ try{ const d=JSON.parse(localStorage.getItem('gh-state4')||'null'); if(d&&d.boards){ Object.assign(S,{boards:d.boards,look:Object.assign(S.look,d.look||{}),people:d.people||S.people,access:d.access||S.access,accounts:d.accounts||S.accounts,installed:d.installed||{}}); uid=d.uid||100; } }catch(_){} }
+function save(){ try{ localStorage.setItem('gh-state5',JSON.stringify({boards:S.boards,look:S.look,people:S.people,access:S.access,accounts:S.accounts,installed:S.installed,uid})); }catch(_){} }
+function load(){ try{ const d=JSON.parse(localStorage.getItem('gh-state5')||'null'); if(d&&d.boards){ Object.assign(S,{boards:d.boards,look:Object.assign(S.look,d.look||{}),people:d.people||S.people,access:d.access||S.access,accounts:d.accounts||S.accounts,installed:d.installed||{}}); uid=d.uid||100; } }catch(_){} }
 
 /* ============ look ============ */
 const MATS={
@@ -598,15 +726,15 @@ const PROPS={
  'prod-washer':`<svg width="60" height="66" viewBox="0 0 60 66"><rect x="4" y="2" width="52" height="62" rx="5" fill="#f4f5f6" stroke="#cfd4d9"/><circle cx="30" cy="38" r="16" fill="#cfd8e0" stroke="#aab4be" stroke-width="3"/><circle cx="12" cy="10" r="2.5" fill="#9aa"/></svg>`
 };
 const prod=(k)=>slot(k,'prod',PROPS[k]||'');
-const HRS=['Now','12 PM','2 PM','4 PM','6 PM','8 PM','10 PM','12 AM','2 AM'], TMP=[15,18,19,19,18,15,13,10,9];
-function curveSVG(){ const W0=470,X0=16,X1=W0-16, xs=TMP.map((_,i)=>X0+i*(X1-X0)/(TMP.length-1)), ys=TMP.map(t=>78-(t-8)*3.4);
+const HRS=['Now','12 PM','2 PM','4 PM','6 PM','8 PM','10 PM','12 AM','2 AM'], TMP=[31,32,32,31,29,27,26,26,25];
+function curveSVG(){ const W0=470,X0=16,X1=W0-16, xs=TMP.map((_,i)=>X0+i*(X1-X0)/(TMP.length-1)), ys=TMP.map(t=>78-(t-22)*5);
  let d=`M${xs[0]},${ys[0]}`; for(let i=1;i<xs.length;i++){ const cx=(xs[i-1]+xs[i])/2; d+=` C${cx},${ys[i-1]} ${cx},${ys[i]} ${xs[i]},${ys[i]}`; }
  const icons={0:'csun',7:'cloud',8:'csun'};
  const parts=TMP.map((t,i)=>`${icons[i]!==undefined?`<g transform="translate(${xs[i]-10},${ys[i]-48}) scale(.85)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${P[icons[i]]}"/></g>`:''}<text x="${xs[i]}" y="${ys[i]-12}" text-anchor="middle" font-size="14" font-weight="750" fill="#fff">${t}°</text><text x="${xs[i]}" y="122" text-anchor="middle" font-size="11.5" font-weight="500" fill="rgba(255,255,255,.88)">${HRS[i]}</text>`).join('');
- return `<svg viewBox="0 0 ${W0} 128" role="img" aria-label="Temperature for the next 16 hours: 15° now, up to 19° this afternoon and down to 9° by 2 AM"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#43dd88"/><stop offset="1" stop-color="#2cb7a3"/></linearGradient></defs><path d="${d}" fill="none" stroke="url(#cg)" stroke-width="4.5" stroke-linecap="round"/><circle cx="${xs[0]}" cy="${ys[0]}" r="7" fill="#43dd88" stroke="#fff" stroke-width="2.5"/>${parts}</svg>`; }
+ return `<svg viewBox="0 0 ${W0} 128" role="img" aria-label="Temperature for the next 16 hours: 31° now, 32° this afternoon, down to 25° by 2 AM"><defs><linearGradient id="cg" x1="0" x2="1"><stop offset="0" stop-color="#43dd88"/><stop offset="1" stop-color="#2cb7a3"/></linearGradient></defs><path d="${d}" fill="none" stroke="url(#cg)" stroke-width="4.5" stroke-linecap="round"/><circle cx="${xs[0]}" cy="${ys[0]}" r="7" fill="#43dd88" stroke="#fff" stroke-width="2.5"/>${parts}</svg>`; }
 const R={
- weather:(w,z)=>({cls:'photo',html:`${slot('weather','fill ph-sky')}<div class="shade"></div><div class="wx ${z.c<6||z.rows<4?'tiny':z.c<9?'small':''}"><div class="t">16<span>°</span></div><div class="cond">Partly cloudy · 18° / 9°</div>
-  <div class="wx-bot"><div class="curve">${curveSVG()}</div><div class="days">${[['Today','csun','',18,9],['Fri','cloud','20%',18,9],['Sat','sun','',16,8],['Sun','cloud','20%',16,8]].map(d=>`<div class="day"><span>${d[0]}</span>${ic(d[1],20,1.8)}<span class="rain">${d[2]}</span><span>${d[3]}°</span><i class="bar2"></i><span class="lo">${d[4]}°</span></div>`).join('')}</div></div></div>`}),
+ weather:(w,z)=>({cls:'photo',html:`${slot('weather','fill ph-sky')}<div class="shade"></div><div class="wx ${z.c<6||z.rows<4?'tiny':z.c<9?'small':''}"><div class="t">31<span>°</span></div><div class="cond">Thunderstorms likely · 32° / 25°</div>
+  <div class="wx-bot"><div class="curve">${curveSVG()}</div><div class="days">${[['Today','cloud','70%',32,25],['Sat','csun','40%',31,24],['Sun','cloud','80%',30,24],['Mon','sun','',33,25]].map(d=>`<div class="day"><span>${d[0]}</span>${ic(d[1],20,1.8)}<span class="rain">${d[2]}</span><span>${d[3]}°</span><i class="bar2"></i><span class="lo">${d[4]}°</span></div>`).join('')}</div></div></div>`}),
  media:(w,z)=>{ const a=pic('media-art'); return {cls:'photo '+(S.playing?'playing ':'')+(z.rows<=3?'compact':''),html:`<div class="mbg ${a?'':'ph-art'}" style="${a?`background-image:url('${a}')`:''}"></div><div class="shade" style="background:rgba(10,10,18,.25)"></div>
   <div class="hd" style="max-width:${z.c>=6?'62%':'100%'}"><span class="chip" style="width:46px;height:46px;border-radius:14px">${ic('music',22)}</span><div><div class="lab" style="font-size:12.5px">Chill Station · ${S.playing?'Playing':'Paused'}</div><div class="nm" style="font-size:${z.c>=6?22:18}px;font-weight:700;white-space:normal">Lo-fi Beats</div></div></div>
   ${slot('media-art','disc '+(a?'':'ph-art'))}
@@ -615,8 +743,8 @@ const R={
   return {cls:on?'tint-cream':'',tap:'light',html:`${hd(ic('bulb',18,2,on?'color:#c78a1e':''),grp?(on?`${on} of ${w.lamps.length} on`:'All off'):'Light',w.name)}<div class="big">${on?'On':'Off'}</div>${prod(w.prod)}`}; },
  lock:(w)=>({cls:w.locked?'tint-green':'tint-peach',tap:'lock',html:`${hd(ic(w.locked?'lock':'unlock',18,2,w.locked?'color:#25804f':'color:#c4512e'),w.group?(w.locked?'All locked':'1 unlocked'):'Lock',w.name)}<div class="big">${w.locked?'Locked':'Unlocked'}</div>${prod('prod-door')}`}),
  thermo:(w,z)=>{ const m=w.mode, col=m==='heat'?'#d9443c':m==='cool'?'#2f7fd6':m==='auto'?'#1f9d63':'';
-  const ctl=z.rows>=3?`<div class="tc"><span class="seg2"><button data-act="tdown" data-id="${w.id}" aria-label="Lower">−</button><button data-act="tup" data-id="${w.id}" aria-label="Raise">+</button></span>${[['off','power'],['heat','flame'],['cool','snow']].map(([k,i])=>`<button class="${m===k?'on':''}" data-act="tmode" data-id="${w.id}" data-v="${k}" aria-label="${k}">${ic(i,15)}</button>`).join('')}</div>`:'';
-  return {cls:m==='heat'?'tint-pink':m==='cool'?'tint-sky':m==='auto'?'tint-green':'',html:`${hd(ic(m==='cool'?'snow':m==='off'?'power':m==='auto'?'auto':'flame',18,2,col?`color:${col}`:''),m==='off'?'Off':m[0].toUpperCase()+m.slice(1),w.name)}<div class="pre" style="margin-top:auto">Now ${w.now}°C</div><div class="big" style="margin-top:0">${w.target}<sup>°</sup></div>${z.rows>=3?ctl:prod('prod-thermostat')}`}; },
+  const ctl=z.rows>=3?`<div class="tc"><span class="seg2"><button data-act="tdown" data-id="${w.id}" aria-label="Lower">−</button><button data-act="tup" data-id="${w.id}" aria-label="Raise">+</button></span>${[['off','power'],['cool','snow'],['fan','fan']].map(([k,i])=>`<button class="${m===k?'on':''}" data-act="tmode" data-id="${w.id}" data-v="${k}" aria-label="${k}">${ic(i,15)}</button>`).join('')}</div>`:'';
+  return {cls:m==='heat'?'tint-pink':m==='cool'?'tint-sky':m==='auto'?'tint-green':'',html:`${hd(ic(m==='cool'?'snow':m==='off'?'power':m==='auto'?'auto':m==='fan'?'fan':'flame',18,2,col?`color:${col}`:''),m==='off'?'Off':m[0].toUpperCase()+m.slice(1),w.name)}<div class="pre" style="margin-top:auto">Now ${w.now}°C</div><div class="big" style="margin-top:0">${w.target}<sup>°</sup></div>${z.rows>=3?ctl:prod('prod-thermostat')}`}; },
  humidity:(w)=>({cls:'tint-blue',html:`${hd(ic('drop',18,2,'color:#2f7fd6'),'Humidity',w.name)}<div class="big">${w.v}<small>%</small></div><svg class="spark" viewBox="0 0 100 50" preserveAspectRatio="none" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="rgba(47,127,214,.35)"/><stop offset="1" stop-color="rgba(47,127,214,0)"/></linearGradient></defs><path d="M0 38 C14 36 20 26 34 28 S56 16 70 20 S90 12 100 10 V50 H0z" fill="url(#hg)"/><path d="M0 38 C14 36 20 26 34 28 S56 16 70 20 S90 12 100 10" fill="none" stroke="#3a8ae0" stroke-width="2"/></svg>`}),
  scenes:(w)=>({cls:'tint-sage',html:`${hd(ic('sparkle',18),'Scenes','Run a scene')}<div class="scn">${w.list.map(s=>`<button class="sb ${S.scene===s?'on':''}" data-act="scene" data-v="${esc(s)}">${ic('play',10,2.5)} ${esc(s)}</button>`).join('')}</div>`}),
  room:(w)=>({cls:'photo',html:`${slot(w.ph,'fill ph-room')}<div class="shade"></div>${hd(ic(w.ico,18),`${w.t}° · 💧${w.h}%`,w.name)}<div class="rchips">${(ROOMCHIPS[w.room]||[]).map(([i,t,c])=>`<span class="rc ${c||''}"><span class="ico">${ic(i,12)}</span>${esc(t)}</span>`).join('')}<span class="rc">${ic('chev',13)}</span></div>`}),
@@ -637,7 +765,7 @@ function tileHTML(w){ const z=sz(w), r=R[w.type](w,z);
  return `<section class="tile g ${r.cls||''}" style="--c:${z.c};--rows:${z.rows}" data-wid="${w.id}"${r.tap?` data-tap="${r.tap}"`:''} aria-label="${esc(w.name||w.type)}"><div class="ti">${r.html}</div><i class="mline" aria-hidden="true"></i>${ed}</section>`; }
 
 /* ============ views ============ */
-function dashView(){ const d=DASH.find(x=>x[0]===S.dash), h=new Date().getHours(), greet=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+function dashView(){ if(DENSE_PAGES.includes(S.dash)) return denseView(); const d=DASH.find(x=>x[0]===S.dash), h=new Date().getHours(), greet=h<5?'Good night':h<12?'Good morning':h<18?'Good afternoon':'Good evening';
  const seen={}, unlocked=Object.values(S.boards).flat().filter(w=>w.type==='lock'&&!seen[w.name]&&(seen[w.name]=1)&&!w.locked).length;
  const dv=curDev();
  return `<div class="bar g"><div style="display:flex;align-items:center;gap:10px;min-width:0"><span class="chip">${ic(d[2],18)}</span><div style="min-width:0"><div class="t1">${greet}, ${esc(S.people.find(p=>p.id===S.me).name)}</div><div class="t2">${d[1]}</div></div></div>
@@ -676,11 +804,11 @@ function overlays(){ let o='';
 
 function holdSheet(){ const s=S.sheet; let cls='',body='';
  if(s.kind==='weather'){ cls='wxs'; body=`<div class="wxhead">${slot('weather','fill ph-sky')}<div><span class="chip" style="background:rgba(0,0,0,.3);border-color:rgba(255,255,255,.2);color:#fff">${ic('csun',18)}</span><h2 style="margin:0;font-size:22px">Weather</h2></div><button class="xb" data-act="close" aria-label="Close" style="position:absolute;z-index:3;top:14px;right:14px;background:rgba(0,0,0,.3);color:#fff">${ic('x',16)}</button></div>
-  <div class="sec">Next hours</div><div class="hours">${[['11 AM',16],['2 PM',19],['5 PM',18],['8 PM',15],['11 PM',11],['2 AM',9]].map(h=>`<div>${ic('csun',20,1.8)}<span><span>${h[0]}</span><b>${h[1]}°</b></span></div>`).join('')}</div>
-  <div class="sec">Next days</div><div class="dlist">${[['Today','18° / 9°','','csun'],['Tomorrow','18° / 9° · 20% rain','','cloud'],['Saturday','16° / 8°','sun','sun'],['Sunday','16° / 8° · 20% rain','','cloud'],['Monday','14° / 6°','','csun'],['Tuesday','14° / 6°','','csun'],['Wednesday','15° / 7° · 20% rain','','cloud']].map(d=>`<div><span class="ic2 ${d[2]}">${ic(d[3],17,1.8)}</span><span><b>${d[0]}</b><span>${d[1]}</span></span></div>`).join('')}</div>
-  <div class="sec">Right now</div><div class="dlist" style="grid-template-columns:1fr"><div><span class="ic2">${ic('drop',16)}</span><span><span>Humidity</span><b>56%</b></span></div></div>`; }
- else if(s.kind==='thermo'){ const w=find(s.id); cls='pink'; body=`<div class="sh"><div style="display:flex;align-items:center;gap:12px"><span class="chip" style="color:#d9443c">${ic('flame',18)}</span><h2>${esc(w.name)}</h2></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
-  <div class="sec">Mode</div><div class="modes" role="group" aria-label="Mode">${[['off','Off','power'],['heat','Heat','flame'],['cool','Cool','snow'],['auto','Auto','auto']].map(m=>`<button aria-pressed="${w.mode===m[0]}" data-act="tmode" data-id="${w.id}" data-v="${m[0]}">${ic(m[2],16)} ${m[1]}</button>`).join('')}</div>
+  <div class="sec">Next hours</div><div class="hours">${[['12 PM',31],['3 PM',32],['6 PM',28],['9 PM',27],['12 AM',26],['3 AM',25]].map(h=>`<div>${ic('csun',20,1.8)}<span><span>${h[0]}</span><b>${h[1]}°</b></span></div>`).join('')}</div>
+  <div class="sec">Next days</div><div class="dlist">${[['Today','32° / 25° · 70% rain','','cloud'],['Tomorrow','31° / 24° · 40% rain','','csun'],['Sunday','30° / 24° · 80% rain','','cloud'],['Monday','33° / 25°','sun','sun'],['Tuesday','32° / 25° · 30% rain','','csun'],['Wednesday','31° / 24° · 60% rain','','cloud'],['Thursday','32° / 25°','sun','sun']].map(d=>`<div><span class="ic2 ${d[2]}">${ic(d[3],17,1.8)}</span><span><b>${d[0]}</b><span>${d[1]}</span></span></div>`).join('')}</div>
+  <div class="sec">Right now</div><div class="dlist" style="grid-template-columns:1fr"><div><span class="ic2">${ic('drop',16)}</span><span><span>Humidity</span><b>74%</b></span></div></div>`; }
+ else if(s.kind==='thermo'){ const w=find(s.id); cls=''; body=`<div class="sh"><div style="display:flex;align-items:center;gap:12px"><span class="chip" style="color:#2f7fd6">${ic('snow',18)}</span><h2>${esc(w.name)}</h2></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+  <div class="sec">Mode</div><div class="modes" role="group" aria-label="Mode">${[['off','Off','power'],['cool','Cool','snow'],['fan','Fan','fan'],['auto','Auto','auto']].map(m=>`<button aria-pressed="${w.mode===m[0]}" data-act="tmode" data-id="${w.id}" data-v="${m[0]}">${ic(m[2],16)} ${m[1]}</button>`).join('')}</div>
   <div class="arow" style="font-size:15px"><span>Target · now ${w.now}°C</span><span style="display:flex;align-items:center;gap:10px"><button class="xb" data-act="tdown" data-id="${w.id}" aria-label="Lower">−</button><b style="font-size:24px;min-width:52px;text-align:center">${w.target}°</b><button class="xb" data-act="tup" data-id="${w.id}" aria-label="Raise">+</button></span></div>`; }
  else if(s.kind==='light'){ const w=find(s.id); body=`<div class="sh"><div style="display:flex;align-items:center;gap:12px"><span class="chip">${ic('bulb',18)}</span><h2>${esc(w.name)}</h2></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <div class="sec">Lamps · hold one to set it alone</div><div class="lamps">${w.lamps.map((l,i)=>`<button class="lamp" aria-pressed="${l[1]}" data-act="lamp" data-id="${w.id}" data-i="${i}" data-lamphold="${w.id}:${i}"><span class="bulb">${ic('bulb',17)}</span><span><b>${esc(l[0])}</b><span>${l[1]?'On':'Off'}</span></span></button>`).join('')}</div>
@@ -761,7 +889,7 @@ const autoDev=()=>innerWidth<720?'phone':innerWidth<1180?'tablet':'monitor';
 
 let lastStudioLook=null;
 function render(){
- document.body.classList.toggle('editing',S.edit);
+ document.body.classList.toggle('editing',S.edit); document.body.classList.toggle('dense',S.view==='dash'&&DENSE_PAGES.includes(S.dash));
  const mw=S.edit&&S.device&&S.device!==autoDev()?(S.device==='phone'?'430px':S.device==='tablet'?'900px':'none'):'none';
  $('#app').innerHTML=`<main class="main" style="max-width:${mw}">${S.view==='settings'?settingsView():dashView()}</main>${studio()}`;
  $('#layer').innerHTML=dock()+overlays();
@@ -769,6 +897,144 @@ function render(){
 function update(){ applyLook(); render(); save(); }
 function find(id){ for(const k in S.boards){ const w=S.boards[k].find(x=>x.id===id); if(w) return w; } }
 function toast(m){ const t=document.createElement('div'); t.className='toast'; t.textContent=m; t.setAttribute('role','status'); document.body.appendChild(t); setTimeout(()=>t.remove(),2200); }
+
+
+/* ============ dense panels: live house (mirrors house_sim) ============ */
+Object.assign(P,{
+ gen:'M3 8h13v9H3zM16 11h3l2 2v4h-5M6 17v2M13 17v2M7 11h5M9.5 8V5h3',
+ panel:'M3 18L6 6h12l3 12zM4.5 12h15M9 6l-1.5 12M15 6l1.5 12',
+ meter:'M4 4h16v16H4zM8 9h8M8 13h3M14 13h2M8 17h8',
+ tank:'M6 4h12v15a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2zM6 10h12',
+ wifi:'M2 9a15 15 0 0 1 20 0M5 12.5a10 10 0 0 1 14 0M8.5 16a5 5 0 0 1 7 0M12 19.5h.01',
+ tv:'M3 6h18v12H3zM8 21h8M9 2l3 4 3-4',
+ shield:'M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z',
+ list:'M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01',
+ pump:'M5 20h14M7 20V9h6v11M13 12h4a2 2 0 0 1 2 2v2M10 9V5h4',
+ snowflake:'M12 2v20M2 12h20M5 5l14 14M19 5L5 19'
+});
+const LOADS={freezer:{n:'Freezer',w:200,room:'Kitchen',ic:'snowflake'},pump:{n:'Borehole pump',w:750,room:'Compound',ic:'pump',shed:1},tv:{n:'TV & DStv',w:120,room:'Living room',ic:'tv',shed:1,spike:1},
+ kettle:{n:'Kettle',w:2000,room:'Kitchen',ic:'flame',shed:1,spike:1},acBed:{n:'Bedroom AC',w:1100,room:'Bedroom',ic:'snow',shed:1},acLiv:{n:'Living room AC',w:1300,room:'Living room',ic:'snow',shed:1},fans:{n:'Fans',w:180,room:'All rooms',ic:'fan'},iron:{n:'Pressing iron',w:1000,room:'Laundry',ic:'bolt',shed:1}};
+const LIGHTS=[['Living room',1],['Bedroom',1],['Kitchen',0],['Corridor',1],['Compound',1],['Security lights',1],['Boys’ quarters',0],['Bathroom',0]];
+const SIM={src:'nepa',v:226,vh:[],batt:78,fuel:42,units:84.2,tank:62,offline:false,lastOk:Date.now(),
+ on:{freezer:1,pump:0,tv:1,kettle:0,acBed:1,acLiv:0,fans:1,iron:0}, lights:LIGHTS.map(l=>l[1]), acSet:{acBed:24,acLiv:25},
+ log:[], tl:['inv','inv','inv','inv','inv','inv','nepa','nepa','nepa','nepa','off','gen','gen','nepa','nepa','nepa','nepa','nepa','nepa','nepa','gen','inv','inv','inv']};
+const SRC={nepa:['NEPA','Grid power','bolt'],gen:['Gen','Generator','gen'],inv:['Inverter','On battery','battery'],off:['No power','Everything off','power']};
+const DENSE_PAGES=['home','power','water','security'];
+const hhmm=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
+function slog(what,why,cls=''){ SIM.log.unshift({t:hhmm(),what,why,cls}); SIM.log.length=Math.min(SIM.log.length,40); }
+const gauss=(m,s)=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
+const lightW=()=>SIM.lights.filter(Boolean).length*20;
+const drawW=()=>SIM.src==='off'?0:Object.keys(LOADS).reduce((a,k)=>a+(SIM.on[k]?LOADS[k].w:0),0)+lightW();
+function setLoad(k,on,why){ if(!!SIM.on[k]===!!on) return; SIM.on[k]=on?1:0; slog(`${on?'ON ':'OFF'} ${LOADS[k].n.toLowerCase()}`,why,why.startsWith('shed')||why.startsWith('spike')||why.startsWith('tank')?'rule':''); }
+function rules(){ // same rules as house_sim.py, plus the ACs and iron
+ if(SIM.v>260) Object.keys(LOADS).forEach(k=>{ if(LOADS[k].spike&&SIM.on[k]) setLoad(k,0,`spike ${Math.round(SIM.v)}V`); });
+ if(SIM.src==='inv') Object.keys(LOADS).forEach(k=>{ if(LOADS[k].shed&&SIM.on[k]) setLoad(k,0,'shed: on inverter'); });
+ if(SIM.on.pump&&SIM.tank>=95) setLoad('pump',0,`tank at ${Math.round(SIM.tank)}%`);
+ if(!SIM.on.pump&&SIM.tank<=20&&(SIM.src==='nepa'||SIM.src==='gen')) setLoad('pump',1,`tank at ${Math.round(SIM.tank)}%`);
+ if(SIM.src==='inv'&&SIM.batt<=20.5&&SIM.batt>19.5) slog('ALERT','battery at 20 percent','bad');
+}
+function setSrc(s){ if(SIM.src===s) return; const prev=SIM.src; SIM.src=s;
+ const msg={nepa:['LIGHT IS BACK',''],gen:['GEN STARTED',''],inv:[prev==='gen'?'GEN OFF':'NEPA TOOK LIGHT','on battery now'],off:['NO POWER','battery flat, everything off']}[s];
+ slog(msg[0],msg[1],s==='off'?'bad':''); rules(); }
+function tick(){
+ if(SIM.offline) return;
+ const s=SIM.src;
+ SIM.v=s==='nepa'?gauss(224,11):s==='gen'?gauss(233,18):s==='inv'?gauss(220,2):0;
+ if((s==='nepa'||s==='gen')&&Math.random()<.01){ SIM.v=280+Math.random()*50; slog('VOLTAGE SPIKE',`${Math.round(SIM.v)}V`,'bad'); }
+ SIM.vh.push(SIM.v); if(SIM.vh.length>60) SIM.vh.shift();
+ const w=drawW();
+ if(s==='inv'){ SIM.batt=Math.max(0,SIM.batt-w/5000*100/60); if(SIM.batt===0) setSrc('off'); }
+ else if(s==='nepa'||s==='gen') SIM.batt=Math.min(100,SIM.batt+.08);
+ if(s==='nepa') SIM.units=Math.max(0,SIM.units-w/1000/60);
+ if(s==='gen') SIM.fuel=Math.max(0,SIM.fuel-.02);
+ SIM.tank=SIM.on.pump&&s!=='off'?Math.min(110,SIM.tank+.5):Math.max(0,SIM.tank-.03);
+ SIM.tl[new Date().getHours()]=s;
+ rules(); SIM.lastOk=Date.now();
+}
+for(let i=0;i<60;i++) SIM.vh.push(gauss(224,11));
+[['06:12','LIGHT IS BACK',''],['10:02','NEPA TOOK LIGHT','on battery now'],['10:02','OFF borehole pump','shed: on inverter','rule'],['11:05','GEN STARTED',''],['13:10','LIGHT IS BACK',''],['14:21','ON borehole pump','tank at 19%','rule'],['14:58','OFF borehole pump','tank at 95%','rule'],['17:40','VOLTAGE SPIKE','304V','bad'],['17:40','OFF tv & dstv','spike 304V','rule']].forEach(([t,w,y,c])=>SIM.log.unshift({t,what:w,why:y,cls:c||''}));
+const isStale=()=>Date.now()-SIM.lastOk>5000;
+const ago=()=>{ const s=Math.max(0,Math.round((Date.now()-SIM.lastOk)/1000)); return s<60?`${s}s`:`${Math.floor(s/60)}m ${s%60}s`; };
+const fmt=n=>n.toLocaleString('en-NG');
+
+/* --- panels --- */
+const pnh=(icon,label,sum='',end='')=>`<div class="pnh"><span class="lb">${ic(icon,14,2)}${label}</span>${sum?`<span class="sm">${sum}</span>`:''}${end?`<span class="end">${end}</span>`:''}</div>`;
+function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.v>250||(SIM.v>0&&SIM.v<190);
+ const run=w>0?SIM.batt/100*5000/w:0, rh=Math.floor(run), rm=Math.round((run-rh)*60);
+ const pos=Math.max(0,Math.min(100,(SIM.v-160)/(300-160)*100));
+ const vh=SIM.vh, mx=320, mn=150, pts=vh.map((x,i)=>`${(i/(vh.length-1)*100).toFixed(1)},${(40-(Math.max(mn,Math.min(mx,x||mn))-mn)/(mx-mn)*40).toFixed(1)}`).join(' ');
+ const solar=(()=>{const h=new Date().getHours();return h>=7&&h<18?Math.round(1400*Math.sin((h-7)/11*Math.PI)):0})();
+ const hrs={nepa:0,gen:0,inv:0,off:0}, nowH=new Date().getHours(); SIM.tl.forEach((x,i)=>{ if(i<=nowH) hrs[x]++; });
+ return `<section class="pn g" aria-label="Power">${pnh('bolt','Power',`${SRC[s][1]} · <i>${fmt(w)} W</i> in use`,`<span class="pill src-${s==='inv'?'inv':s}"><span class="dot"></span>${SRC[s][0]}</span>`)}
+  <div class="srcs" role="list">${['nepa','gen','inv','off'].map(k=>`<div role="listitem" class="${s===k?'on '+k:''}" aria-current="${s===k}">${ic(SRC[k][2],18,1.8)}${SRC[k][0]}</div>`).join('')}</div>
+  <div class="volt"><div class="big2 ser">${s==='off'?'—':v}<small>V</small></div><div><div class="band ${bad?'bad':''}"><span class="safe" style="left:${(200-160)/1.4}%;right:${100-(250-160)/1.4}%"></span><span class="mk" style="left:${pos}%"></span></div><div class="bandlab"><span>160</span><span>safe 200–250</span><span>300</span></div></div></div>
+  <svg class="spk" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Voltage over the last minute"><rect x="0" y="${40-(250-mn)/(mx-mn)*40}" width="100" height="${(250-200)/(mx-mn)*40}" fill="rgba(61,138,87,.12)"/><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke" opacity=".75"/></svg>
+  <div class="boxes">
+   <div class="box"><span class="k">Inverter</span><span class="v">${Math.round(SIM.batt)}<small>%</small></span><span class="s">${s==='inv'?`≈ ${rh}h ${rm}m left`:s==='off'?'flat':'charging'}</span></div>
+   <div class="box"><span class="k">Solar</span><span class="v">${solar?(solar/1000).toFixed(1):'0'}<small>${solar?'kW':'W'}</small></span><span class="s">${solar?'from 6 panels':'night'}</span></div>
+   <div class="box"><span class="k">Prepaid meter</span><span class="v">${SIM.units.toFixed(1)}<small>kWh</small></span><span class="s">≈ ₦${fmt(Math.round(SIM.units*209.5))} · Band A</span></div>
+   <div class="box"><span class="k">Gen fuel</span><span class="v">${Math.round(SIM.fuel)}<small>%</small></span><span class="s">≈ ${Math.round(SIM.fuel/100*20)} L · ${Math.max(1,Math.round(SIM.fuel/100*20/1.4))}h at half load</span></div>
+   <div class="box"><span class="k">Today’s cost</span><span class="v">₦${fmt(3420)}</span><span class="s">Gen ₦2,100 · NEPA ₦1,320</span></div>
+   <div class="box"><span class="k">Load</span><span class="v">${(w/1000).toFixed(2)}<small>kW</small></span><span class="s">${Object.keys(LOADS).filter(k=>SIM.on[k]).length+1} things running</span></div>
+  </div>
+  <div><div class="tl" role="img" aria-label="Power source for each hour today">${SIM.tl.map((x,i)=>`<i class="${i>nowH?'fut':x} ${i===nowH?'now':''}"></i>`).join('')}</div>
+   <div class="bandlab"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
+   <div class="leg" style="margin-top:6px"><span><i style="background:var(--d-ok)"></i>NEPA <b>${hrs.nepa}h</b></span><span><i style="background:var(--d-amber)"></i>Gen <b>${hrs.gen}h</b></span><span><i style="background:var(--d-blue)"></i>Inverter <b>${hrs.inv}h</b></span><span><i style="background:rgba(194,82,44,.55)"></i>Off <b>${hrs.off}h</b></span></div></div>
+  <div class="demo"><span>Demo:</span>${['nepa','gen','inv','off'].map(k=>`<button aria-pressed="${s===k}" data-act="dsrc" data-v="${k}">${SRC[k][0]}</button>`).join('')}<button aria-pressed="${SIM.offline}" data-act="doff">${SIM.offline?'Hub back online':'Hub goes offline'}</button></div>
+ </section>`; }
+function pWater(){ const t=Math.min(100,SIM.tank), on=SIM.on.pump;
+ return `<section class="pn g" aria-label="Water">${pnh('drop','Water',`Overhead tank · <i>${fmt(Math.round(t/100*2000))} L</i>`,`<span class="pill"><span class="dot" style="background:${on?'var(--d-blue)':'var(--d-grey)'}"></span>Pump ${on?'running':'off'}</span>`)}
+  <div class="tank"><div class="vessel" role="img" aria-label="Tank ${Math.round(t)} percent full"><i style="height:${t}%"></i><b>${Math.round(t)}%</b></div>
+   <div class="rows2"><div class="r2"><span class="t"><b>Borehole pump</b><span>${on?`Filling · full in about ${Math.max(1,Math.round((95-t)/.5))} min`:'Starts by itself at 20% when there’s NEPA or gen'}</span></span><button class="tgl" role="switch" aria-checked="${!!on}" aria-label="Borehole pump" data-act="dload" data-v="pump"></button></div>
+   <div class="r2"><span class="t"><b>Stops at 95%</b><span>No overflow, nobody has to remember</span></span></div></div></div></section>`; }
+function pLights(){ const n=SIM.lights.filter(Boolean).length;
+ return `<section class="pn g" aria-label="Lights">${pnh('bulb','Lights',`<i>${n}</i> on`,`<button class="mini-b" data-act="dlall" data-v="0">${ic('power',12)} All off</button>`)}
+  <div class="lgrid">${LIGHTS.map(([nm],i)=>`<button class="lt" aria-pressed="${!!SIM.lights[i]}" data-act="dlight" data-v="${i}"><span class="bulb2">${ic('bulb',14)}</span><span style="min-width:0"><b>${nm}</b><span>${SIM.lights[i]?'On':'Off'}</span></span></button>`).join('')}</div></section>`; }
+function pClimate(){ return `<section class="pn g" aria-label="Air conditioning">${pnh('snow','Cooling',`<i>29°</i> inside · 74% humid`)}
+  <div class="ac">${['acBed','acLiv'].map(k=>`<div class="box"><span class="t"><b>${LOADS[k].n}</b><span>${SIM.on[k]?`Cooling to ${SIM.acSet[k]}°`:SIM.src==='inv'?'Off · shed on inverter':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.on[k]}" aria-label="${LOADS[k].n}" data-act="dload" data-v="${k}"></button></div>`).join('')}
+  <div class="box"><span class="t"><b>Fans</b><span>${SIM.on.fans?'On in 3 rooms':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.on.fans}" aria-label="Fans" data-act="dload" data-v="fans"></button></div>
+  <div class="box"><span class="t"><b>Freezer</b><span>${SIM.on.freezer?'−18° · running':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.on.freezer}" aria-label="Freezer" data-act="dload" data-v="freezer"></button></div></div></section>`; }
+function pWeather(){ const hrs=[['Now','csun',31,''],['3p','cloud',32,'40%'],['4p','cloud',30,'70%'],['5p','cloud',28,'80%'],['6p','cloud',27,'60%'],['7p','csun',27,'20%'],['8p','moon',26,'']];
+ return `<section class="pn g" aria-label="Weather">${pnh('csun','Lagos','Rainy season','<span class="sm" style="color:var(--d-ink2)">Sunset 6:41pm</span>')}
+  <div style="display:flex;align-items:center;gap:14px"><span class="ser" style="font-size:54px;line-height:1">31°</span><div><div style="font-weight:600">Thunderstorms likely at 4pm</div><div class="sub" style="color:var(--d-ink2)">High 32° · Low 25° · Feels 36°</div></div></div>
+  <div class="wxrow">${hrs.map(h=>`<div><span>${h[0]}</span>${ic(h[1],16,1.8)}<span class="rp">${h[3]}</span><b>${h[2]}°</b></div>`).join('')}</div>
+  <div class="boxes" style="grid-template-columns:repeat(3,minmax(0,1fr))"><div class="box"><span class="k">Humidity</span><span class="v">74<small>%</small></span></div><div class="box"><span class="k">Rain</span><span class="v">70<small>%</small></span><span class="s">from 4pm</span></div><div class="box"><span class="k">Air</span><span class="v">Fair</span><span class="s">dust low</span></div></div></section>`; }
+function pSecurity(big){ const cams=[['cam-gate','Gate'],['cam-compound','Compound'],['cam-back','Back yard'],['cam-street','Street']];
+ return `<section class="pn g" aria-label="Security">${pnh('shield','Security','',`<span class="pill"><span class="dot"></span>All clear</span>`)}
+  <div class="cams">${cams.map(([k,n])=>`<div class="cam2">${slot(k,'fill')}<em>${n}</em></div>`).join('')}</div>
+  <div class="rows2"><div class="r2"><span class="t"><b>Gate</b><span>${SIM.gateOpen?'Open':'Closed and locked'} · gateman on duty</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.gateOpen}" aria-label="Gate open" data-act="dgate"></button></div>
+  <div class="r2"><span class="t"><b>Security lights</b><span>${SIM.lights[5]?'On till 6am':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.lights[5]}" aria-label="Security lights" data-act="dlight" data-v="5"></button></div></div></section>`; }
+function pLog(){ return `<section class="pn g" aria-label="What happened">${pnh('list','What happened','Today')}<div class="log">${SIM.log.slice(0,18).map(l=>`<div class="lg ${l.cls}"><time>${l.t}</time><span><b>${esc(l.what)}</b>${l.why?` <span>· ${esc(l.why)}</span>`:''}</span></div>`).join('')}</div></section>`; }
+function pLoads(){ return `<section class="pn g" aria-label="Appliances">${pnh('plug','Appliances',`<i>${fmt(drawW())} W</i> now`,`<span class="badge2 shed">Shed on inverter</span>`)}<div class="rows2">${Object.entries(LOADS).map(([k,l])=>`<div class="r2">${ic(l.ic,16,1.8)}<span class="t"><b>${l.n}</b><span>${l.room}</span></span>${l.shed?'<span class="badge2 shed">Shed</span>':''}<span class="w">${fmt(l.w)} W</span><button class="tgl" role="switch" aria-checked="${!!SIM.on[k]}" aria-label="${l.n}" data-act="dload" data-v="${k}"></button></div>`).join('')}</div></section>`; }
+function pNet(){ return `<section class="pn g" aria-label="Internet and TV">${pnh('wifi','Internet & TV')}<div class="boxes" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="box"><span class="k">MTN fibre</span><span class="v">48<small>Mbps</small></span><span class="s">up · 12 devices</span></div><div class="box"><span class="k">Backup</span><span class="v">Starlink</span><span class="s">standby</span></div><div class="box"><span class="k">DStv</span><span class="v">${SIM.on.tv?'On':'Off'}</span><span class="s">renews 14 days · Compact</span></div><div class="box"><span class="k">Data left</span><span class="v">38<small>GB</small></span><span class="s">Airtel MiFi</span></div></div></section>`; }
+
+function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHours(), greet=h<12?'Good morning':h<16?'Good afternoon':'Good evening', st=isStale();
+ document.body.classList.toggle('stale',st);
+ const layouts={
+  home:{monitor:[[()=>pPower(),pWater],[pWeather,pLights,pClimate],[()=>pSecurity(),pLog]],tablet:[[()=>pPower(),pWater,pClimate],[pWeather,pLights,()=>pSecurity(),pLog]],phone:[[()=>pPower(),pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
+  power:{monitor:[[()=>pPower(true)],[pLoads],[pLog,pNet]],tablet:[[()=>pPower(true),pNet],[pLoads,pLog]],phone:[[()=>pPower(true),pLoads,pLog,pNet]]},
+  water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
+  security:{monitor:[[()=>pSecurity(true)],[pLights],[pLog]],tablet:[[()=>pSecurity(true)],[pLights,pLog]],phone:[[()=>pSecurity(true),pLights,pLog]]}
+ }[pg][dv];
+ const tmpl={monitor:'minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr)',tablet:'minmax(0,1fr) minmax(0,1fr)',phone:'minmax(0,1fr)'}[dv];
+ return `<div class="stalebar" role="alert"><b>Not live.</b> Last reading ${ago()} ago. Switches are paused until the hub answers again, nothing gets queued.</div>
+ <header class="dh"><div class="clock2"><b>${hhmm()}</b></div><div class="when"><b>${greet}, ${esc(S.people.find(p=>p.id===S.me).name)}</b><br>${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} · Lekki, Lagos</div>
+  <div class="right"><span class="pill live-pill"><span class="dot"></span>${st?'Not live':'Live'} · ${ago()} ago</span><span class="pill src-${SIM.src}"><span class="dot"></span>${SRC[SIM.src][0]} · ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'}</span>
+  <span class="avs" aria-label="Alex and Ada are home, Tobi is out"><span>A<i></i></span><span>Ad<i></i></span><span class="away">T<i></i></span></span>
+  <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>
+ <div class="cols" style="grid-template-columns:${tmpl}">${layouts.map(c=>`<div class="col">${c.map(f=>f()).join('')}</div>`).join('')}</div>`; }
+function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
+function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
+setInterval(()=>{ tick(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
+function denseAct(a,v){
+ if(['dload','dlight','dlall','dgate'].includes(a)&&isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; }
+ if(a==='dsrc'){ setSrc(v); return true; }
+ if(a==='doff'){ SIM.offline=!SIM.offline; if(!SIM.offline){ SIM.lastOk=Date.now(); slog('HUB BACK','readings are live again'); } return true; }
+ if(a==='dload'){ const want=!SIM.on[v]; setLoad(v,want,'from dashboard'); rules(); if(want&&!SIM.on[v]){ const last=SIM.log[0]; toast(`${LOADS[v].n} switched back off: ${last.why}`); } return true; }
+ if(a==='dlight'){ SIM.lights[+v]=SIM.lights[+v]?0:1; slog(`${SIM.lights[+v]?'ON ':'OFF'} ${LIGHTS[+v][0].toLowerCase()} light`,'from dashboard'); return true; }
+ if(a==='dlall'){ SIM.lights=SIM.lights.map(()=>0); slog('ALL LIGHTS OFF','from dashboard'); return true; }
+ if(a==='dgate'){ SIM.gateOpen=!SIM.gateOpen; slog(SIM.gateOpen?'GATE OPENED':'GATE CLOSED','from dashboard'); return true; }
+ return false; }
 
 /* ============ events ============ */
 let eatClick=false;
@@ -778,6 +1044,7 @@ document.addEventListener('click',e=>{
  if(!b){ const t=e.target.closest('[data-tap]'); if(t&&!S.edit){ const w=find(t.dataset.wid);
    if(t.dataset.tap==='lock') w.locked=!w.locked; else if(t.dataset.tap==='gate') w.closed=!w.closed; else if(t.dataset.tap==='washer') w.on=!w.on; else if(t.dataset.tap==='light'){ const on=!w.lamps.some(l=>l[1]); w.lamps.forEach(l=>l[1]=on); } update(); } return; }
  const a=b.dataset.act, v=b.dataset.v, id=b.dataset.id;
+ if(denseAct(a,v)){ update(); return; }
  if((a==='scrim'||a==='scrimshare')&&e.target!==b) return;
  switch(a){
   case 'upload': uploadKey=v; $('#file').click(); return;
@@ -867,7 +1134,7 @@ document.addEventListener('pointerdown',e=>{
  if(!lh&&e.target.closest('button,input,select')&&!e.target.closest('[data-hold]')) return;
  hold={x:e.clientX,y:e.clientY,t:setTimeout(()=>{ eatClick=true; setTimeout(()=>eatClick=false,900);
   if(lh){ const [wid,i]=lh.dataset.lamphold.split(':'), w=find(wid); w.lamps.forEach((l,j)=>l[1]=j===+i); update(); toast(`Only ${w.lamps[+i][0]} is on`); return; }
-  if(h.dataset.hold==='dock'){ S.edit=true; S.view='dash'; S.device=null; update(); toast('Editing. Drag, resize or pinch widgets'); return; }
+  if(h.dataset.hold==='dock'){ if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)){ toast('Home, Power, Water and Security panels are fixed for now. Room dashboards can be edited.'); return; } S.edit=true; S.view='dash'; S.device=null; update(); toast('Editing. Drag, resize or pinch widgets'); return; }
   const w=find(h.dataset.wid); S.sheet={kind:['weather','thermo','light'].includes(w.type)?w.type:'other',id:w.id}; update(); },520)};
 });
 document.addEventListener('pointermove',e=>{
@@ -891,7 +1158,7 @@ function endPtr(e){ pts.delete(e.pointerId); if(hold){ clearTimeout(hold.t); hol
  if(!drag) return; const d=drag; drag=null; if(d.ghost) d.ghost.remove();
  if(d.mode==='move'){ const list=sorted(S.dash,d.dv), i=list.findIndex(x=>x.id===d.id);
   if(d.target){ const [w]=list.splice(i,1); list.splice(list.findIndex(x=>x.id===d.target),0,w); list.forEach((x,j)=>x.o[d.dv]=j); }
-  else if(d.dock){ const src=S.boards[S.dash], w=src.splice(src.findIndex(x=>x.id===d.id),1)[0], dst=S.boards[d.dock]; DEVS.forEach(dv=>w.o[dv]=dst.length+1); dst.push(w); toast(`Moved to ${DASH.find(x=>x[0]===d.dock)[1]}`); } }
+  else if(d.dock&&S.boards[d.dock]){ const src=S.boards[S.dash], w=src.splice(src.findIndex(x=>x.id===d.id),1)[0], dst=S.boards[d.dock]; DEVS.forEach(dv=>w.o[dv]=dst.length+1); dst.push(w); toast(`Moved to ${DASH.find(x=>x[0]===d.dock)[1]}`); } }
  update(); }
 document.addEventListener('pointerup',endPtr); document.addEventListener('pointercancel',endPtr);
 document.addEventListener('contextmenu',e=>{ if(e.target.closest('[data-wid],[data-hold],[data-lamphold]')) e.preventDefault(); });
