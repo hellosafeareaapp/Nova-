@@ -920,6 +920,47 @@ body.dense .solid{color:var(--ink)}
 .sif.t-input.is-error{border-color:#ff8a75}
 .t-error-msg{min-height:18px;font-size:14px;color:#ffb6aa}
 .btn .t-success-check,.inst .t-success-check{vertical-align:-3px;margin-right:2px}
+
+/* ===== AI: forecast + Ask A.D.A. ===== */
+.tank .vessel b{display:flex!important;align-items:center;justify-content:center}
+.mini-b{white-space:nowrap}
+@media (max-width:719px){.pn .mini-b[data-act=askopen]{display:none}}
+.fc{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.fcbig{display:flex;flex-direction:column;gap:2px;min-width:0}
+.fcbig .k{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--d-ink2)}
+.fcbig .v{font-size:40px;line-height:1.05}
+.fcbig .s{font-size:12.5px;color:var(--d-ink2)}
+.fcbig .s b{color:var(--d-ink);font-weight:600}
+.fcwhy{flex:none;height:26px;padding:0 10px;border-radius:999px;border:1px solid rgba(var(--d-amber-rgb),.5);background:rgba(var(--d-amber-rgb),.12);color:var(--d-ink);font-size:11.5px;font-weight:650}
+.fcnote{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--d-ink2,var(--ink2));line-height:1.35}
+.lg{grid-template-columns:44px 1fr auto}
+.lg .why{height:22px;padding:0 8px;border-radius:999px;border:1px solid var(--d-line);font-size:11px;font-weight:600;color:var(--d-ink2);opacity:.75}
+.lg .why:hover,.lg .why:focus-visible{opacity:1;color:var(--d-ink);border-color:rgba(var(--d-amber-rgb),.6)}
+.askbtn{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 12px;border-radius:999px;border:1px solid rgba(var(--d-amber-rgb),.55);background:rgba(var(--d-amber-rgb),.16);font-size:12.5px;font-weight:650;color:var(--d-ink)}
+.askp{width:min(520px,100%);height:min(680px,86vh);gap:12px;--a1:#2b261f;--a2:#857b6c}
+body.dense .askp{background:rgba(var(--d-pn),.98);color:var(--d-ink);border-color:var(--d-line)}
+.aiav{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#d9a74c,#b5822a);color:#fff;box-shadow:0 2px 8px rgba(181,130,42,.35)}
+.langsw{display:flex;gap:2px;padding:3px;border-radius:999px;background:rgba(127,127,127,.12)}
+.langsw button{height:28px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:650;color:inherit;opacity:.7}
+.langsw button[aria-pressed=true]{background:rgba(var(--d-amber-rgb,181,130,42),.25);opacity:1}
+.chatlog{flex:1;min-height:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px}
+.msg{max-width:86%;padding:10px 13px;border-radius:16px;font-size:14.5px;line-height:1.45}
+.msg b{font-weight:700}
+.msg.ai{align-self:flex-start;background:rgba(127,127,127,.12);border-bottom-left-radius:5px}
+.msg.me{align-self:flex-end;background:linear-gradient(135deg,#d9a74c,#b5822a);color:#fff;border-bottom-right-radius:5px}
+.msg.typing{display:flex;gap:4px;padding:13px 14px}
+.msg.typing i{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.4;animation:tdot 1s infinite}
+.msg.typing i:nth-child(2){animation-delay:.15s}.msg.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tdot{50%{opacity:1;transform:translateY(-2px)}}
+@media (prefers-reduced-motion:reduce){.msg.typing i{animation:none}}
+.suggs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.suggs::-webkit-scrollbar{display:none}
+.suggs button{flex:none;height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(127,127,127,.3);font-size:12.5px;font-weight:600;color:inherit;white-space:nowrap}
+.askf{display:flex;gap:8px}
+.askf input{flex:1;min-width:0;height:46px;border-radius:14px;border:1px solid rgba(127,127,127,.3);background:rgba(127,127,127,.06);padding:0 14px;font-size:15px;color:inherit;outline:none}
+.askf input:focus{border-color:#b5822a}
+.askgo{flex:none;width:46px;height:46px;border-radius:14px;display:grid;place-items:center;background:#2b261f;color:#fff}
+html.dark .askgo{background:#efe7da;color:#17130f}
 </style>
 </head>
 <body>
@@ -1045,7 +1086,7 @@ function defaults(){ uid=0; return orderAll({
  outside:[W('camera',8,4,{name:'Driveway',ph:'cam-driveway'}),W('gate',4,2,{name:'Driveway gate',closed:true}),W('lock',4,2,{name:'Patio door',locked:false}),W('light',4,2,{name:'Garden',prod:'prod-walllamp',lamps:[['Path Lights',false],['Terrace',false]]})],
  energy:[W('battery',8,4),W('grid',8,4),W('ev',4,2),W('power',4,2)]
 },true);}
-const S={dash:'home',view:'dash',edit:false,device:null,showSlots:false,sheet:null,ov:null,btab:'widgets',share:null,sent:false,studio:false,stab:'colors',
+const S={lang:'en',chat:[],typing:false,dash:'home',view:'dash',edit:false,device:null,showSlots:false,sheet:null,ov:null,btab:'widgets',share:null,sent:false,studio:false,stab:'colors',
  look:{dark:'auto',mat:'glass',tune:null,accent:'#4fb3cf',tint:'auto',corners:'soft'},hist:[],fut:[],
  boards:defaults(),playing:false,volume:40,scene:null,
  people:[{id:'alex',name:'Alex',main:'home',dark:true},{id:'daniel',name:'Daniel',main:'outside',dark:false},{id:'sofia',name:'Sofia',main:'home',dark:true},{id:'ktab',name:'Kitchen tablet',main:'kitchen',dark:'auto',device:true}],
@@ -1177,6 +1218,7 @@ function overlays(){ let o='';
  if(S.ov==='setup') o+=setup();
  if(S.ov==='signin') o+=signin();
  if(S.share) o+=share();
+ if(S.ov==='ask') o+=askPanel();
  return o; }
 
 function holdSheet(){ const s=S.sheet; let cls='',body='';
@@ -1272,6 +1314,7 @@ function render(){
  $('#app').innerHTML=`<main class="main" style="max-width:${mw}">${S.view==='settings'?settingsView():dashView()}</main>${studio()}`;
  $('#layer').innerHTML=dock()+overlays();
  postRender();
+ const cl=document.querySelector('.chatlog'); if(cl) cl.scrollTop=cl.scrollHeight;
 }
 function update(){ applyLook(); render(); save(); }
 function find(id){ for(const k in S.boards){ const w=S.boards[k].find(x=>x.id===id); if(w) return w; } }
@@ -1383,15 +1426,15 @@ function pSecurity(big){ const cams=[['cam-gate','Gate'],['cam-compound','Compou
   <div class="cams">${cams.map(([k,n])=>`<div class="cam2">${slot(k,'fill')}<em>${n}</em></div>`).join('')}</div>
   <div class="rows2"><div class="r2"><span class="t"><b>Gate</b><span>${SIM.gateOpen?'Open':'Closed and locked'} · gateman on duty</span></span><button class="tgl" role="switch" ${an('tgl-gate','aria-checked',!!SIM.gateOpen)} aria-label="Gate open" data-act="dgate"></button></div>
   <div class="r2"><span class="t"><b>Security lights</b><span>${SIM.lights[5]?'On till 6am':'Off'}</span></span><button class="tgl" role="switch" ${an('lt-5x','aria-checked',!!SIM.lights[5])} aria-label="Security lights" data-act="dlight" data-v="5"></button></div></div></section>`; }
-function pLog(){ return `<section class="pn g" aria-label="What happened">${pnh('list','What happened','Today')}<div class="log">${SIM.log.slice(0,18).map(l=>`<div class="lg ${l.cls}"><time>${l.t}</time><span><b>${esc(l.what)}</b>${l.why?` <span>· ${esc(l.why)}</span>`:''}</span></div>`).join('')}</div></section>`; }
+function pLog(){ return `<section class="pn g" aria-label="What happened">${pnh('list','What happened','Today')}<div class="log">${SIM.log.slice(0,18).map((l,i)=>`<div class="lg ${l.cls}"><time>${l.t}</time><span><b>${esc(l.what)}</b>${l.why?` <span>· ${esc(l.why)}</span>`:''}</span><button class="why" data-act="whylog" data-v="${i}" aria-label="Why: ${esc(l.what)} at ${l.t}">Why?</button></div>`).join('')}</div></section>`; }
 function pLoads(){ return `<section class="pn g" aria-label="Appliances">${pnh('plug','Appliances',`<i>${fmt(drawW())} W</i> now`,`<span class="badge2 shed">Shed on inverter</span>`)}<div class="rows2">${Object.entries(LOADS).map(([k,l])=>`<div class="r2">${ic(l.ic,16,1.8)}<span class="t"><b>${l.n}</b><span>${l.room}</span></span>${l.shed?'<span class="badge2 shed">Shed</span>':''}<span class="w">${fmt(l.w)} W</span><button class="tgl" role="switch" ${an('tgl-'+k,'aria-checked',!!SIM.on[k])} aria-label="${l.n}" data-act="dload" data-v="${k}"></button></div>`).join('')}</div></section>`; }
 function pNet(){ return `<section class="pn g" aria-label="Internet and TV">${pnh('wifi','Internet & TV')}<div class="boxes" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="box"><span class="k">MTN fibre</span><span class="v">48<small>Mbps</small></span><span class="s">up · 12 devices</span></div><div class="box"><span class="k">Backup</span><span class="v">Starlink</span><span class="s">standby</span></div><div class="box"><span class="k">DStv</span><span class="v">${SIM.on.tv?'On':'Off'}</span><span class="s">renews 14 days · Compact</span></div><div class="box"><span class="k">Data left</span><span class="v">38<small>GB</small></span><span class="s">Airtel MiFi</span></div></div></section>`; }
 
 function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHours(), greet=h<12?'Good morning':h<16?'Good afternoon':'Good evening', st=isStale();
  document.body.classList.toggle('stale',st);
  const layouts={
-  home:{monitor:[[()=>pPower(),pWater],[pWeather,pLights,pClimate],[()=>pSecurity(),pLog]],tablet:[[()=>pPower(),pWater,pClimate],[pWeather,pLights,()=>pSecurity(),pLog]],phone:[[()=>pPower(),pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
-  power:{monitor:[[()=>pPower(true)],[pLoads],[pLog,pNet]],tablet:[[()=>pPower(true),pNet],[pLoads,pLog]],phone:[[()=>pPower(true),pLoads,pLog,pNet]]},
+  home:{monitor:[[()=>pPower(),pWater],[pForecast,pLights,pClimate,pWeather],[()=>pSecurity(),pLog]],tablet:[[()=>pPower(),pForecast,pWater,pClimate],[pWeather,pLights,()=>pSecurity(),pLog]],phone:[[pForecast,()=>pPower(),pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
+  power:{monitor:[[()=>pPower(true),pForecast],[pLoads],[pLog,pNet]],tablet:[[()=>pPower(true),pNet],[pLoads,pLog]],phone:[[()=>pPower(true),pLoads,pLog,pNet]]},
   water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
   security:{monitor:[[()=>pSecurity(true)],[pLights],[pLog]],tablet:[[()=>pSecurity(true)],[pLights,pLog]],phone:[[()=>pSecurity(true),pLights,pLog]]}
  }[pg][dv];
@@ -1399,7 +1442,7 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
  return `<div class="stalebar" role="alert"><b>Not live.</b> Last reading ${ago()} ago. Switches are paused until the hub answers again, nothing gets queued.</div>
  <header class="dh"><div class="clock2"><b>${hhmm()}</b></div><div class="when"><b>${greet}, ${esc(S.people.find(p=>p.id===S.me).name)}</b><br>${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} · Lekki, Lagos</div>
   <div class="right"><span class="pill live-pill"><span class="dot"></span>${st?'Not live':'Live'} · ${ago()} ago</span><span class="pill src-${SIM.src}"><span class="dot"></span>${SRC[SIM.src][0]} · ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'}</span>
-  <span class="avs" aria-label="Alex and Ada are home, Tobi is out"><span>A<i></i></span><span>Ad<i></i></span><span class="away">T<i></i></span></span>
+  <button class="askbtn" data-act="askopen">${ic('sparkle',13)} Ask A.D.A.</button><span class="avs" aria-label="Alex and Ada are home, Tobi is out"><span>A<i></i></span><span>Ad<i></i></span><span class="away">T<i></i></span></span>
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>
  <div class="cols" style="grid-template-columns:${tmpl}">${layouts.map(c=>`<div class="col">${c.map(f=>f()).join('')}</div>`).join('')}</div>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
@@ -1412,9 +1455,111 @@ function denseAct(a,v){
  if(a==='dload'){ const want=!SIM.on[v]; setLoad(v,want,'from dashboard'); rules(); if(want&&!SIM.on[v]){ const last=SIM.log[0]; toast(`${LOADS[v].n} switched back off: ${last.why}`); } return true; }
  if(a==='dlight'){ SIM.lights[+v]=SIM.lights[+v]?0:1; slog(`${SIM.lights[+v]?'ON ':'OFF'} ${LIGHTS[+v][0].toLowerCase()} light`,'from dashboard'); return true; }
  if(a==='dlall'){ SIM.lights=SIM.lights.map(()=>0); slog('ALL LIGHTS OFF','from dashboard'); return true; }
+ if(a==='askopen'){ S.ov='ask'; return true; }
+ if(a==='askq'){ const sg=SUGG.find(x=>x[0]===v); ask(sg?(S.lang==='pg'?sg[2]:sg[1]):v,v); return 'done'; }
+ if(a==='whylog'){ const l=SIM.log[+v]; ask(L(`Why: ${l.what.toLowerCase()} at ${l.t}?`,`Why ${l.what.toLowerCase()} for ${l.t}?`),()=>explainLog(l)); return 'done'; }
+ if(a==='lang'){ S.lang=v; return true; }
  if(a==='dgate'){ SIM.gateOpen=!SIM.gateOpen; slog(SIM.gateOpen?'GATE OPENED':'GATE CLOSED','from dashboard'); return true; }
  return false; }
 
+
+
+/* ============ AI: explain + predict (mockup; the real app asks Claude when online) ============ */
+const OUT_P=[.62,.66,.68,.66,.6,.5,.3,.18,.14,.2,.34,.4,.3,.22,.18,.2,.24,.3,.38,.46,.56,.66,.71,.66]; // sample: chance NEPA is off, by hour, last 14 days
+const BATT_WH=5000, UNITS_PER_DAY=9.2, FUEL_L=20, GEN_L_PER_DAY=3.6;
+const L=(en,pg)=>S.lang==='pg'?pg:en;
+const durTxt=h=>{ if(!isFinite(h)||h>99) return L('well over a day','pass one day'); const hh=Math.floor(h), mm=Math.round((h-hh)*60); return hh?`${hh}h ${mm}m`:`${mm}m`; };
+const sheddableNames=()=>Object.keys(LOADS).filter(k=>LOADS[k].shed&&SIM.on[k]).map(k=>LOADS[k].n.replace('Bedroom AC','bedroom AC').replace('Living room AC','living-room AC').replace('TV & DStv','TV').toLowerCase().replace(' ac',' AC').replace('tv','TV')).join(', ');
+const sheddableOnW=()=>Object.keys(LOADS).reduce((a,k)=>a+(LOADS[k].shed&&SIM.on[k]?LOADS[k].w:0),0);
+function forecast(){ const w=Math.max(60,drawW()||lightW()+380), lean=Math.max(60,w-sheddableOnW());
+ const h=new Date().getHours(); let next=-1; for(let i=1;i<=24;i++){ const hh=(h+i)%24; if(OUT_P[hh]>=.55){ next=hh; break; } }
+ const offNights=Math.round(OUT_P[22]*14);
+ return { runNow:SIM.batt/100*BATT_WH/w, runLean:SIM.batt/100*BATT_WH/lean, sheddable:sheddableOnW(), next, nextP:next>=0?OUT_P[next]:0, offNights,
+  unitDays:SIM.units/UNITS_PER_DAY, fuelDays:(SIM.fuel/100*FUEL_L)/GEN_L_PER_DAY }; }
+const hh2=x=>String(x).padStart(2,'0')+':00';
+const lastLog=re=>SIM.log.find(l=>re.test((l.what+' '+l.why).toLowerCase()));
+
+function answer(intent){ const f=forecast(), s=SIM.src;
+ switch(intent){
+  case 'runtime': {
+   const lead=s==='inv'?L(`You're on the inverter now. At ${fmt(drawW())} W, the battery (${Math.round(SIM.batt)}%) should last about <b>${durTxt(f.runNow)}</b>.`,`You dey on inverter now. With ${fmt(drawW())} W wey dey run, battery (${Math.round(SIM.batt)}%) fit carry you reach <b>${durTxt(f.runNow)}</b>.`)
+     :L(`You're on ${SRC[s][0]} now. If light goes right now, the battery (${Math.round(SIM.batt)}%) would last about <b>${durTxt(f.runNow)}</b> at this load.`,`You dey on ${SRC[s][0]} now. If light go now-now, battery (${Math.round(SIM.batt)}%) fit carry you reach <b>${durTxt(f.runNow)}</b> with wetin dey run.`);
+   const tip=f.sheddable?L(`Turning off the heavy things (${sheddableNames()}, ${fmt(f.sheddable)} W) stretches that to <b>${durTxt(f.runLean)}</b>. A.D.A. does this automatically when it switches to inverter.`,`If you off the heavy things (${sheddableNames()}, ${fmt(f.sheddable)} W), e go reach <b>${durTxt(f.runLean)}</b>. A.D.A. dey do am by itself once e enter inverter.`)
+     :L('Only essentials are running, so this is already about as long as it gets.','Na only the important things dey run, so e no fit last pass this one.');
+   return lead+' '+tip; }
+  case 'pump': {
+   if(SIM.on.pump) return L(`The pump is running. The tank is at ${Math.round(SIM.tank)}% and will be full in about <b>${Math.max(1,Math.round((95-SIM.tank)/.5))} minutes</b>. It stops by itself at 95%.`,`Pump dey run. Tank don reach ${Math.round(SIM.tank)}%, e go full in like <b>${Math.max(1,Math.round((95-SIM.tank)/.5))} minutes</b>. E go off by itself for 95%.`);
+   const e=lastLog(/pump/);
+   const why=!e?'':/tank at 9/.test(e.why)?L(`It stopped at ${e.t} because the tank reached ${e.why.replace(/\D/g,'')}%.`,`E off for ${e.t} because tank don full reach ${e.why.replace(/\D/g,'')}%.`)
+     :/inverter/.test(e.why)?L(`It was switched off at ${e.t} because the house went on inverter, and the pump (750 W) would drain the battery fast.`,`Dem off am for ${e.t} because house enter inverter, and pump (750 W) go chop battery quick-quick.`)
+     :L(`Last change: ${e.what.toLowerCase()} at ${e.t} (${e.why}).`,`Last time: ${e.what.toLowerCase()} for ${e.t} (${e.why}).`);
+   return `${why} `+L(`The tank is at <b>${Math.round(SIM.tank)}%</b>. The pump starts again by itself at 20%, as long as there's NEPA or gen.`,`Tank dey <b>${Math.round(SIM.tank)}%</b>. Pump go start again by itself for 20%, as long as NEPA or gen dey.`); }
+  case 'ac': {
+   const on=['acBed','acLiv'].filter(k=>SIM.on[k]).map(k=>LOADS[k].n);
+   if(on.length&&s!=='inv') return L(`${on.join(' and ')} ${on.length>1?'are':'is'} on. If light goes, A.D.A. will switch ${on.length>1?'them':'it'} off so the inverter lasts the night.`,`${on.join(' and ')} dey on. If light go, A.D.A. go off am make inverter fit carry reach morning.`);
+   if(s==='inv') return L(`The ACs are off because you're on the inverter. Together they pull up to 2,400 W, which would flatten the battery in about ${durTxt(SIM.batt/100*BATT_WH/2600)}. They can come back on when NEPA or gen returns.`,`AC dey off because you dey on inverter. The two together dey pull reach 2,400 W, e go finish battery in like ${durTxt(SIM.batt/100*BATT_WH/2600)}. Once NEPA or gen come back, you fit on am.`);
+   return L('Both ACs are off right now. Nothing is stopping you from switching one on.','The two AC dey off now. Nothing dey stop you to on one.'); }
+  case 'nepa': {
+   if(s==='nepa'&&f.next>=0) return L(`From the last 14 days, light most often goes around <b>${hh2(f.next)}</b> (${Math.round(f.nextP*100)}% of days at that hour). Good time to pump water and charge things before then.`,`From the last 14 days, light dey usually go around <b>${hh2(f.next)}</b> (${Math.round(f.nextP*100)}% of days for that time). Make you pump water and charge your things before then.`);
+   const back=[...Array(24).keys()].map(i=>(new Date().getHours()+i)%24).find(hh=>OUT_P[hh]<.3);
+   return L(`NEPA is off now. On recent days light usually came back around <b>${hh2(back)}</b>. That's a pattern, not a promise.`,`NEPA no dey now. For the recent days, light dey usually come back around <b>${hh2(back)}</b>. Na pattern o, no be promise.`); }
+  case 'spike': {
+   const e=lastLog(/spike/);
+   return e?L(`The last voltage spike was <b>${e.why.replace(/\D/g,'')} V</b> at ${e.t}. A.D.A. cut the TV and kettle straight away, because anything over 260 V can damage them. Safe range is 200–250 V; it's ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'} now.`,`Last voltage spike na <b>${e.why.replace(/\D/g,'')} V</b> for ${e.t}. A.D.A. off TV and kettle sharp-sharp, because anything wey pass 260 V fit spoil them. Safe range na 200–250 V; e be ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'} now.`)
+    :L('No voltage spikes recorded today.','No voltage spike today.'); }
+  case 'diesel': return L(`The gen tank is at ${Math.round(SIM.fuel)}% (about ${Math.round(SIM.fuel/100*FUEL_L)} L). At your usual use (~${GEN_L_PER_DAY} L a day), that's about <b>${Math.round(f.fuelDays)} days</b>. Buy diesel before then.`,`Gen tank dey ${Math.round(SIM.fuel)}% (like ${Math.round(SIM.fuel/100*FUEL_L)} L). As you dey use am (~${GEN_L_PER_DAY} L every day), e fit reach <b>${Math.round(f.fuelDays)} days</b>. Buy diesel before then.`);
+  case 'units': return L(`You have <b>${SIM.units.toFixed(1)} kWh</b> left on the prepaid meter (about ₦${fmt(Math.round(SIM.units*209.5))}). At ~${UNITS_PER_DAY} kWh a day on NEPA, that lasts about <b>${Math.round(f.unitDays)} days</b>.`,`You get <b>${SIM.units.toFixed(1)} kWh</b> remain for prepaid meter (like ₦${fmt(Math.round(SIM.units*209.5))}). As you dey use ~${UNITS_PER_DAY} kWh every day for NEPA, e go last like <b>${Math.round(f.unitDays)} days</b>.`);
+  case 'cost': return L('Today so far: <b>₦3,420</b>, made of gen ₦2,100 and NEPA ₦1,320. The gen ran 2 hours; most of the cost is diesel.','Today so far: <b>₦3,420</b>. Gen na ₦2,100, NEPA na ₦1,320. Gen run 2 hours, na diesel carry most of the money.');
+  case 'now': { const on=Object.keys(LOADS).filter(k=>SIM.on[k]);
+   return L(`On ${SRC[s][0]}, using <b>${fmt(drawW())} W</b>: ${on.map(k=>`${LOADS[k].n} (${fmt(LOADS[k].w)} W)`).join(', ')||'nothing heavy'}, plus ${SIM.lights.filter(Boolean).length} lights.`,`On ${SRC[s][0]}, e dey use <b>${fmt(drawW())} W</b>: ${on.map(k=>`${LOADS[k].n} (${fmt(LOADS[k].w)} W)`).join(', ')||'nothing heavy'}, plus ${SIM.lights.filter(Boolean).length} lights.`); }
+ }
+ return L(`In the full app, A.D.A. answers anything about your home using Claude when there's internet. In this mockup I can answer about the pump, how long the battery will last, the ACs, when light usually goes, voltage spikes, diesel, prepaid units, today's cost, and what's running.`,`For the full app, A.D.A. go answer anything about your house with Claude when internet dey. For this mockup I fit answer about pump, how long battery go last, AC, when light dey usually go, voltage spike, diesel, prepaid unit, today money, and wetin dey run.`); }
+function intentOf(q){ q=q.toLowerCase();
+ if(/pump|water|tank|borehole/.test(q)) return 'pump';
+ if(/how long|last|battery|inverter|runtime|carry/.test(q)) return 'runtime';
+ if(/\bac\b|air ?con|aircon|cool/.test(q)) return 'ac';
+ if(/nepa|light (go|dey go|come|go come)|when.*light|outage|power cut/.test(q)) return 'nepa';
+ if(/spike|voltage|surge|\btv\b/.test(q)) return 'spike';
+ if(/diesel|fuel|gen\b|generator/.test(q)) return 'diesel';
+ if(/unit|meter|prepaid|token/.test(q)) return 'units';
+ if(/cost|money|spend|naira|₦|bill/.test(q)) return 'cost';
+ if(/what.*(on|running|using)|wetin dey|using now|draw/.test(q)) return 'now';
+ return 'other'; }
+function explainLog(l){ const w=(l.what+' '+l.why).toLowerCase(), thing=l.what.replace(/^(ON|OFF)\s+/,'').toLowerCase(); const nm=Object.values(LOADS).find(x=>x.n.toLowerCase()===thing); const thing2=nm?nm.n:thing;
+ if(/shed: on inverter/.test(w)) return L(`At ${l.t} the house went on inverter, so A.D.A. switched off the ${thing2}. Heavy loads like this drain the battery fast; shedding them keeps the inverter going through the night.`,`For ${l.t} house enter inverter, so A.D.A. off the ${thing2}. Heavy things like this dey chop battery quick; to off them make inverter fit carry reach morning.`);
+ if(/spike/.test(l.why)) return L(`At ${l.t} the voltage jumped to ${l.why.replace(/\D/g,'')} V. Anything above 260 V can damage electronics, so A.D.A. cut the ${thing} immediately.`,`For ${l.t} voltage jump reach ${l.why.replace(/\D/g,'')} V. Anything wey pass 260 V fit spoil electronics, so A.D.A. off the ${thing} sharp-sharp.`);
+ if(/voltage spike/.test(w)) return L(`At ${l.t} the mains voltage spiked to ${l.why.replace(/\D/g,'')} V, well above the safe 200–250 V. Sensitive appliances were protected automatically.`,`For ${l.t} voltage spike reach ${l.why.replace(/\D/g,'')} V, e pass the safe 200–250 V well-well. A.D.A. protect the sensitive appliances by itself.`);
+ if(/tank at/.test(l.why)) return /^on/i.test(l.what)?L(`At ${l.t} the tank dropped to ${l.why.replace(/\D/g,'')}% and there was power, so A.D.A. started the pump.`,`For ${l.t} tank drop reach ${l.why.replace(/\D/g,'')}% and light dey, so A.D.A. start the pump.`):L(`At ${l.t} the tank reached ${l.why.replace(/\D/g,'')}%, so A.D.A. stopped the pump before it could overflow.`,`For ${l.t} tank reach ${l.why.replace(/\D/g,'')}%, so A.D.A. off the pump before water go waste.`);
+ if(/from dashboard/.test(w)) return L(`Someone switched the ${thing.replace(/ light$/,' light')} from the dashboard at ${l.t}.`,`Person switch the ${thing} from dashboard for ${l.t}.`);
+ if(/nepa took light/.test(w)) return L(`At ${l.t} grid power went off and the house moved to the inverter. That's when A.D.A. starts shedding heavy loads.`,`For ${l.t} NEPA take light, house enter inverter. Na that time A.D.A. dey start to off the heavy things.`);
+ if(/light is back/.test(w)) return L(`At ${l.t} grid power came back. The battery starts recharging and the pump can run again.`,`For ${l.t} NEPA bring light back. Battery go start to charge and pump fit run again.`);
+ if(/gen started/.test(w)) return L(`At ${l.t} the generator came on. The battery charges and heavy loads are allowed again.`,`For ${l.t} gen start. Battery go charge and heavy things fit run again.`);
+ if(/hub back|device online/.test(w)) return L(`At ${l.t} the hub started answering again, so readings are live.`,`For ${l.t} hub start to answer again, so the readings dey live.`);
+ if(/alert/.test(w)) return L(`At ${l.t} the battery dropped to 20%. Below this the inverter will cut out soon.`,`For ${l.t} battery drop reach 20%. If e go below this one, inverter go soon off.`);
+ return L(`${l.what} at ${l.t}${l.why?` (${l.why})`:''}.`,`${l.what} for ${l.t}${l.why?` (${l.why})`:''}.`); }
+const SUGG=[['runtime','How long will the inverter last?','How long inverter go carry?'],['pump','Why is the pump off?','Why pump off?'],['nepa','When does light usually go?','When light dey usually go?'],['ac','Why is the AC off?','Why AC off?'],['units','How many days of units left?','How many days unit remain?'],['spike','Any voltage spikes today?','Voltage spike happen today?']];
+function ask(q,intent){ S.chat=S.chat||[]; S.chat.push({who:'me',t:q}); S.ov='ask'; S.typing=true; update();
+ setTimeout(()=>{ S.typing=false; S.chat.push({who:'ai',t:typeof intent==='function'?intent():answer(intent||intentOf(q))}); if(S.ov==='ask') update(); },650); }
+
+function pForecast(){ const f=forecast(), h=new Date().getHours();
+ const cells=[...Array(24).keys()].map(i=>{ const hh=(h+i)%24, p=OUT_P[hh]; return `<i style="background:rgba(var(--d-amber-rgb),${(.12+p*.85).toFixed(2)})" title="${hh2(hh)}: ${Math.round(p*100)}% chance light is off"></i>`; }).join('');
+ return `<section class="pn g" aria-label="Forecast">${pnh('sparkle','Forecast',L('What A.D.A. expects','Wetin A.D.A. dey expect'),`<button class="mini-b" data-act="askopen">${ic('sparkle',12)} ${L('Ask A.D.A.','Ask A.D.A.')}</button>`)}
+  <div class="fc"><div class="fcbig"><span class="k">${SIM.src==='inv'?L('Battery lasts','Battery go carry'):L('If light goes now','If light go now')}</span><span class="v ser">${durTxt(f.runNow)}</span><span class="s">${L('at','with')} ${fmt(Math.max(60,drawW()))} W${f.sheddable?` · <b>${durTxt(f.runLean)}</b> ${L('without '+sheddableNames(),'if you off '+sheddableNames())}`:''}</span></div>
+  <button class="fcwhy" data-act="askq" data-v="runtime">${L('Why?','Why?')}</button></div>
+  <div><div class="pnh" style="min-height:0"><span class="sm">${f.next>=0&&SIM.src==='nepa'?L(`Light usually goes around <i>${hh2(f.next)}</i>`,`Light dey usually go around <i>${hh2(f.next)}</i>`):SIM.src==='nepa'?L('No outage expected soon','No outage dey come soon'):L('Light usually returns around <i>06:00</i>','Light dey usually come back around <i>06:00</i>')}</span><span class="end"><button class="fcwhy" data-act="askq" data-v="nepa">${L('Why?','Why?')}</button></span></div>
+   <div class="tl" role="img" aria-label="Chance light is off for each of the next 24 hours">${cells}</div><div class="bandlab"><span>${L('now','now')}</span><span>+6h</span><span>+12h</span><span>+18h</span><span>+24h</span></div></div>
+  <div class="boxes" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="box"><span class="k">${L('Prepaid units','Prepaid unit')}</span><span class="v">≈ ${Math.round(f.unitDays)}<small>${L('days','days')}</small></span><span class="s">${L('at','with')} ~${UNITS_PER_DAY} kWh/${L('day','day')}</span></div>
+   <div class="box"><span class="k">${L('Diesel','Diesel')}</span><span class="v">≈ ${Math.round(f.fuelDays)}<small>${L('days','days')}</small></span><span class="s">${L('buy before','buy before')} ${new Date(Date.now()+Math.max(0,Math.round(f.fuelDays)-1)*864e5).toLocaleDateString('en-GB',{weekday:'short'})}</span></div></div>
+  <div class="fcnote">${ic('clock',12)} ${L('Learned from 14 days of sample history. Gets sharper as the hub learns your home.','E learn from 14 days of sample history. E go sharp pass as hub dey learn your house.')}</div></section>`; }
+
+function askPanel(){ const msgs=(S.chat&&S.chat.length)?S.chat:[{who:'ai',t:L(`Hi ${esc(S.people.find(p=>p.id===S.me).name)} 👋🏾 Ask me about your power, water or bills. Tap a question below or type your own.`,`How far ${esc(S.people.find(p=>p.id===S.me).name)} 👋🏾 Ask me anything about your light, water or money. Tap one question for down or type your own.`)}];
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid askp" role="dialog" aria-label="Ask A.D.A.">
+  <div class="sh"><div style="display:flex;align-items:center;gap:10px"><span class="aiav">${ic('sparkle',16)}</span><div><h2 style="font-size:18px">Ask A.D.A.</h2><div class="sub" style="font-size:12px">${isStale()?L('Hub not live: answers use the last reading','Hub no live: answer na from last reading'):L('Reads your home live','E dey read your house live')}</div></div></div>
+   <div style="display:flex;gap:8px;align-items:center"><span class="langsw" role="group" aria-label="Language"><button aria-pressed="${S.lang!=='pg'}" data-act="lang" data-v="en">English</button><button aria-pressed="${S.lang==='pg'}" data-act="lang" data-v="pg">Pidgin</button></span><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div></div>
+  <div class="chatlog" aria-live="polite">${msgs.map(m=>`<div class="msg ${m.who}">${m.t}</div>`).join('')}${S.typing?'<div class="msg ai typing" aria-label="A.D.A. is typing"><i></i><i></i><i></i></div>':''}</div>
+  <div class="suggs">${SUGG.map(([k,en,pg])=>`<button data-act="askq" data-v="${k}">${S.lang==='pg'?pg:en}</button>`).join('')}</div>
+  <form id="askform" class="askf"><label class="vh" for="askin">Your question</label><input id="askin" autocomplete="off" placeholder="${L('Ask about light, water, bills…','Ask about light, water, money…')}"><button class="askgo" aria-label="Send">${ic('send',16)}</button></form>
+  <div class="fcnote">${L('Mockup: answers are worked out from the live house here. The real app will use Claude when online, and these local answers when offline.','Mockup: the answers na from the live house for here. The real app go use Claude when internet dey, and these local answers when no internet.')}</div></div></div>`; }
 
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their
@@ -1480,7 +1625,7 @@ document.addEventListener('click',e=>{
  if(!b){ const t=e.target.closest('[data-tap]'); if(t&&!S.edit){ const w=find(t.dataset.wid);
    if(t.dataset.tap==='lock') w.locked=!w.locked; else if(t.dataset.tap==='gate') w.closed=!w.closed; else if(t.dataset.tap==='washer') w.on=!w.on; else if(t.dataset.tap==='light'){ const on=!w.lamps.some(l=>l[1]); w.lamps.forEach(l=>l[1]=on); } update(); } return; }
  const a=b.dataset.act, v=b.dataset.v, id=b.dataset.id;
- if(denseAct(a,v)){ update(); return; }
+ { const r=denseAct(a,v); if(r==='done') return; if(r){ update(); return; } }
  if((a==='scrim'||a==='scrimshare')&&e.target!==b) return;
  switch(a){
   case 'upload': uploadKey=v; $('#file').click(); return;
@@ -1548,6 +1693,7 @@ document.addEventListener('change',e=>{ const t=e.target;
  if(t.dataset.hex!==undefined) update();
 });
 document.addEventListener('submit',e=>{ e.preventDefault();
+ if(e.target.id==='askform'){ const q=$('#askin').value.trim(); if(q) ask(q); return; }
  if(e.target.id==='acctform'){ S.accounts.push({name:$('#an').value.trim(),pw:$('#ap').value}); update(); }
  if(e.target.id==='signform'){ const n=$('#sn').value.trim().toLowerCase(), p=$('#sp').value, a=S.accounts.find(x=>x.name.toLowerCase()===n&&x.pw===p);
   if(a){ S.ov=null; S.view='dash'; S.dash='kitchen'; S.me='ktab'; update(); toast(`Signed in as ${a.name}`); } else showError(e.target); }
