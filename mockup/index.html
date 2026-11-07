@@ -358,7 +358,7 @@ html.dark .ob{color:#bfe9f6;background:rgba(79,179,207,.2)}
 /* materials */
 .mats{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:14px}
 .mc{display:flex;flex-direction:column;gap:8px;align-items:flex-start;text-align:left}
-.mp{position:relative;width:100%;aspect-ratio:1.12;border-radius:22px;overflow:hidden;background-size:cover;background-position:center;background-color:#8aa4b8;box-shadow:0 6px 16px rgba(0,0,0,.12)}
+.mp{display:block;position:relative;width:100%;aspect-ratio:1.12;border-radius:22px;overflow:hidden;background-size:cover;background-position:center;background-color:#8aa4b8;box-shadow:0 6px 16px rgba(0,0,0,.12)}
 .mp .m{position:absolute;inset:12% 8% 8% 12%;border-radius:16px;padding:10px;display:flex;flex-direction:column;justify-content:space-between}
 .mp .li{width:32px;height:32px;border-radius:10px;display:grid;place-items:center;background:rgba(244,236,222,.92);color:#6b5a3a;border:1px solid rgba(0,0,0,.06)}
 .mp .br{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:650}
@@ -543,6 +543,383 @@ body.stale .live-pill .dot{background:var(--d-warn);animation:none}
 @media (max-width:719px){.boxes{grid-template-columns:repeat(2,minmax(0,1fr))}.volt .big2{font-size:38px}.wxrow div:nth-child(n+6){display:none}.wxrow{grid-template-columns:repeat(5,minmax(0,1fr))}}
 
 body.dense .solid{color:var(--ink)}
+/* ===== transitions-dev (github.com/Jakubantalik/transitions-dev, MIT) ===== */
+:root {
+  /* Card resize */
+  --resize-dur: 300ms;
+  --resize-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Number pop-in */
+  --digit-dur: 500ms;
+  --digit-distance: 8px;
+  --digit-stagger: 70ms;
+  --digit-blur: 2px;
+  --digit-ease: cubic-bezier(0.34, 1.45, 0.64, 1);
+  --digit-dir-x: 0;
+  --digit-dir-y: 1;
+  /* Notification badge */
+  --badge-slide-dur: 260ms;
+  --badge-pop-dur: 500ms;
+  --badge-pop-close-dur: 180ms;
+  --badge-fade-dur: 400ms;
+  --badge-fade-close-dur: 180ms;
+  --badge-blur: 2px;
+  --badge-offset-x: -8.2px;
+  --badge-offset-y: 12.4px;
+  --badge-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --badge-pop-ease: cubic-bezier(0.34, 1.36, 0.64, 1);
+  --badge-close-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  /* Text states swap */
+  --text-swap-dur: 200ms;
+  --text-swap-translate-y: 8px;
+  --text-swap-blur: 2px;
+  --text-swap-ease: ease-out;
+  /* Menu dropdown */
+  --dropdown-open-dur: 250ms;
+  --dropdown-close-dur: 150ms;
+  --dropdown-pre-scale: 0.97;
+  --dropdown-closing-scale: 0.99;
+  --dropdown-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Modal open / close */
+  --modal-open-dur: 250ms;
+  --modal-close-dur: 150ms;
+  --modal-scale: 0.96;
+  --modal-scale-close: 0.96;
+  --modal-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Panel reveal */
+  --panel-open-dur: 400ms;
+  --panel-close-dur: 350ms;
+  --panel-translate-y: 100px;
+  --panel-blur: 2px;
+  --panel-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Page side-by-side */
+  --page-slide-dur: 200ms;
+  --page-fade-dur: 200ms;
+  --page-slide-distance: 8px;
+  --page-blur: 3px;
+  --page-stagger: 0ms;
+  --page-exit-enabled: 1;
+  --page-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --page-fade-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Icon swap */
+  --icon-swap-dur: 200ms;
+  --icon-swap-blur: 2px;
+  --icon-swap-start-scale: 0.25;
+  --icon-swap-ease: ease-in-out;
+  /* Success check */
+  --check-opacity-dur: 550ms;
+  --check-rotate-dur: 550ms;
+  --check-rotate-from: 80deg;
+  --check-bob-dur: 450ms;
+  --check-y-amount: 40px;
+  --check-blur-dur: 500ms;
+  --check-blur-from: 10px;
+  --check-path-dur: 550ms;
+  --check-path-delay: 80ms;
+  --check-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-opacity: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-rotate: cubic-bezier(0.22, 1, 0.36, 1);
+  --check-ease-bob: cubic-bezier(0.34, 1.35, 0.64, 1);
+  --check-ease-path: cubic-bezier(0.22, 1, 0.36, 1);
+  /* Avatar group hover */
+  --avatar-lift: -4px;
+  --avatar-dur: 320ms;
+  --avatar-scale: 1.05;
+  --avatar-falloff: 0.45;
+  --avatar-ease-in: cubic-bezier(0.22, 1, 0.36, 1);
+  --avatar-ease-out: cubic-bezier(0.34, 3.85, 0.64, 1);
+  /* Error state shake */
+  --shake-distance: 6px;
+  --shake-overshoot: 4px;
+  --shake-dur-a: 80ms;
+  --shake-dur-b: 60ms;
+  --shake-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --revert-hold: 3000ms;
+  --revert-dur: 280ms;
+}
+.t-modal {
+  transform-origin: center;
+  transform: scale(var(--modal-scale));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-open-dur) var(--modal-ease),
+    opacity   var(--modal-open-dur) var(--modal-ease);
+  will-change: transform, opacity;
+}
+.t-modal.is-open {
+  transform: scale(1);
+  opacity: 1;
+  pointer-events: auto;
+}
+.t-modal.is-closing {
+  transform: scale(var(--modal-scale-close));
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--modal-close-dur) var(--modal-ease),
+    opacity   var(--modal-close-dur) var(--modal-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-modal { transition: none !important; }
+}
+@keyframes t-digit-pop-in {
+  0%   {
+    transform: translate(
+      calc(var(--digit-distance) * var(--digit-dir-x)),
+      calc(var(--digit-distance) * var(--digit-dir-y))
+    );
+    opacity: 0;
+    filter: blur(var(--digit-blur));
+  }
+  100% { transform: translate(0, 0); opacity: 1; filter: blur(0); }
+}
+
+.t-digit-group {
+  display: inline-flex;
+  align-items: baseline;
+}
+.t-digit {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+.t-digit-group.is-animating .t-digit {
+  animation: t-digit-pop-in var(--digit-dur) var(--digit-ease) both;
+}
+.t-digit-group.is-animating .t-digit[data-stagger="1"] {
+  animation-delay: var(--digit-stagger);
+}
+.t-digit-group.is-animating .t-digit[data-stagger="2"] {
+  animation-delay: calc(var(--digit-stagger) * 2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-digit-group .t-digit { animation: none !important; }
+}
+.t-icon-swap {
+  position: relative;
+  display: inline-grid;
+}
+.t-icon-swap .t-icon {
+  grid-area: 1 / 1;
+  transition:
+    opacity   var(--icon-swap-dur) var(--icon-swap-ease),
+    filter    var(--icon-swap-dur) var(--icon-swap-ease),
+    transform var(--icon-swap-dur) var(--icon-swap-ease);
+  will-change: opacity, filter, transform;
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="a"],
+.t-icon-swap[data-state="b"] .t-icon[data-icon="b"] {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+.t-icon-swap[data-state="a"] .t-icon[data-icon="b"],
+.t-icon-swap[data-state="b"] .t-icon[data-icon="a"] {
+  opacity: 0;
+  filter: blur(var(--icon-swap-blur));
+  transform: scale(var(--icon-swap-start-scale));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-icon-swap .t-icon { transition: none !important; }
+}
+@keyframes t-badge-slide-in {
+  from { transform: translate(var(--badge-offset-x), var(--badge-offset-y)); }
+  to   { transform: translate(0, 0); }
+}
+
+/* .t-badge is the absolutely-positioned wrapper for the dot.
+   Adjust top/right (or left/bottom) to anchor it on your trigger. */
+.t-badge {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  pointer-events: none;
+  will-change: transform;
+}
+.t-badge[data-open="true"] {
+  animation: t-badge-slide-in var(--badge-slide-dur) var(--badge-slide-ease);
+}
+
+.t-badge-dot {
+  display: block;
+  transform-origin: center;
+  transform: scale(1);
+  opacity: 1;
+  filter: blur(0);
+  transition:
+    transform var(--badge-pop-dur)  var(--badge-pop-ease),
+    opacity   var(--badge-fade-dur) var(--badge-pop-ease),
+    filter    var(--badge-pop-dur)  var(--badge-pop-ease);
+  will-change: transform, opacity, filter;
+}
+.t-badge[data-open="false"] .t-badge-dot {
+  transform: scale(0);
+  opacity: 0;
+  filter: blur(var(--badge-blur));
+  transition:
+    transform var(--badge-pop-close-dur)  var(--badge-close-ease),
+    opacity   var(--badge-fade-close-dur) var(--badge-close-ease),
+    filter    var(--badge-pop-close-dur)  var(--badge-close-ease);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-badge, .t-badge-dot { animation: none !important; transition: none !important; }
+}
+.t-page-slide {
+  position: relative;
+}
+.t-page-slide .t-page[data-page-id="1"] {
+  --t-page-from-x: calc(var(--page-slide-distance) * -1);
+}
+.t-page-slide .t-page[data-page-id="2"] {
+  --t-page-from-x: var(--page-slide-distance);
+}
+.t-page-slide .t-page {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(calc(var(--t-page-from-x, 0px) * var(--page-exit-enabled)));
+  filter: blur(calc(var(--page-blur) * var(--page-exit-enabled)));
+  transition:
+    opacity   var(--page-fade-dur)  var(--page-fade-ease),
+    transform var(--page-slide-dur) var(--page-slide-ease),
+    filter    var(--page-slide-dur) var(--page-slide-ease);
+  will-change: opacity, transform, filter;
+}
+.t-page-slide[data-page="1"] .t-page[data-page-id="1"],
+.t-page-slide[data-page="2"] .t-page[data-page-id="2"] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(0);
+  filter: blur(0);
+  transition-delay: var(--page-stagger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-page-slide .t-page { transition: none !important; }
+}
+/* Wrapper drives the appear animation; it doesn't own any
+   sizing or color so you can drop in any icon. */
+.t-success-check {
+  display: inline-block;
+  transform-origin: center;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+}
+/* overflow: visible keeps the stroke from clipping while it
+   draws; display: block kills the inline whitespace under SVGs. */
+.t-success-check svg { display: block; overflow: visible; }
+/* Stroke-draw setup. Replace 20 with the result of
+   path.getTotalLength() for your path; round caps mean any
+   sub-pixel overshoot is invisible. */
+.t-success-check svg path {
+  stroke-dasharray: 20;
+  stroke-dashoffset: 20;
+}
+
+.t-success-check[data-state="in"] {
+  animation:
+    t-check-fade   var(--check-opacity-dur) var(--check-ease-opacity) forwards,
+    t-check-rotate var(--check-rotate-dur)  var(--check-ease-rotate)  forwards,
+    t-check-blur   var(--check-blur-dur)    var(--check-ease-out)     forwards,
+    t-check-bob    var(--check-bob-dur)     var(--check-ease-bob)     forwards;
+}
+.t-success-check[data-state="in"] svg path {
+  animation: t-check-draw var(--check-path-dur) var(--check-ease-path) var(--check-path-delay, 0ms) forwards;
+}
+
+@keyframes t-check-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes t-check-rotate {
+  from { transform: rotate(var(--check-rotate-from)); }
+  to   { transform: rotate(0deg); }
+}
+@keyframes t-check-blur {
+  from { filter: blur(var(--check-blur-from)); }
+  to   { filter: blur(0); }
+}
+@keyframes t-check-bob {
+  from { translate: 0 var(--check-y-amount); }
+  to   { translate: 0 0; }
+}
+@keyframes t-check-draw { to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .t-success-check { animation: none !important; opacity: 1; }
+  .t-success-check svg path { animation: none !important; stroke-dashoffset: 0 !important; }
+}
+/* Border-color tween. Define your input's default / focused
+   / error border-color in your own component CSS — this rule
+   only owns the interpolation. Use a constant border-width
+   across states so the tween never shifts inner content. */
+.t-input {
+  transition: border-color 150ms ease-out;
+  will-change: transform;
+}
+.t-input.is-error {
+  /* Error border auto-reverts on the hold timer, so the
+     fade-out uses the slower revert duration (matches the
+     message fade). */
+  transition: border-color var(--revert-dur, 280ms) ease-out;
+}
+
+/* Error message reveal. Visibility is delayed by --revert-dur
+   on hide so the message stays painted for the full opacity
+   fade-out. Entering .is-error drops the delay to 0 so the
+   message becomes visible immediately. */
+.t-error-msg {
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity    var(--revert-dur, 280ms) ease-out,
+    visibility 0s linear var(--revert-dur, 280ms);
+}
+.t-input-wrap.is-error .t-error-msg {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity    var(--revert-dur, 280ms) ease-out,
+    visibility 0s linear 0s;
+}
+
+/* Multi-segment keyframe with per-stop easing so each leg
+   of the shake follows its own cubic-bezier independently.
+   %-stops are cumulative durations as a fraction of the
+   total (80, 60, 80, 60 = 280ms): 28.57%, 57.14%, 78.57%,
+   100%. Recompute if any segment duration changes. */
+.t-input.is-shaking {
+  animation: t-input-shake calc(
+      var(--shake-dur-a) * 2 + var(--shake-dur-b) * 2
+    ) linear;
+}
+@keyframes t-input-shake {
+  0%      { transform: translateX(0);                                 animation-timing-function: var(--shake-ease); }
+  28.57%  { transform: translateX(var(--shake-distance));             animation-timing-function: var(--shake-ease); }
+  57.14%  { transform: translateX(calc(var(--shake-distance) * -1)); animation-timing-function: var(--shake-ease); }
+  78.57%  { transform: translateX(var(--shake-overshoot));            animation-timing-function: var(--shake-ease); }
+  100%    { transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-input { animation: none !important; transform: none !important; }
+}
+
+/* glue for transitions-dev in this app */
+.t-fade{opacity:0;transition:opacity var(--modal-open-dur) var(--modal-ease)}
+.t-fade.is-open{opacity:1}
+.t-fade.is-closing{opacity:0;transition:opacity var(--modal-close-dur) var(--modal-ease)}
+@media (prefers-reduced-motion: reduce){.t-fade{transition:none!important}}
+.t-page-slide[data-page="1"] .t-page[data-page-id="1"],.t-page-slide[data-page="2"] .t-page[data-page-id="2"]{position:relative}
+.t-page{display:flex;flex-direction:column;gap:12px}
+.dock .db{position:relative}
+.dock .t-badge{top:3px;right:3px}
+.t-badge-dot{min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#d6453f;color:#fff;font-size:11px;font-weight:700;line-height:18px;text-align:center;box-shadow:0 0 0 2px rgba(255,255,255,.85)}
+.t-icon-swap .t-icon{display:grid;place-items:center}
+.sif.t-input.is-error{border-color:#ff8a75}
+.t-error-msg{min-height:18px;font-size:14px;color:#ffb6aa}
+.btn .t-success-check,.inst .t-success-check{vertical-align:-3px;margin-right:2px}
 </style>
 </head>
 <body>
@@ -738,10 +1115,10 @@ const R={
  media:(w,z)=>{ const a=pic('media-art'); return {cls:'photo '+(S.playing?'playing ':'')+(z.rows<=3?'compact':''),html:`<div class="mbg ${a?'':'ph-art'}" style="${a?`background-image:url('${a}')`:''}"></div><div class="shade" style="background:rgba(10,10,18,.25)"></div>
   <div class="hd" style="max-width:${z.c>=6?'62%':'100%'}"><span class="chip" style="width:46px;height:46px;border-radius:14px">${ic('music',22)}</span><div><div class="lab" style="font-size:12.5px">Chill Station · ${S.playing?'Playing':'Paused'}</div><div class="nm" style="font-size:${z.c>=6?22:18}px;font-weight:700;white-space:normal">Lo-fi Beats</div></div></div>
   ${slot('media-art','disc '+(a?'':'ph-art'))}
-  <div class="mctl"><div class="seg3"><button aria-label="Previous track">${ic('prev',15,2.2)}</button><button data-act="play" aria-label="${S.playing?'Pause':'Play'}">${ic(S.playing?'pause':'play',15,2.6)}</button><button aria-label="Next track">${ic('next',15,2.2)}</button></div><span class="vol">${ic('music',12)} ${S.volume}%</span></div>`}; },
+  <div class="mctl"><div class="seg3"><button aria-label="Previous track">${ic('prev',15,2.2)}</button><button data-act="play" aria-label="${S.playing?'Pause':'Play'}"><span class="t-icon-swap" ${an('play','data-state',S.playing?'a':'b')}><span class="t-icon" data-icon="a">${ic('pause',15,2.6)}</span><span class="t-icon" data-icon="b">${ic('play',15,2.6)}</span></span></button><button aria-label="Next track">${ic('next',15,2.2)}</button></div><span class="vol">${ic('music',12)} ${S.volume}%</span></div>`}; },
  light:(w,z)=>{ const on=w.lamps.filter(l=>l[1]).length, grp=w.lamps.length>1;
   return {cls:on?'tint-cream':'',tap:'light',html:`${hd(ic('bulb',18,2,on?'color:#c78a1e':''),grp?(on?`${on} of ${w.lamps.length} on`:'All off'):'Light',w.name)}<div class="big">${on?'On':'Off'}</div>${prod(w.prod)}`}; },
- lock:(w)=>({cls:w.locked?'tint-green':'tint-peach',tap:'lock',html:`${hd(ic(w.locked?'lock':'unlock',18,2,w.locked?'color:#25804f':'color:#c4512e'),w.group?(w.locked?'All locked':'1 unlocked'):'Lock',w.name)}<div class="big">${w.locked?'Locked':'Unlocked'}</div>${prod('prod-door')}`}),
+ lock:(w)=>({cls:w.locked?'tint-green':'tint-peach',tap:'lock',html:`${hd(`<span class="t-icon-swap" ${an('lk-'+w.id,'data-state',w.locked?'a':'b')}><span class="t-icon" data-icon="a">${ic('lock',18,2,'color:#25804f')}</span><span class="t-icon" data-icon="b">${ic('unlock',18,2,'color:#c4512e')}</span></span>`,w.group?(w.locked?'All locked':'1 unlocked'):'Lock',w.name)}<div class="big">${w.locked?'Locked':'Unlocked'}</div>${prod('prod-door')}`}),
  thermo:(w,z)=>{ const m=w.mode, col=m==='heat'?'#d9443c':m==='cool'?'#2f7fd6':m==='auto'?'#1f9d63':'';
   const ctl=z.rows>=3?`<div class="tc"><span class="seg2"><button data-act="tdown" data-id="${w.id}" aria-label="Lower">−</button><button data-act="tup" data-id="${w.id}" aria-label="Raise">+</button></span>${[['off','power'],['cool','snow'],['fan','fan']].map(([k,i])=>`<button class="${m===k?'on':''}" data-act="tmode" data-id="${w.id}" data-v="${k}" aria-label="${k}">${ic(i,15)}</button>`).join('')}</div>`:'';
   return {cls:m==='heat'?'tint-pink':m==='cool'?'tint-sky':m==='auto'?'tint-green':'',html:`${hd(ic(m==='cool'?'snow':m==='off'?'power':m==='auto'?'auto':m==='fan'?'fan':'flame',18,2,col?`color:${col}`:''),m==='off'?'Off':m[0].toUpperCase()+m.slice(1),w.name)}<div class="pre" style="margin-top:auto">Now ${w.now}°C</div><div class="big" style="margin-top:0">${w.target}<sup>°</sup></div>${z.rows>=3?ctl:prod('prod-thermostat')}`}; },
@@ -815,7 +1192,7 @@ function holdSheet(){ const s=S.sheet; let cls='',body='';
   <div class="srow"><label for="lb">Brightness</label><input class="gs" id="lb" type="range" min="1" max="100" value="${w.bright||70}" data-bright="${w.id}" style="--p:${w.bright||70}%"></div>`; }
  else if(s.kind==='locks'){ const seen={}; body=`<div class="sh"><h2>Locks</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div><div class="lamps">${Object.values(S.boards).flat().filter(w=>w.type==='lock'&&!seen[w.name]&&(seen[w.name]=1)).map(w=>`<button class="lamp" data-act="lockt" data-id="${w.id}"><span class="bulb" style="background:${w.locked?'#d6f0dd':'#ffe3d3'};color:${w.locked?'#25804f':'#c4512e'}">${ic(w.locked?'lock':'unlock',16)}</span><span><b>${esc(w.name)}</b><span>${w.locked?'Locked':'Unlocked'} · tap to ${w.locked?'unlock':'lock'}</span></span></button>`).join('')}</div>`; }
  else { const w=find(s.id); body=`<div class="sh"><h2>${esc(w.name||w.type)}</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div><p class="sub" style="margin:0;font-size:15px">This widget has no extra controls yet.</p>`; }
- return `<div class="scrim" data-act="scrim"><div class="sheet solid ${cls}" role="dialog" aria-label="More controls">${body}</div></div>`; }
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid ${cls}" role="dialog" aria-label="More controls">${body}</div></div>`; }
 
 function matPrev(k){ const m=MATS[k], bg=pic('wall-day'); let st;
  if(k==='neon') st='background:rgba(18,20,32,.78);border:1.5px solid #ff5a5a;box-shadow:0 0 16px rgba(255,80,80,.7),inset 0 0 10px rgba(255,80,80,.35);color:#fff';
@@ -827,44 +1204,44 @@ function sliders(){ const m=mat(); return KNOBS.map(([g,ks])=>`<div class="sec">
 
 function browser(){ const t=S.btab; let body='';
  if(t==='widgets'){ const list=[['Weather','csun','The sky outside, the hours and days ahead','1.0.0','2.5k',1],['Light','bulb','Light control with brightness, color, and temperature','1.0.0','2.3k',1],['Camera','cctv','Live camera stream with multi-protocol support','1.0.1','1.5k',1],['Thermostat','flame','Heat, cool, auto or off, with room temperature','1.0.0','1.4k',1],['Lock','lock','Locked or unlocked, one tap to change','1.0.0','1.3k',1],['Blinds','blinds','Open, close or set the position','1.0.0','1.1k',1],['Plant care','drop','Soil moisture and when to water','0.4.2','612',0,'@greenthumb'],['Bin day','grid','Which bin goes out tonight','1.2.0','944',0,'@kerbside'],['Air purifier','fan','Fan speed, filter life and air quality','0.9.0','388',0,'@cleanair']];
-  body=`<div style="display:flex;flex-direction:column;gap:12px">${list.map(([n,i,d,v,dl,off,by])=>{ const inst=off||S.installed[n]; return `<div class="item"><span class="ic">${ic(i,24,1.8)}</span><div class="bd"><div class="tt">${n} ${off?`<span class="vf">${ic('check',13,3.2)}</span><span class="by">@glasshome</span>`:`<span class="by">${by}</span><span class="cb">Community</span>`}</div><div class="sub" style="font-size:14.5px">${d}</div><div class="meta"><span>${ic('tag',13)} ${v}${inst?' installed':''}</span><span>${ic('dl',13)} ${dl}</span></div></div>${off?'':`<button class="inst ${inst?'done':''}" data-act="install" data-v="${n}">${inst?'Installed':'Install'}</button>`}</div>`; }).join('')}</div>`; }
+  body=`<div style="display:flex;flex-direction:column;gap:12px">${list.map(([n,i,d,v,dl,off,by])=>{ const inst=off||S.installed[n]; return `<div class="item"><span class="ic">${ic(i,24,1.8)}</span><div class="bd"><div class="tt">${n} ${off?`<span class="vf">${ic('check',13,3.2)}</span><span class="by">@glasshome</span>`:`<span class="by">${by}</span><span class="cb">Community</span>`}</div><div class="sub" style="font-size:14.5px">${d}</div><div class="meta"><span>${ic('tag',13)} ${v}${inst?' installed':''}</span><span>${ic('dl',13)} ${dl}</span></div></div>${off?'':`<button class="inst ${inst?'done':''}" data-act="install" data-v="${n}">${inst?chk('chk-inst-'+n,true,14)+' Installed':'Install'}</button>`}</div>`; }).join('')}</div>`; }
  else if(t==='materials'){ body=`<div class="mats">${Object.entries(MATS).map(([k,m])=>`<button class="mc" aria-pressed="${S.look.mat===k}" data-act="mat" data-v="${k}">${matPrev(k)}<span class="nmm">${ic(m.icon,14)} ${m.label}</span><span class="sub" style="margin-top:-6px;font-size:12px">Built in</span></button>`).join('')}</div>
   <div style="display:flex;flex-direction:column;gap:12px;max-width:520px">${sliders()}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="share" data-v="material">${ic('send',16)} Share this material</button><button class="btn sec" data-act="resetmat">Reset</button></div>`; }
  else { body=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px">${DASH.map(([k,n])=>`<div class="wire"><div class="bar0"></div><div class="gg">${sorted(k,'monitor').map(w=>`<i style="grid-column:span ${Math.max(1,Math.min(8,Math.round(w.sz.monitor[0]/2)))};grid-row:span ${Math.max(1,w.sz.monitor[1])}"></i>`).join('')}</div><div style="display:flex;justify-content:space-between;align-items:center"><span><b style="font-size:14px">${n}</b><br><span style="font-size:12px;color:#5a6170">Built in</span></span><button class="inst" data-act="share" data-v="dash:${k}">Share</button></div></div>`).join('')}</div><p class="sub" style="margin:0">7 starter dashboards, ready to use. More shared by other homes.</p>`; }
- return `<div class="scrim" data-act="scrim"><div class="sheet solid wide bwr" role="dialog" aria-label="Browse" style="padding:26px;gap:20px"><div class="sh" style="align-items:flex-start"><div><div class="ttl">One browser</div><div class="lead" style="margin-top:10px">Widgets, materials and dashboards, from GlassHome and other homes.</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid wide bwr" role="dialog" aria-label="Browse" style="padding:26px;gap:20px"><div class="sh" style="align-items:flex-start"><div><div class="ttl">One browser</div><div class="lead" style="margin-top:10px">Widgets, materials and dashboards, from GlassHome and other homes.</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <div class="segbig" role="group" aria-label="Browse"><div class="row">${[['widgets','Widgets','puzzle'],['materials','Materials','layers'],['dashboards','Dashboards','grid']].map(([k,n,i])=>`<button aria-pressed="${t===k}" data-act="btab" data-v="${k}" aria-label="${n}">${ic(i,30,1.7)}</button>`).join('')}</div><div class="labs"><span>Widgets</span><span>Materials</span><span>Dashboards</span></div></div>${body}</div></div>`; }
 
 function share(){ let name,desc,prev,slug,off;
  if(S.share==='material'){ const m=MATS[S.look.mat]; off=!S.look.tune; name=off?m.label:`My ${m.label.toLowerCase()}`; desc=off?`The ${m.label.toLowerCase()} material. Others try it on their own theme.`:'Your tuned material. Others try it on their own theme.'; prev=`<div style="width:46%">${matPrev(S.look.mat)}</div>`; slug=`materials/${off?'@glasshome':'@alex'}/${name.toLowerCase().replace(/\s+/g,'-')}`; }
  else { const k=S.share.split(':')[1], d=DASH.find(x=>x[0]===k); off=true; name=d[1]; desc='Others get your layout and widgets.'; prev=`<div class="wire" style="width:70%"><div class="bar0"></div><div class="gg">${sorted(k,'monitor').map(w=>`<i style="grid-column:span ${Math.max(1,Math.min(8,Math.round(w.sz.monitor[0]/2)))};grid-row:span ${Math.max(1,w.sz.monitor[1])}"></i>`).join('')}</div></div>`; slug=`dashboards/@alex/${k}`; }
  const sp=pic('share-preview');
- return `<div class="scrim" data-act="scrimshare" style="z-index:70"><div class="sheet solid" role="dialog" aria-label="Share" style="padding:24px;gap:16px"><div class="sh"><span class="sub" style="font-size:15px">New</span><button class="xb" data-act="closeshare" aria-label="Close">${ic('x',16)}</button></div>
+ return `<div class="scrim t-fade" data-act="scrimshare" style="z-index:70"><div class="sheet t-modal solid" role="dialog" aria-label="Share" style="padding:24px;gap:16px"><div class="sh"><span class="sub" style="font-size:15px">New</span><button class="xb" data-act="closeshare" aria-label="Close">${ic('x',16)}</button></div>
   <h2 style="margin:-8px 0 0;font-family:var(--font-d);font-size:clamp(30px,5vw,44px);font-weight:800;letter-spacing:-.03em;line-height:1">Share with other homes</h2><p class="sub" style="margin:0;font-size:17px;line-height:1.35">Your materials and dashboards get a page anyone can send to their home.</p>
   <div class="shareprev">${slot('share-preview','fill')}${sp?'':prev}</div>
   <div style="display:flex;align-items:center;gap:10px"><b style="font-size:28px;letter-spacing:-.02em">${esc(name)}</b><span class="${off?'ob':'cb'}">${off?'Official':'Yours'}</span></div><p class="sub" style="margin:-8px 0 0;font-size:15px">${desc}</p>
-  <button class="btn pri" style="width:100%" data-act="sent">${ic('send',17)} ${S.sent?'Sent to your home':'Send to my home'}</button>
+  <button class="btn pri" style="width:100%" data-act="sent">${S.sent?chk('chk-share',true,18):(AN['chk-share']='out',ic('send',17))} ${S.sent?'Sent to your home':'Send to my home'}</button>
   <div class="linkrow"><code id="link">glasshome.app/${slug}</code><button class="xb" style="width:32px;height:32px" data-act="copy" aria-label="Copy link">${ic('copy',15)}</button></div><span class="sub" id="copied" role="status"></span></div></div>`; }
 
-function pictures(){ return `<div class="scrim" data-act="scrim"><div class="sheet solid wide" role="dialog" aria-label="Pictures"><div class="sh"><div><h2>Pictures</h2><p class="sub" style="margin:4px 0 0">Every picture in the dashboard. They stay on this device.</p></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+function pictures(){ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid wide" role="dialog" aria-label="Pictures"><div class="sh"><div><h2>Pictures</h2><p class="sub" style="margin:4px 0 0">Every picture in the dashboard. They stay on this device.</p></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <label style="display:flex;align-items:center;gap:10px;font-size:14px"><input type="checkbox" data-showslots ${S.showSlots?'checked':''}> Show upload buttons on the dashboard</label>
   ${SLOTS.map(([g,l])=>`<div class="sec">${g}</div><div class="pics">${l.map(([k,n,d])=>{ const u=pic(k), mine=!!IMG[k]; return `<div class="pic"><div class="pv ${u?'has':''}"><div class="slot ${k.startsWith('prod')||k==='logo'?'contain':''}" style="${u?`background-image:url('${u}')`:''}"></div></div><b>${esc(n)}</b>${d?`<span>${esc(d)}</span>`:''}<div class="act"><button class="u" data-act="upload" data-v="${k}">${u?'Replace':'Upload'}</button>${mine?`<button data-act="unpic" data-v="${k}">Remove</button>`:''}</div></div>`; }).join('')}</div>`).join('')}
  </div></div>`; }
 
-function accounts(){ return `<div class="scrim" data-act="scrim"><div class="sheet solid" role="dialog" aria-label="Wall tablet accounts"><div class="sh"><h2>Wall tablet accounts</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+function accounts(){ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid" role="dialog" aria-label="Wall tablet accounts"><div class="sh"><h2>Wall tablet accounts</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <p class="sub" style="margin:0;font-size:15px">A wall tablet signs in with just a name and password. Each account opens its own main dashboard.</p>
   ${S.accounts.map((a,i)=>`<div class="prow"><span class="av">${ic('tablet',14)}</span><span class="pn">${esc(a.name)}</span><span class="sub">password set</span><button class="mb" data-act="delacct" data-v="${i}" aria-label="Remove ${esc(a.name)}">${ic('x',14)}</button></div>`).join('')}
   <form id="acctform" style="display:flex;gap:8px;flex-wrap:wrap"><input class="field2" id="an" placeholder="Name" aria-label="Name" required><input class="field2" id="ap" type="password" placeholder="Password" aria-label="Password" required><button class="btn sec">Add</button></form>
   <button class="btn pri" data-act="signin">Show the sign-in screen</button></div></div>`; }
 
-function setup(){ const done=S.setupDone; return `<div class="scrim"><div class="sheet solid" role="dialog" aria-label="Setup" style="padding:24px"><div class="sh"><h2>Set up GlassHome</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+function setup(){ const done=S.setupDone; return `<div class="scrim t-fade"><div class="sheet t-modal solid" role="dialog" aria-label="Setup" style="padding:24px"><div class="sh"><h2>Set up GlassHome</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <div class="radar"><i></i><i></i><i></i><span class="ring"></span><div class="hub">${haI(60)}${done?`<span class="ok">${ic('check',16,3)}</span>`:''}</div></div>
   <p style="margin:0;text-align:center;font-size:17px">${done?'Found Home Assistant at <b>homeassistant.local:8123</b>':'Looking for Home Assistant on your network…'}</p>${done?'<button class="btn pri" data-act="close">Connect</button>':''}</div></div>`; }
 
-function signin(){ return `<div class="si" role="dialog" aria-label="Wall tablet sign in">${slot('signin-bg','fill')}<div class="veil"></div><div class="brand">${ic('home',16)} GlassHome <b>Dash</b></div>
-  <div class="box"><form id="signform" style="display:flex;flex-direction:column;gap:12px;max-width:420px"><h2>Welcome<br>back.</h2>
-   <div class="sif"><label for="sn">Your name</label><div><input id="sn" autocomplete="username" placeholder="Kitchen"></div></div>
-   <div class="sif"><label for="sp">Password</label><div><input id="sp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" data-act="peek" aria-label="Show password" style="color:rgba(255,255,255,.7)">${ic('eye',18)}</button></div></div>
-   <div class="err" id="serr" role="alert"></div>
+function signin(){ return `<div class="si t-fade" role="dialog" aria-label="Wall tablet sign in">${slot('signin-bg','fill')}<div class="veil"></div><div class="brand">${ic('home',16)} GlassHome <b>Dash</b></div>
+  <div class="box"><form id="signform" class="t-input-wrap" style="display:flex;flex-direction:column;gap:12px;max-width:420px"><h2>Welcome<br>back.</h2>
+   <div class="sif t-input"><label for="sn">Your name</label><div><input id="sn" autocomplete="username" placeholder="Kitchen"></div></div>
+   <div class="sif t-input"><label for="sp">Password</label><div><input id="sp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" data-act="peek" aria-label="Show password" style="color:rgba(255,255,255,.7)">${ic('eye',18)}</button></div></div>
+   <div class="t-error-msg" id="serr" role="alert">That name and password don’t match an account. Try Kitchen and kitchen.</div>
    <button class="sigo"><span class="gi">${ic('arrow',16,2.4)}</span><span><b style="font-size:16px">Sign in</b><br><span style="font-size:12.5px;opacity:.8">to Alex’s home</span></span></button>
    <button type="button" data-act="close" style="color:rgba(255,255,255,.65);font-size:13px;text-align:left;padding:6px 0">Another way in</button></form>
   <div class="logo">${slot('logo','fill',pic('logo')?'':`<svg viewBox="0 0 200 200" width="100%" height="100%" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#4fb0e6"/><stop offset="1" stop-color="#174a7c"/></linearGradient></defs><path d="M100 22L180 90v86H20V90z" fill="url(#lg)" stroke="rgba(255,255,255,.4)" stroke-width="3" stroke-linejoin="round"/></svg>`)}</div></div></div>`; }
@@ -883,7 +1260,8 @@ function studio(){ if(!S.studio) return ''; const L=S.look, t=S.stab; let body='
   <div class="stabs" role="group" aria-label="Studio sections">${[['background','Background','img'],['colors','Colors','palette'],['material','Material','layers']].map(([k,n,i])=>`<button aria-pressed="${t===k}" data-act="stab" data-v="${k}">${ic(i,20,1.8)}${n}</button>`).join('')}</div>${body}
   <div class="st-f"><button class="btn sec" style="flex:1" data-act="studiocancel">Cancel</button><button class="btn pri" style="flex:2" data-act="studiosave">Save and use</button></div></aside>`; }
 
-function dock(){ return `<nav class="dock g" aria-label="Dashboards" data-hold="dock">${DASH.map(([k,n,i])=>`<button class="db" data-act="go" data-v="${k}" data-dock="${k}" aria-label="${n}"${S.view==='dash'&&S.dash===k?' aria-current="page"':''}>${ic(i,21,1.9)}</button>`).join('')}<button class="db" data-act="settings" aria-label="Settings"${S.view==='settings'?' aria-current="page"':''}>${ic('gear',21,1.9)}</button>
+function alerts(){ const seen={}; return (SIM.gateOpen?1:0)+Object.values(S.boards).flat().filter(w=>w.type==='lock'&&!seen[w.name]&&(seen[w.name]=1)&&!w.locked).length; }
+function dock(){ const al=alerts(); return `<nav class="dock g" aria-label="Dashboards" data-hold="dock">${DASH.map(([k,n,i])=>`<button class="db" data-act="go" data-v="${k}" data-dock="${k}" aria-label="${n}${k==='security'&&al?`, ${al} to check`:''}"${S.view==='dash'&&S.dash===k?' aria-current="page"':''}>${ic(i,21,1.9)}${k==='security'?`<span class="t-badge" ${an('badge-sec','data-open',al>0,false)} aria-hidden="true"><span class="t-badge-dot">${al||''}</span></span>`:''}</button>`).join('')}<button class="db" data-act="settings" aria-label="Settings"${S.view==='settings'?' aria-current="page"':''}>${ic('gear',21,1.9)}</button>
   ${S.edit?`<span class="sep"></span><span class="devs" role="group" aria-label="Layout for">${[['phone','Phone'],['tablet','Tablet'],['monitor','Wide screen']].map(([d,l])=>`<button aria-pressed="${(S.device||autoDev())===d}" data-act="dev" data-v="${d}" aria-label="${l}">${ic(d,17)}</button>`).join('')}</span><button class="addw" data-act="browser">${ic('plus',15,2.5)} Add widget</button><button class="okb" data-act="done" aria-label="Done editing">${ic('check',18,2.6)}</button>`:''}</nav>`; }
 const autoDev=()=>innerWidth<720?'phone':innerWidth<1180?'tablet':'monitor';
 
@@ -893,6 +1271,7 @@ function render(){
  const mw=S.edit&&S.device&&S.device!==autoDev()?(S.device==='phone'?'430px':S.device==='tablet'?'900px':'none'):'none';
  $('#app').innerHTML=`<main class="main" style="max-width:${mw}">${S.view==='settings'?settingsView():dashView()}</main>${studio()}`;
  $('#layer').innerHTML=dock()+overlays();
+ postRender();
 }
 function update(){ applyLook(); render(); save(); }
 function find(id){ for(const k in S.boards){ const w=S.boards[k].find(x=>x.id===id); if(w) return w; } }
@@ -965,17 +1344,17 @@ function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.
  const vh=SIM.vh, mx=320, mn=150, pts=vh.map((x,i)=>`${(i/(vh.length-1)*100).toFixed(1)},${(40-(Math.max(mn,Math.min(mx,x||mn))-mn)/(mx-mn)*40).toFixed(1)}`).join(' ');
  const solar=(()=>{const h=new Date().getHours();return h>=7&&h<18?Math.round(1400*Math.sin((h-7)/11*Math.PI)):0})();
  const hrs={nepa:0,gen:0,inv:0,off:0}, nowH=new Date().getHours(); SIM.tl.forEach((x,i)=>{ if(i<=nowH) hrs[x]++; });
- return `<section class="pn g" aria-label="Power">${pnh('bolt','Power',`${SRC[s][1]} · <i>${fmt(w)} W</i> in use`,`<span class="pill src-${s==='inv'?'inv':s}"><span class="dot"></span>${SRC[s][0]}</span>`)}
+ return `<section class="pn g" aria-label="Power">${pnh('bolt','Power',`${SRC[s][1]} · <i>${np('watts',fmt(w))} W</i> in use`,`<span class="pill src-${s==='inv'?'inv':s}"><span class="dot"></span>${SRC[s][0]}</span>`)}
   <div class="srcs" role="list">${['nepa','gen','inv','off'].map(k=>`<div role="listitem" class="${s===k?'on '+k:''}" aria-current="${s===k}">${ic(SRC[k][2],18,1.8)}${SRC[k][0]}</div>`).join('')}</div>
-  <div class="volt"><div class="big2 ser">${s==='off'?'—':v}<small>V</small></div><div><div class="band ${bad?'bad':''}"><span class="safe" style="left:${(200-160)/1.4}%;right:${100-(250-160)/1.4}%"></span><span class="mk" style="left:${pos}%"></span></div><div class="bandlab"><span>160</span><span>safe 200–250</span><span>300</span></div></div></div>
+  <div class="volt"><div class="big2 ser">${s==='off'?'—':np('volt',String(v))}<small>V</small></div><div><div class="band ${bad?'bad':''}"><span class="safe" style="left:${(200-160)/1.4}%;right:${100-(250-160)/1.4}%"></span><span class="mk" style="left:${pos}%"></span></div><div class="bandlab"><span>160</span><span>safe 200–250</span><span>300</span></div></div></div>
   <svg class="spk" viewBox="0 0 100 40" preserveAspectRatio="none" role="img" aria-label="Voltage over the last minute"><rect x="0" y="${40-(250-mn)/(mx-mn)*40}" width="100" height="${(250-200)/(mx-mn)*40}" fill="rgba(61,138,87,.12)"/><polyline points="${pts}" fill="none" stroke="currentColor" stroke-width="1.2" vector-effect="non-scaling-stroke" opacity=".75"/></svg>
   <div class="boxes">
-   <div class="box"><span class="k">Inverter</span><span class="v">${Math.round(SIM.batt)}<small>%</small></span><span class="s">${s==='inv'?`≈ ${rh}h ${rm}m left`:s==='off'?'flat':'charging'}</span></div>
+   <div class="box"><span class="k">Inverter</span><span class="v">${np('batt',String(Math.round(SIM.batt)))}<small>%</small></span><span class="s">${s==='inv'?`≈ ${rh}h ${rm}m left`:s==='off'?'flat':'charging'}</span></div>
    <div class="box"><span class="k">Solar</span><span class="v">${solar?(solar/1000).toFixed(1):'0'}<small>${solar?'kW':'W'}</small></span><span class="s">${solar?'from 6 panels':'night'}</span></div>
-   <div class="box"><span class="k">Prepaid meter</span><span class="v">${SIM.units.toFixed(1)}<small>kWh</small></span><span class="s">≈ ₦${fmt(Math.round(SIM.units*209.5))} · Band A</span></div>
+   <div class="box"><span class="k">Prepaid meter</span><span class="v">${np('units',SIM.units.toFixed(1))}<small>kWh</small></span><span class="s">≈ ₦${fmt(Math.round(SIM.units*209.5))} · Band A</span></div>
    <div class="box"><span class="k">Gen fuel</span><span class="v">${Math.round(SIM.fuel)}<small>%</small></span><span class="s">≈ ${Math.round(SIM.fuel/100*20)} L · ${Math.max(1,Math.round(SIM.fuel/100*20/1.4))}h at half load</span></div>
    <div class="box"><span class="k">Today’s cost</span><span class="v">₦${fmt(3420)}</span><span class="s">Gen ₦2,100 · NEPA ₦1,320</span></div>
-   <div class="box"><span class="k">Load</span><span class="v">${(w/1000).toFixed(2)}<small>kW</small></span><span class="s">${Object.keys(LOADS).filter(k=>SIM.on[k]).length+1} things running</span></div>
+   <div class="box"><span class="k">Load</span><span class="v">${np('load',(w/1000).toFixed(2))}<small>kW</small></span><span class="s">${Object.keys(LOADS).filter(k=>SIM.on[k]).length+1} things running</span></div>
   </div>
   <div><div class="tl" role="img" aria-label="Power source for each hour today">${SIM.tl.map((x,i)=>`<i class="${i>nowH?'fut':x} ${i===nowH?'now':''}"></i>`).join('')}</div>
    <div class="bandlab"><span>00</span><span>06</span><span>12</span><span>18</span><span>23</span></div>
@@ -984,16 +1363,16 @@ function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.
  </section>`; }
 function pWater(){ const t=Math.min(100,SIM.tank), on=SIM.on.pump;
  return `<section class="pn g" aria-label="Water">${pnh('drop','Water',`Overhead tank · <i>${fmt(Math.round(t/100*2000))} L</i>`,`<span class="pill"><span class="dot" style="background:${on?'var(--d-blue)':'var(--d-grey)'}"></span>Pump ${on?'running':'off'}</span>`)}
-  <div class="tank"><div class="vessel" role="img" aria-label="Tank ${Math.round(t)} percent full"><i style="height:${t}%"></i><b>${Math.round(t)}%</b></div>
-   <div class="rows2"><div class="r2"><span class="t"><b>Borehole pump</b><span>${on?`Filling · full in about ${Math.max(1,Math.round((95-t)/.5))} min`:'Starts by itself at 20% when there’s NEPA or gen'}</span></span><button class="tgl" role="switch" aria-checked="${!!on}" aria-label="Borehole pump" data-act="dload" data-v="pump"></button></div>
+  <div class="tank"><div class="vessel" role="img" aria-label="Tank ${Math.round(t)} percent full"><i style="height:${t}%"></i><b>${np('tank',String(Math.round(t)))}%</b></div>
+   <div class="rows2"><div class="r2"><span class="t"><b>Borehole pump</b><span>${on?`Filling · full in about ${Math.max(1,Math.round((95-t)/.5))} min`:'Starts by itself at 20% when there’s NEPA or gen'}</span></span><button class="tgl" role="switch" ${an('tgl-pump','aria-checked',!!on)} aria-label="Borehole pump" data-act="dload" data-v="pump"></button></div>
    <div class="r2"><span class="t"><b>Stops at 95%</b><span>No overflow, nobody has to remember</span></span></div></div></div></section>`; }
 function pLights(){ const n=SIM.lights.filter(Boolean).length;
  return `<section class="pn g" aria-label="Lights">${pnh('bulb','Lights',`<i>${n}</i> on`,`<button class="mini-b" data-act="dlall" data-v="0">${ic('power',12)} All off</button>`)}
-  <div class="lgrid">${LIGHTS.map(([nm],i)=>`<button class="lt" aria-pressed="${!!SIM.lights[i]}" data-act="dlight" data-v="${i}"><span class="bulb2">${ic('bulb',14)}</span><span style="min-width:0"><b>${nm}</b><span>${SIM.lights[i]?'On':'Off'}</span></span></button>`).join('')}</div></section>`; }
+  <div class="lgrid">${LIGHTS.map(([nm],i)=>`<button class="lt" ${an('lt-'+i,'aria-pressed',!!SIM.lights[i])} data-act="dlight" data-v="${i}"><span class="bulb2">${ic('bulb',14)}</span><span style="min-width:0"><b>${nm}</b><span>${SIM.lights[i]?'On':'Off'}</span></span></button>`).join('')}</div></section>`; }
 function pClimate(){ return `<section class="pn g" aria-label="Air conditioning">${pnh('snow','Cooling',`<i>29°</i> inside · 74% humid`)}
-  <div class="ac">${['acBed','acLiv'].map(k=>`<div class="box"><span class="t"><b>${LOADS[k].n}</b><span>${SIM.on[k]?`Cooling to ${SIM.acSet[k]}°`:SIM.src==='inv'?'Off · shed on inverter':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.on[k]}" aria-label="${LOADS[k].n}" data-act="dload" data-v="${k}"></button></div>`).join('')}
-  <div class="box"><span class="t"><b>Fans</b><span>${SIM.on.fans?'On in 3 rooms':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.on.fans}" aria-label="Fans" data-act="dload" data-v="fans"></button></div>
-  <div class="box"><span class="t"><b>Freezer</b><span>${SIM.on.freezer?'−18° · running':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.on.freezer}" aria-label="Freezer" data-act="dload" data-v="freezer"></button></div></div></section>`; }
+  <div class="ac">${['acBed','acLiv'].map(k=>`<div class="box"><span class="t"><b>${LOADS[k].n}</b><span>${SIM.on[k]?`Cooling to ${SIM.acSet[k]}°`:SIM.src==='inv'?'Off · shed on inverter':'Off'}</span></span><button class="tgl" role="switch" ${an('tgl-'+k,'aria-checked',!!SIM.on[k])} aria-label="${LOADS[k].n}" data-act="dload" data-v="${k}"></button></div>`).join('')}
+  <div class="box"><span class="t"><b>Fans</b><span>${SIM.on.fans?'On in 3 rooms':'Off'}</span></span><button class="tgl" role="switch" ${an('tgl-fans','aria-checked',!!SIM.on.fans)} aria-label="Fans" data-act="dload" data-v="fans"></button></div>
+  <div class="box"><span class="t"><b>Freezer</b><span>${SIM.on.freezer?'−18° · running':'Off'}</span></span><button class="tgl" role="switch" ${an('tgl-freezer','aria-checked',!!SIM.on.freezer)} aria-label="Freezer" data-act="dload" data-v="freezer"></button></div></div></section>`; }
 function pWeather(){ const hrs=[['Now','csun',31,''],['3p','cloud',32,'40%'],['4p','cloud',30,'70%'],['5p','cloud',28,'80%'],['6p','cloud',27,'60%'],['7p','csun',27,'20%'],['8p','moon',26,'']];
  return `<section class="pn g" aria-label="Weather">${pnh('csun','Lagos','Rainy season','<span class="sm" style="color:var(--d-ink2)">Sunset 6:41pm</span>')}
   <div style="display:flex;align-items:center;gap:14px"><span class="ser" style="font-size:54px;line-height:1">31°</span><div><div style="font-weight:600">Thunderstorms likely at 4pm</div><div class="sub" style="color:var(--d-ink2)">High 32° · Low 25° · Feels 36°</div></div></div>
@@ -1002,10 +1381,10 @@ function pWeather(){ const hrs=[['Now','csun',31,''],['3p','cloud',32,'40%'],['4
 function pSecurity(big){ const cams=[['cam-gate','Gate'],['cam-compound','Compound'],['cam-back','Back yard'],['cam-street','Street']];
  return `<section class="pn g" aria-label="Security">${pnh('shield','Security','',`<span class="pill"><span class="dot"></span>All clear</span>`)}
   <div class="cams">${cams.map(([k,n])=>`<div class="cam2">${slot(k,'fill')}<em>${n}</em></div>`).join('')}</div>
-  <div class="rows2"><div class="r2"><span class="t"><b>Gate</b><span>${SIM.gateOpen?'Open':'Closed and locked'} · gateman on duty</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.gateOpen}" aria-label="Gate open" data-act="dgate"></button></div>
-  <div class="r2"><span class="t"><b>Security lights</b><span>${SIM.lights[5]?'On till 6am':'Off'}</span></span><button class="tgl" role="switch" aria-checked="${!!SIM.lights[5]}" aria-label="Security lights" data-act="dlight" data-v="5"></button></div></div></section>`; }
+  <div class="rows2"><div class="r2"><span class="t"><b>Gate</b><span>${SIM.gateOpen?'Open':'Closed and locked'} · gateman on duty</span></span><button class="tgl" role="switch" ${an('tgl-gate','aria-checked',!!SIM.gateOpen)} aria-label="Gate open" data-act="dgate"></button></div>
+  <div class="r2"><span class="t"><b>Security lights</b><span>${SIM.lights[5]?'On till 6am':'Off'}</span></span><button class="tgl" role="switch" ${an('lt-5x','aria-checked',!!SIM.lights[5])} aria-label="Security lights" data-act="dlight" data-v="5"></button></div></div></section>`; }
 function pLog(){ return `<section class="pn g" aria-label="What happened">${pnh('list','What happened','Today')}<div class="log">${SIM.log.slice(0,18).map(l=>`<div class="lg ${l.cls}"><time>${l.t}</time><span><b>${esc(l.what)}</b>${l.why?` <span>· ${esc(l.why)}</span>`:''}</span></div>`).join('')}</div></section>`; }
-function pLoads(){ return `<section class="pn g" aria-label="Appliances">${pnh('plug','Appliances',`<i>${fmt(drawW())} W</i> now`,`<span class="badge2 shed">Shed on inverter</span>`)}<div class="rows2">${Object.entries(LOADS).map(([k,l])=>`<div class="r2">${ic(l.ic,16,1.8)}<span class="t"><b>${l.n}</b><span>${l.room}</span></span>${l.shed?'<span class="badge2 shed">Shed</span>':''}<span class="w">${fmt(l.w)} W</span><button class="tgl" role="switch" aria-checked="${!!SIM.on[k]}" aria-label="${l.n}" data-act="dload" data-v="${k}"></button></div>`).join('')}</div></section>`; }
+function pLoads(){ return `<section class="pn g" aria-label="Appliances">${pnh('plug','Appliances',`<i>${fmt(drawW())} W</i> now`,`<span class="badge2 shed">Shed on inverter</span>`)}<div class="rows2">${Object.entries(LOADS).map(([k,l])=>`<div class="r2">${ic(l.ic,16,1.8)}<span class="t"><b>${l.n}</b><span>${l.room}</span></span>${l.shed?'<span class="badge2 shed">Shed</span>':''}<span class="w">${fmt(l.w)} W</span><button class="tgl" role="switch" ${an('tgl-'+k,'aria-checked',!!SIM.on[k])} aria-label="${l.n}" data-act="dload" data-v="${k}"></button></div>`).join('')}</div></section>`; }
 function pNet(){ return `<section class="pn g" aria-label="Internet and TV">${pnh('wifi','Internet & TV')}<div class="boxes" style="grid-template-columns:repeat(2,minmax(0,1fr))"><div class="box"><span class="k">MTN fibre</span><span class="v">48<small>Mbps</small></span><span class="s">up · 12 devices</span></div><div class="box"><span class="k">Backup</span><span class="v">Starlink</span><span class="s">standby</span></div><div class="box"><span class="k">DStv</span><span class="v">${SIM.on.tv?'On':'Off'}</span><span class="s">renews 14 days · Compact</span></div><div class="box"><span class="k">Data left</span><span class="v">38<small>GB</small></span><span class="s">Airtel MiFi</span></div></div></section>`; }
 
 function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHours(), greet=h<12?'Good morning':h<16?'Good afternoon':'Good evening', st=isStale();
@@ -1024,8 +1403,8 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>
  <div class="cols" style="grid-template-columns:${tmpl}">${layouts.map(c=>`<div class="col">${c.map(f=>f()).join('')}</div>`).join('')}</div>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
-function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
-setInterval(()=>{ tick(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
+function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); postRender(el); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
+setInterval(()=>{ tick(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
 function denseAct(a,v){
  if(['dload','dlight','dlall','dgate'].includes(a)&&isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; }
  if(a==='dsrc'){ setSrc(v); return true; }
@@ -1035,6 +1414,63 @@ function denseAct(a,v){
  if(a==='dlall'){ SIM.lights=SIM.lights.map(()=>0); slog('ALL LIGHTS OFF','from dashboard'); return true; }
  if(a==='dgate'){ SIM.gateOpen=!SIM.gateOpen; slog(SIM.gateOpen?'GATE OPENED':'GATE CLOSED','from dashboard'); return true; }
  return false; }
+
+
+/* ============ transitions (transitions-dev) ============ */
+// The app re-renders with innerHTML, so animated attributes are rendered in their
+// previous state and flipped after a reflow. AN remembers the last value per key.
+const AN={}, NUMS={}; let OPENSET=new Set();
+function an(key,attr,val,initial){ const p=AN[key]; const start=p===undefined?(initial===undefined?val:initial):p; return `${attr}="${start}" data-ak="${key}" data-aa="${attr}" data-av="${val}"`; }
+const np=(k,v)=>`<span class="t-digit-group" data-num="${k}">${v}</span>`;
+const checkSVG=(s=18)=>`<span class="t-success-check" ${'%CHK%'}><svg viewBox="0 0 24 24" width="${s}" height="${s}" fill="none"><path d="M5 12.5l4.5 4.5L19.5 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+const chk=(key,on,s)=>checkSVG(s).replace('%CHK%',an(key,'data-state',on?'in':'out','out'));
+const cssMs=(n,fb)=>{ const v=parseFloat(getComputedStyle(document.documentElement).getPropertyValue(n)); return Number.isFinite(v)?v:fb; };
+function setDigits(group,str){ // from 02-number-pop-in
+ group.classList.remove('is-animating'); group.replaceChildren();
+ const chars=str.split('');
+ chars.forEach((ch,i)=>{ const span=document.createElement('span'); span.className='t-digit'; span.textContent=ch;
+  if(i===chars.length-2) span.dataset.stagger='1'; else if(i===chars.length-1) span.dataset.stagger='2'; group.appendChild(span); });
+ void group.offsetHeight; group.classList.add('is-animating'); }
+const mkey=el=>(el.classList.contains('t-modal')?'m:':'f:')+(el.getAttribute('aria-label')||el.querySelector('[aria-label]')?.getAttribute('aria-label')||'');
+function postRender(root=document){
+ // 1. modals and fades: already open → straight to is-open, before anything forces a style flush
+ const ms=[...document.querySelectorAll('#layer .t-modal, #layer .t-fade')], fresh=[], keys=new Set();
+ ms.forEach(el=>{ const k=mkey(el); keys.add(k); if(OPENSET.has(k)) el.classList.add('is-open'); else fresh.push(el); });
+ OPENSET=keys;
+ // 2. numbers that changed since the last render pop in
+ root.querySelectorAll('[data-num]').forEach(g=>{ const k=g.dataset.num, v=g.textContent; if(NUMS[k]!==undefined&&NUMS[k]!==v) setDigits(g,v); NUMS[k]=v; });
+ // 3. success-check paths: measure once per render
+ root.querySelectorAll('.t-success-check svg path').forEach(p=>{ const len=Math.ceil(p.getTotalLength())+1; p.style.strokeDasharray=len; p.style.strokeDashoffset=len; });
+ // 4. attributes rendered in their old state flip to the new one
+ const els=[...root.querySelectorAll('[data-ak]')], pend=els.filter(e=>e.getAttribute(e.dataset.aa)!==e.dataset.av);
+ els.forEach(e=>AN[e.dataset.ak]=e.dataset.av);
+ if(fresh.length||pend.length){ void document.body.offsetWidth; requestAnimationFrame(()=>{ fresh.forEach(el=>{ el.classList.remove('is-closing'); el.classList.add('is-open'); }); pend.forEach(e=>e.setAttribute(e.dataset.aa,e.dataset.av)); }); }
+}
+function closeAnim(el,fn){ // from 06-modal: swap is-open for is-closing, clean up after --modal-close-dur
+ if(!el){ fn(); update(); return; }
+ const closeMs=cssMs('--modal-close-dur',150), sc=el.closest('.t-fade');
+ [el,sc].forEach(x=>{ if(x){ x.classList.remove('is-open'); x.classList.add('is-closing'); } });
+ setTimeout(()=>{ fn(); update(); },closeMs);
+}
+function showError(wrap){ // from 12-error-state-shake
+ const input=wrap.querySelectorAll('.t-input');
+ wrap.classList.add('is-error'); input.forEach(i=>{ i.classList.add('is-error'); i.classList.remove('is-shaking'); void i.offsetWidth; i.classList.add('is-shaking'); });
+ const shakeMs=cssMs('--shake-dur-a',80)*2+cssMs('--shake-dur-b',60)*2;
+ setTimeout(()=>input.forEach(i=>i.classList.remove('is-shaking')),shakeMs+20);
+ if(wrap._revertTimer) clearTimeout(wrap._revertTimer);
+ wrap._revertTimer=setTimeout(()=>{ wrap._revertTimer=null; wrap.classList.remove('is-error'); input.forEach(i=>i.classList.remove('is-error')); },shakeMs+cssMs('--revert-hold',3000));
+}
+document.addEventListener('input',e=>{ const w=e.target.closest('.t-input-wrap'); if(w&&w.classList.contains('is-error')){ if(w._revertTimer){ clearTimeout(w._revertTimer); w._revertTimer=null; } w.classList.remove('is-error'); w.querySelectorAll('.t-input').forEach(i=>i.classList.remove('is-error')); } });
+function slideTo(v){ // from 08-page-side-by-side: two pages, flip data-page
+ const main=document.querySelector('.main'), from=S.dash, idx=k=>DASH.findIndex(d=>d[0]===k), fwd=idx(v)>idx(from);
+ const oldHTML=main.innerHTML; S.dash=v; S.view='dash'; S.sliding=true;
+ document.body.classList.toggle('dense',DENSE_PAGES.includes(v));
+ const newHTML=dashView(), a=fwd?1:2, b=fwd?2:1;
+ main.innerHTML=`<div class="t-page-slide" data-page="${a}"><section class="t-page" data-page-id="1">${fwd?oldHTML:newHTML}</section><section class="t-page" data-page-id="2">${fwd?newHTML:oldHTML}</section></div>`;
+ document.getElementById('layer').innerHTML=dock()+overlays(); postRender();
+ const sl=main.firstElementChild; void sl.offsetWidth; sl.setAttribute('data-page',String(b));
+ setTimeout(()=>{ S.sliding=false; update(); },Math.max(cssMs('--page-slide-dur',200),cssMs('--page-fade-dur',200))+60);
+}
 
 /* ============ events ============ */
 let eatClick=false;
@@ -1049,7 +1485,7 @@ document.addEventListener('click',e=>{
  switch(a){
   case 'upload': uploadKey=v; $('#file').click(); return;
   case 'unpic': if(IMG[v]&&IMG[v].startsWith('blob:')) URL.revokeObjectURL(IMG[v]); delete IMG[v]; idbPut(v,null); break;
-  case 'go': S.dash=v; S.view='dash'; break;
+  case 'go': if(S.view==='dash'&&v!==S.dash&&!S.edit&&!S.sliding){ slideTo(v); return; } S.dash=v; S.view='dash'; break;
   case 'settings': S.view='settings'; S.edit=false; break;
   case 'play': S.playing=!S.playing; break;
   case 'scene': S.scene=S.scene===v?null:v; break;
@@ -1060,7 +1496,7 @@ document.addEventListener('click',e=>{
   case 'lamp': { const w=find(id), i=+b.dataset.i; w.lamps[i][1]=!w.lamps[i][1]; break; }
   case 'lockt': find(id).locked=!find(id).locked; break;
   case 'locks': S.sheet={kind:'locks'}; break;
-  case 'close': case 'scrim': S.sheet=null; S.ov=null; break;
+  case 'close': case 'scrim': { const ms=[...document.querySelectorAll('#layer .t-modal:not([aria-label="Share"]), #layer .si')]; closeAnim(ms[ms.length-1],()=>{ S.sheet=null; S.ov=null; }); return; }
   case 'remove': { for(const k in S.boards) S.boards[k]=S.boards[k].filter(x=>x.id!==id); break; }
   case 'done': S.edit=false; S.device=null; break;
   case 'dev': S.device=v; break;
@@ -1077,7 +1513,7 @@ document.addEventListener('click',e=>{
   case 'who': { const ids=S.people.map(p=>p.id); S.accessWho=ids[(ids.indexOf(S.accessWho)+1)%ids.length]; break; }
   case 'acc': S.access[b.dataset.p][b.dataset.d]=+v; break;
   case 'share': S.share=v; S.sent=false; break;
-  case 'closeshare': case 'scrimshare': S.share=null; break;
+  case 'closeshare': case 'scrimshare': closeAnim(document.querySelector('#layer .t-modal[aria-label="Share"]'),()=>{ S.share=null; }); return;
   case 'sent': S.sent=true; break;
   case 'copy': { const t=$('#link').textContent, ok=()=>{const c=$('#copied'); if(c) c.textContent='Link copied';};
     try{ navigator.clipboard.writeText(t).then(ok,()=>getSelection().selectAllChildren($('#link'))); }catch(_){ getSelection().selectAllChildren($('#link')); } return; }
@@ -1097,7 +1533,7 @@ document.addEventListener('click',e=>{
  }
  update();
 });
-document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape'&&(S.sheet||S.ov||S.share)){ S.sheet=null; S.ov=null; S.share=null; update(); } });
+document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape'&&(S.sheet||S.ov||S.share)){ const ms=[...document.querySelectorAll('#layer .t-modal, #layer .si')]; closeAnim(ms[ms.length-1],()=>{ if(S.share) S.share=null; else { S.sheet=null; S.ov=null; } }); } });
 let knobStart=null;
 document.addEventListener('input',e=>{ const t=e.target;
  if(t.classList.contains('gs')) t.style.setProperty('--p',((t.value-t.min)/(t.max-t.min)*100)+'%');
@@ -1114,7 +1550,7 @@ document.addEventListener('change',e=>{ const t=e.target;
 document.addEventListener('submit',e=>{ e.preventDefault();
  if(e.target.id==='acctform'){ S.accounts.push({name:$('#an').value.trim(),pw:$('#ap').value}); update(); }
  if(e.target.id==='signform'){ const n=$('#sn').value.trim().toLowerCase(), p=$('#sp').value, a=S.accounts.find(x=>x.name.toLowerCase()===n&&x.pw===p);
-  if(a){ S.ov=null; S.view='dash'; S.dash='kitchen'; S.me='ktab'; update(); toast(`Signed in as ${a.name}`); } else $('#serr').textContent='That name and password don’t match an account. Try Kitchen and kitchen.'; }
+  if(a){ S.ov=null; S.view='dash'; S.dash='kitchen'; S.me='ktab'; update(); toast(`Signed in as ${a.name}`); } else showError(e.target); }
 });
 
 /* hold, drag, resize, pinch */
