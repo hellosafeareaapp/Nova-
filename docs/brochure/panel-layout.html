@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>A.D.A. — Panel layout</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+@page{size:A4 landscape;margin:0}
+*{box-sizing:border-box}
+body{margin:0;font-family:Archivo,Arial,sans-serif;color:#0b1b2b;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.sheet{width:297mm;height:210mm;padding:9mm 10mm 8mm;display:grid;grid-template-columns:168mm 1fr;grid-template-rows:auto 1fr auto;gap:4mm 7mm;position:relative;overflow:hidden;background:#fff}
+.hd{grid-column:1/-1;display:flex;justify-content:space-between;align-items:flex-end;border-bottom:1.5px solid #0b1b2b;padding-bottom:2.5mm}
+.mark{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-stretch:85%;font-size:13pt;letter-spacing:.06em}
+.mark i{width:6mm;height:6mm;background:#f5b800;display:grid;place-items:center;font-style:normal;font-size:8pt;font-weight:900}
+.hd h1{margin:0;font-size:17pt;font-weight:900;font-stretch:80%}
+.hd .s{font-size:8pt;color:#8a939e;text-align:right}
+svg text{font-family:Archivo,Arial,sans-serif}
+.mono{font-family:"IBM Plex Mono",monospace}
+.side{display:flex;flex-direction:column;gap:3mm;min-width:0}
+.k{font-size:7pt;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4a5562;margin-bottom:1mm}
+table{border-collapse:collapse;width:100%}
+td{font-size:7.6pt;line-height:1.3;padding:.9mm 1.2mm;border-bottom:1px solid #e3e6ea;vertical-align:top;color:#4a5562}
+td:first-child{font-family:"IBM Plex Mono",monospace;font-weight:600;color:#0b1b2b;width:9mm}
+td b{color:#0b1b2b}
+.leg{display:grid;grid-template-columns:1fr 1fr;gap:1mm 4mm;font-size:7.4pt;color:#4a5562}
+.leg span{display:flex;align-items:center;gap:2mm}
+.leg i{display:inline-block;width:8mm;height:1.6mm}
+.warn{border:1.5px solid #c8462c;padding:2mm 3mm;font-size:7.6pt;line-height:1.4;color:#4a5562}
+.warn b{color:#c8462c}
+.ft{grid-column:1/-1;display:flex;justify-content:space-between;font-size:7pt;color:#8a939e;border-top:1px solid #e3e6ea;padding-top:1.5mm}
+</style></head><body>
+<section class="sheet">
+ <div class="hd"><div style="display:flex;align-items:flex-end;gap:6mm"><div class="mark"><i>A</i>A.D.A.</div><h1>Controller panel · general arrangement</h1></div><div class="s">Concept layout for one building · Drawing ADA-PNL-01 rev A · November 2026<br>Not to scale · Final design and wiring by a qualified electrician</div></div>
+
+ <!-- PANEL FRONT VIEW -->
+ <svg viewBox="0 0 640 600" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Front view of the A.D.A. controller panel">
+  <defs>
+   <pattern id="slots" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#eef1f4"/><rect x="1" y="0" width="2" height="8" fill="#d5dbe1"/></pattern>
+   <pattern id="slotsV" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#eef1f4"/><rect x="0" y="1" width="8" height="2" fill="#d5dbe1"/></pattern>
+   <marker id="ar" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 z" fill="#0b1b2b"/></marker>
+  </defs>
+  <!-- enclosure -->
+  <rect x="20" y="10" width="600" height="580" rx="10" fill="#f7f8f9" stroke="#0b1b2b" stroke-width="3"/>
+  <rect x="34" y="24" width="572" height="552" rx="4" fill="#fff" stroke="#9aa4ae" stroke-width="1"/>
+  <text x="320" y="6" text-anchor="middle" font-size="9" fill="#8a939e" font-weight="700" letter-spacing="1.5">IP65 ENCLOSURE · CLEAR HINGED COVER · ~ 500 × 400 × 160 mm</text>
+  <!-- ducts -->
+  <rect x="48" y="36" width="544" height="22" fill="url(#slots)" stroke="#9aa4ae"/>
+  <rect x="48" y="176" width="544" height="22" fill="url(#slots)" stroke="#9aa4ae"/>
+  <rect x="48" y="326" width="544" height="22" fill="url(#slots)" stroke="#9aa4ae"/>
+  <rect x="48" y="452" width="544" height="22" fill="url(#slots)" stroke="#9aa4ae"/>
+  <rect x="48" y="58" width="20" height="394" fill="url(#slotsV)" stroke="#9aa4ae"/>
+  <rect x="572" y="58" width="20" height="394" fill="url(#slotsV)" stroke="#9aa4ae"/>
+  <text x="320" y="51" text-anchor="middle" font-size="8" fill="#6b7682" font-weight="700" letter-spacing="1">WIRE DUCT</text>
+  <!-- rails -->
+  <g fill="#c3cad1" stroke="#8a939e"><rect x="76" y="111" width="488" height="10"/><rect x="76" y="258" width="488" height="10"/><rect x="76" y="410" width="488" height="10"/></g>
+  <g font-size="7.5" fill="#6b7682" font-weight="700"><text x="78" y="72">RAIL 1 · POWER &amp; SENSING (230 V)</text><text x="78" y="212">RAIL 2 · CONTROL &amp; SWITCHING</text><text x="78" y="364">RAIL 3 · TERMINALS</text></g>
+
+  <!-- RAIL 1 -->
+  <g stroke="#0b1b2b" stroke-width="1.5">
+   <rect x="80" y="80" width="46" height="76" fill="#fff"/><rect x="132" y="80" width="24" height="76" fill="#fff"/>
+   <rect x="166" y="80" width="84" height="76" fill="#fff"/>
+   <rect x="260" y="80" width="104" height="76" fill="#fff"/>
+   <rect x="374" y="80" width="78" height="76" fill="#fff"/><rect x="462" y="80" width="78" height="76" fill="#fff"/>
+  </g>
+  <g fill="#0b1b2b"><rect x="92" y="104" width="22" height="18" rx="2"/><rect x="138" y="104" width="12" height="18" rx="2"/></g>
+  <g fill="#f5b800"><rect x="97" y="98" width="12" height="8"/><rect x="140" y="98" width="8" height="8"/></g>
+  <g font-size="9" font-weight="800" text-anchor="middle" fill="#0b1b2b">
+   <text x="103" y="140">Q1</text><text x="144" y="140">F1</text><text x="208" y="102">PS1</text><text x="312" y="102">PM1</text><text x="413" y="102">U2</text><text x="501" y="102">U3</text></g>
+  <g font-size="7" text-anchor="middle" fill="#4a5562">
+   <text x="103" y="150">2P 20A</text><text x="144" y="150">6A</text>
+   <text x="208" y="116">DIN PSU</text><text x="208" y="127">230 V AC →</text><text x="208" y="138">24 V DC</text>
+   <text x="312" y="116">PZEM-004T</text><text x="312" y="127">voltage · current</text><text x="312" y="138">· energy</text>
+   <text x="413" y="116">AC DETECT</text><text x="413" y="130" font-weight="800" fill="#1e8e5a">NEPA</text>
+   <text x="501" y="116">AC DETECT</text><text x="501" y="130" font-weight="800" fill="#c47f00">GEN</text></g>
+  <circle cx="312" cy="148" r="6" fill="none" stroke="#0b1b2b" stroke-width="1.5"/><text x="324" y="151" font-size="6.5" fill="#4a5562">CT</text>
+
+  <!-- RAIL 2 -->
+  <g stroke="#0b1b2b" stroke-width="1.5">
+   <rect x="80" y="222" width="250" height="88" fill="#0b1b2b"/>
+   <rect x="340" y="222" width="60" height="88" fill="#fff"/>
+   <rect x="410" y="222" width="60" height="88" fill="#fff" stroke-dasharray="4 3"/>
+   <rect x="480" y="222" width="60" height="88" fill="#fff" stroke="#9aa4ae" stroke-dasharray="4 3"/>
+  </g>
+  <g fill="#f5b800"><rect x="92" y="232" width="34" height="20"/></g>
+  <text x="109" y="246" font-size="8" font-weight="900" text-anchor="middle" fill="#0b1b2b">ESP32</text>
+  <g fill="#2a3b4d"><rect x="140" y="232" width="26" height="34"/><rect x="172" y="232" width="26" height="34"/><rect x="204" y="232" width="26" height="34"/><rect x="236" y="232" width="26" height="34"/></g>
+  <g font-size="6.5" fill="#f5b800" text-anchor="middle" font-weight="700"><text x="153" y="252">R1</text><text x="185" y="252">R2</text><text x="217" y="252">R3</text><text x="249" y="252">R4</text></g>
+  <g font-size="6" fill="#c9d1da" text-anchor="middle"><text x="153" y="276">PUMP</text><text x="185" y="276">AC</text><text x="217" y="276">SPARE</text><text x="249" y="276">SPARE</text></g>
+  <g fill="#9fb0c0"><circle cx="280" cy="240" r="3"/><circle cx="292" cy="240" r="3"/><circle cx="304" cy="240" r="3"/><circle cx="316" cy="240" r="3"/></g>
+  <text x="298" y="256" font-size="6" fill="#c9d1da" text-anchor="middle">INPUTS</text>
+  <text x="205" y="300" font-size="9" font-weight="800" fill="#fff" text-anchor="middle">A1 · DIN ESP32 CONTROLLER (4 RELAYS)</text>
+  <g font-size="9" font-weight="800" text-anchor="middle" fill="#0b1b2b"><text x="370" y="244">K1</text><text x="440" y="244">K2</text></g>
+  <g font-size="7" text-anchor="middle" fill="#4a5562"><text x="370" y="258">CONTACTOR</text><text x="370" y="269">25 A 2P</text><text x="370" y="292" font-weight="800" fill="#0b1b2b">PUMP</text>
+   <text x="440" y="258">CONTACTOR</text><text x="440" y="269">optional</text><text x="440" y="292" font-weight="800" fill="#0b1b2b">AC</text><text x="510" y="270" fill="#9aa4ae">SPARE</text><text x="510" y="281" fill="#9aa4ae">SPACE</text></g>
+
+  <!-- RAIL 3 terminals -->
+  <g id="terms" stroke="#0b1b2b" stroke-width="1">
+  </g>
+  <g transform="translate(80,386)">
+   <!-- generated terminal groups -->
+   <g font-size="6" text-anchor="middle" fill="#0b1b2b" font-weight="700">
+    <!-- NEPA -->
+    <rect x="0" y="0" width="14" height="56" fill="#8b5a2b"/><rect x="15" y="0" width="14" height="56" fill="#2f6fb5"/>
+    <!-- GEN -->
+    <rect x="40" y="0" width="14" height="56" fill="#8b5a2b"/><rect x="55" y="0" width="14" height="56" fill="#2f6fb5"/>
+    <!-- HOUSE -->
+    <rect x="80" y="0" width="14" height="56" fill="#8b5a2b"/><rect x="95" y="0" width="14" height="56" fill="#2f6fb5"/>
+    <!-- PUMP -->
+    <rect x="120" y="0" width="14" height="56" fill="#8b5a2b"/><rect x="135" y="0" width="14" height="56" fill="#2f6fb5"/>
+    <!-- EARTH -->
+    <rect x="160" y="0" width="14" height="56" fill="#5c9e3c"/><rect x="175" y="0" width="14" height="56" fill="#5c9e3c"/>
+    <!-- TANK -->
+    <rect x="200" y="0" width="14" height="56" fill="#c8462c"/><rect x="215" y="0" width="14" height="56" fill="#222"/><rect x="230" y="0" width="14" height="56" fill="#9aa4ae"/><rect x="245" y="0" width="14" height="56" fill="#9aa4ae"/>
+    <!-- SPARE -->
+    <rect x="270" y="0" width="14" height="56" fill="#e3e6ea"/><rect x="285" y="0" width="14" height="56" fill="#e3e6ea"/><rect x="300" y="0" width="14" height="56" fill="#e3e6ea"/>
+   </g>
+   <g font-size="6.5" fill="#fff" text-anchor="middle" font-weight="700"><text x="7" y="46">L</text><text x="22" y="46">N</text><text x="47" y="46">L</text><text x="62" y="46">N</text><text x="87" y="46">L</text><text x="102" y="46">N</text><text x="127" y="46">L</text><text x="142" y="46">N</text><text x="167" y="46">E</text><text x="182" y="46">E</text><text x="207" y="46">5V</text><text x="222" y="46">0V</text><text x="237" y="46" fill="#0b1b2b">T</text><text x="252" y="46" fill="#0b1b2b">E</text></g>
+   <g font-size="7" font-weight="800" fill="#0b1b2b" text-anchor="middle"><text x="14.5" y="-5">NEPA IN</text><text x="54.5" y="-5">GEN IN</text><text x="94.5" y="-5">HOUSE</text><text x="134.5" y="-5">PUMP OUT</text><text x="174.5" y="-5">EARTH</text><text x="229.5" y="-5">TANK SENSOR</text><text x="292" y="-5" fill="#8a939e">SPARE</text></g>
+   <text x="380" y="6" font-size="9" font-weight="800" fill="#0b1b2b">X1</text><text x="380" y="18" font-size="7" fill="#4a5562">terminal blocks,</text><text x="380" y="52" font-size="7" fill="#4a5562">every wire labelled</text>
+  </g>
+
+  <!-- gland plate -->
+  <rect x="48" y="488" width="544" height="76" fill="#eef1f4" stroke="#9aa4ae"/>
+  <text x="58" y="502" font-size="7.5" font-weight="700" fill="#6b7682">GLAND PLATE · ALL CABLES ENTER FROM BELOW</text>
+  <g fill="#fff" stroke="#0b1b2b" stroke-width="1.5"><circle cx="100" cy="535" r="13"/><circle cx="170" cy="535" r="13"/><circle cx="240" cy="535" r="13"/><circle cx="310" cy="535" r="13"/><circle cx="380" cy="535" r="10"/><circle cx="440" cy="535" r="10"/><circle cx="500" cy="535" r="10"/></g>
+  <g fill="#0b1b2b"><circle cx="100" cy="535" r="5"/><circle cx="170" cy="535" r="5"/><circle cx="240" cy="535" r="5"/><circle cx="310" cy="535" r="5"/><circle cx="380" cy="535" r="4"/><circle cx="440" cy="535" r="4"/><circle cx="500" cy="535" r="4"/></g>
+  <g font-size="6.5" text-anchor="middle" fill="#0b1b2b" font-weight="700"><text x="100" y="559">NEPA</text><text x="170" y="559">GEN</text><text x="240" y="559">HOUSE</text><text x="310" y="559">PUMP</text><text x="380" y="559">TANK</text><text x="440" y="559">ANTENNA</text><text x="500" y="559" fill="#8a939e">SPARE</text></g>
+
+  <!-- sample wires in ducts -->
+  <g fill="none" stroke-width="2" stroke-linecap="round">
+   
+   <path d="M207 340 V316" stroke="#8b5a2b" opacity=".0"/>
+   
+   <path d="M370 310 V330" stroke="#8b5a2b"/><path d="M413 156 V180" stroke="#8b5a2b"/><path d="M501 156 V180" stroke="#8b5a2b"/>
+   <path d="M208 156 V180" stroke="#c8462c"/>
+  </g>
+  <!-- door label -->
+  <rect x="440" y="572" width="152" height="14" fill="#f5b800"/><text x="516" y="582" font-size="7" font-weight="800" text-anchor="middle" fill="#0b1b2b">⚠ 230 V · ISOLATE BEFORE OPENING</text>
+ </svg>
+
+ <!-- SIDE -->
+ <div class="side">
+  <div><div class="k">Parts key</div>
+  <table>
+   <tr><td>Q1</td><td><b>Panel isolator</b> 2-pole. Switches the whole panel off for maintenance.</td></tr>
+   <tr><td>F1</td><td><b>6 A MCB</b> protecting the controller supply.</td></tr>
+   <tr><td>PS1</td><td><b>DIN power supply</b>, 230 V AC to 24 V DC for the controller.</td></tr>
+   <tr><td>PM1</td><td><b>PZEM-004T meter</b>, CT clamp on the house live: voltage, current, energy.</td></tr>
+   <tr><td>U2/U3</td><td><b>AC detection</b> on the NEPA and GEN inputs (before the changeover). Neither live but house powered = <b>inverter</b>.</td></tr>
+   <tr><td>A1</td><td><b>DIN ESP32 controller</b> with 4 relays and inputs. Talks to the hub over Wi-Fi.</td></tr>
+   <tr><td>K1/K2</td><td><b>Contactors</b>. A1's relay only switches the coil; the contactor carries the pump or AC current.</td></tr>
+   <tr><td>X1</td><td><b>Terminals</b> for every incoming and outgoing wire, plus earth.</td></tr>
+  </table></div>
+
+  <div><div class="k">How it connects</div>
+  <svg viewBox="0 0 330 150" width="100%" role="img" aria-label="Single-line overview">
+   <g font-size="8" font-weight="700" fill="#0b1b2b">
+    <rect x="2" y="10" width="54" height="22" fill="#fff" stroke="#1e8e5a" stroke-width="1.5"/><text x="29" y="25" text-anchor="middle">NEPA</text>
+    <rect x="2" y="52" width="54" height="22" fill="#fff" stroke="#c47f00" stroke-width="1.5"/><text x="29" y="67" text-anchor="middle">GEN</text>
+    <rect x="96" y="28" width="66" height="28" fill="#fff" stroke="#0b1b2b" stroke-width="1.5"/><text x="129" y="45" text-anchor="middle">Changeover</text>
+    <rect x="186" y="28" width="56" height="28" fill="#fff" stroke="#0b1b2b" stroke-width="1.5"/><text x="214" y="45" text-anchor="middle">Inverter</text>
+    <rect x="264" y="28" width="62" height="28" fill="#fff" stroke="#0b1b2b" stroke-width="1.5"/><text x="295" y="45" text-anchor="middle">House DB</text>
+    <rect x="264" y="104" width="62" height="24" fill="#0b1b2b"/><text x="295" y="120" text-anchor="middle" fill="#fff">K1 → Pump</text>
+   </g>
+   <g stroke="#0b1b2b" stroke-width="1.5" fill="none"><path d="M56 21 H80 V36 H96"/><path d="M56 63 H80 V48 H96"/><path d="M162 42 H186"/><path d="M242 42 H264"/><path d="M295 56 V104"/></g>
+   <g font-size="7" fill="#4a5562"><circle cx="70" cy="21" r="3.5" fill="#1e8e5a"/><text x="62" y="9">U2</text><circle cx="70" cy="63" r="3.5" fill="#c47f00"/><text x="62" y="84">U3</text>
+    <circle cx="253" cy="42" r="5" fill="none" stroke="#0b1b2b"/><text x="236" y="70">PM1 CT</text>
+    <text x="150" y="100">A1 reads U2, U3, PM1</text><text x="150" y="111">and switches K1 coil</text><text x="150" y="122">via relay R1</text></g>
+   <path d="M210 108 Q240 116 262 116" stroke="#555" stroke-dasharray="3 2" fill="none" marker-end="url(#ar)"/>
+  </svg></div>
+
+  <div><div class="k">Wire colours</div>
+  <div class="leg"><span><i style="background:#8b5a2b"></i>Live (brown)</span><span><i style="background:#2f6fb5"></i>Neutral (blue)</span><span><i style="background:#5c9e3c"></i>Earth (green/yellow)</span><span><i style="background:#c8462c"></i>24 V / 5 V DC +</span><span><i style="background:#222"></i>DC 0 V</span><span><i style="background:#555;height:.8mm;border-top:1px dashed #555"></i>Signal / control</span></div></div>
+
+  <div class="warn"><b>Electrician only for 230 V.</b> Q1, F1, PS1, PM1, U2, U3, K1/K2 and all mains terminals must be installed by a qualified electrician to local regulations. Size cables and contactors to the actual pump rating. If A1 loses contact with the hub, relays release and the pump stops (fail-safe).</div>
+ </div>
+ <div class="ft"><span>A.D.A. · Controller panel general arrangement · ADA-PNL-01</span><span>Ajala David · +234 916 107 8549</span></div>
+</section>
+</body></html>
