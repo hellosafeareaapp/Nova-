@@ -1076,6 +1076,20 @@ body.dense .pn .btn::before,body.dense .pn .btn::after,body.dense .bsh .btn::bef
 .inok{display:flex;align-items:center;gap:8px;font-weight:650;color:var(--d-ok)}
 .insum{display:flex;flex-direction:column;gap:3px;padding:12px;border-radius:12px;background:var(--d-box);border:1px solid var(--d-line);font-size:13px}
 .innav{display:flex;justify-content:space-between;gap:8px;padding-top:6px;border-top:1px solid var(--d-line)}
+
+.tank{grid-template-columns:76px 1fr!important}
+.tank .vessel{height:118px!important}
+.tank .vessel i.wfill{position:absolute;left:0;right:0;bottom:0;overflow:visible;background:linear-gradient(#7aa5cf,#2f6aa6);transition:height .8s ease}
+.wv{position:absolute;left:0;top:-10px;width:200%;height:13px;animation:wave linear infinite;will-change:transform}
+.wv path{fill:#7aa5cf}.wv.back{top:-13px}.wv.back path{fill:#b3cde6}
+@keyframes wave{to{transform:translateX(-50%)}}
+.wstream{position:absolute;top:0;left:50%;width:5px;margin-left:-2.5px;border-radius:0 0 3px 3px;z-index:1;background:repeating-linear-gradient(180deg,rgba(96,150,204,.95) 0 7px,rgba(63,116,168,.6) 7px 12px);background-size:100% 24px;animation:wpour linear infinite}
+@keyframes wpour{to{background-position:0 24px}}
+.wbub{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.18);animation:wbub ease-in infinite;opacity:0}
+@keyframes wbub{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-70px);opacity:0}}
+.tank .vessel b{z-index:2}
+html.dark .wv path{fill:#4f80b4}html.dark .wv.back path{fill:#36597f}html.dark .tank .vessel i.wfill{background:linear-gradient(#4f80b4,#22497a)}
+@media (prefers-reduced-motion:reduce){.wv,.wstream,.wbub{animation:none!important}.wbub{display:none}}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1566,9 +1580,18 @@ function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.
    <div class="leg" style="margin-top:6px"><span><i style="background:var(--d-ok)"></i>NEPA <b>${hrs.nepa}h</b></span><span><i style="background:var(--d-amber)"></i>Gen <b>${hrs.gen}h</b></span><span><i style="background:var(--d-blue)"></i>Inverter <b>${hrs.inv}h</b></span><span><i style="background:rgba(194,82,44,.55)"></i>Off <b>${hrs.off}h</b></span></div></div>
   <div class="demo"><span>${LIVE.on?'Hub demo:':'Demo:'}</span>${['nepa','gen','inv','off'].map(k=>`<button aria-pressed="${s===k}" data-act="dsrc" data-v="${k}">${SRC[k][0]}</button>`).join('')}<button aria-pressed="${SIM.offline}" data-act="doff">${SIM.offline?'Hub back online':'Hub goes offline'}</button></div>
  </section>`; }
+// Moving water. The panel is redrawn every second, so each animation gets a
+// negative delay matching the clock: the waves carry on instead of restarting.
+const wph=d=>`animation-duration:${d}s;animation-delay:-${((performance.now()/1000)%d).toFixed(2)}s`;
+const WAVE='M0 6 Q15 1 30 6 T60 6 T90 6 T120 6 T150 6 T180 6 T210 6 T240 6 V13 H0Z';
+function waterFill(t,pumping){ const f=pumping?[1.7,2.9]:[3.6,6.2];
+ return `${pumping?`<span class="wstream" style="height:${Math.max(0,100-t)}%;${wph(.6)}"></span>`:''}<i class="wfill" style="height:${t}%">
+  <svg class="wv back" viewBox="0 0 240 13" preserveAspectRatio="none" aria-hidden="true" style="${wph(f[1])}"><path d="${WAVE}"/></svg>
+  <svg class="wv front" viewBox="0 0 240 13" preserveAspectRatio="none" aria-hidden="true" style="${wph(f[0])}"><path d="${WAVE}"/></svg>
+  ${pumping?[18,42,66,80,30].map((x,k)=>`<span class="wbub" style="left:${x}%;${wph(2+k*.37)}"></span>`).join(''):''}</i>`; }
 function pWater(){ const t=Math.min(100,SIM.tank), on=SIM.on.pump;
  return `<section class="pn g" aria-label="Water">${pnh('drop','Water',`Overhead tank · <i>${fmt(Math.round(t/100*2000))} L</i>`,`<span class="pill"><span class="dot" style="background:${on?'var(--d-blue)':'var(--d-grey)'}"></span>Pump ${on?'running':'off'}</span>`)}
-  <div class="tank"><div class="vessel" role="img" aria-label="Tank ${Math.round(t)} percent full"><i style="height:${t}%"></i><b>${np('tank',String(Math.round(t)))}%</b></div>
+  <div class="tank"><div class="vessel ${on&&SIM.src!=='off'?'pumping':''}" role="img" aria-label="Tank ${Math.round(t)} percent full${on?', pump filling':''}">${waterFill(t,on&&SIM.src!=='off')}<b>${np('tank',String(Math.round(t)))}%</b></div>
    <div class="rows2"><div class="r2"><span class="t"><b>Borehole pump</b><span>${on?`Filling · full in about ${Math.max(1,Math.round((95-t)/.5))} min`:'Starts by itself at 20% when there’s NEPA or gen'}</span></span><button class="tgl" role="switch" ${an('tgl-pump','aria-checked',!!on)} aria-label="Borehole pump" data-act="dload" data-v="pump"></button></div>
    <div class="r2"><span class="t"><b>Stops at 95%</b><span>No overflow, nobody has to remember</span></span></div></div></div></section>`; }
 function pLights(){ const n=SIM.lights.filter(Boolean).length;
@@ -1613,7 +1636,10 @@ function headerHTML(st){ const now=new Date(), h=now.getHours(), greet=h<12?'Goo
   ${mePill()}<button class="askbtn" data-act="askopen">${ic('sparkle',13)} Ask A.D.A.</button><span class="avs" aria-label="Alex and Ada are home, Tobi is out"><span>A<i></i></span><span>Ad<i></i></span><span class="away">T<i></i></span></span>
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
-function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); postRender(el); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
+function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop);
+ const W='.wv,.wstream,.wbub', ta=[...el.querySelectorAll(W)].map(x=>{ const an=x.getAnimations&&x.getAnimations()[0]; return an?[an.currentTime,x.style.animationDelay,x.style.animationDuration]:null; });
+ el.innerHTML=denseBody(); postRender(el);
+ [...el.querySelectorAll(W)].forEach((x,i)=>{ const o=ta[i]; if(!o||x.style.animationDuration!==o[2]) return; x.style.animationDelay=o[1]; const an=x.getAnimations&&x.getAnimations()[0]; if(an&&o[0]!=null) an.currentTime=o[0]; }); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
 setInterval(()=>{ tick(); sensorTick(); aiTick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
 function denseAct(a,v){
  if(a==='pin'){ if((S.pin||'').length<8){ S.pin=(S.pin||'')+v; S.pinErr=''; } return true; }
