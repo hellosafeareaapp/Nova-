@@ -1053,7 +1053,11 @@ body.dense .bsh{background:rgba(var(--d-pn),.98);color:var(--d-ink)}
 .ai-r .t b{white-space:normal!important;overflow:visible!important;line-height:1.3}
 .ai-r .t b::first-letter{text-transform:uppercase}
 .lg.ai b{color:var(--d-amber)}
-@media (max-width:719px){.ai-r{flex-wrap:wrap}.ai-r .aic{width:100%;padding-left:36px}}
+.ai-r{flex-wrap:wrap}.ai-r .aic{width:100%;padding-left:36px;margin-top:2px}
+body.dense .aic .btn{height:32px;padding:0 14px;border-radius:999px;font-size:12.5px;font-weight:650;box-shadow:none;background:var(--d-box);border:1px solid var(--d-line);color:var(--d-ink);-webkit-backdrop-filter:none;backdrop-filter:none;text-shadow:none;transition:transform .15s,background .2s}
+body.dense .aic .btn.pri{background:var(--d-ink);border-color:var(--d-ink);color:var(--d-bg)}
+body.dense .aic .btn:active{transform:scale(.96)}
+body.dense .aic .btn::before,body.dense .aic .btn::after{display:none}
 
 /* ===== dock in the power-first style ===== */
 body.dense .dock{background:rgba(var(--d-pn),.94)!important;border:1px solid var(--d-line)!important;box-shadow:0 10px 28px rgba(23,19,15,.18)!important;-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-radius:20px}
