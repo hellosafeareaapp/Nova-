@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>A.D.A. · Always-on Domestic Automation</title>
 <style>
-/* GlassHome mockup. Frosted tiles over a wallpaper; 16 columns wide, 8 on tablet, 4 on phone; one round dock. */
+/* A.D.A. dashboard mockup. Frosted tiles over a wallpaper; 16 columns wide, 8 on tablet, 4 on phone; one round dock. */
 :root{
   --ink:#0f131b; --ink2:#5a6170; --ink3:#8b919d;
   --glass-rgb:255,255,255; --green-rgb:214,240,221; --pink-rgb:250,220,218; --blue-rgb:214,231,247; --cream-rgb:255,246,226; --sky-rgb:214,234,250; --sage-rgb:224,232,226; --peach-rgb:255,232,214;
@@ -1373,7 +1373,7 @@ function dashView(){ if(DENSE_PAGES.includes(S.dash)) return denseView(); const 
 
 function settingsView(){ const who=S.people.find(p=>p.id===S.accessWho), opts=k=>DASH.map(d=>`<option value="${d[0]}"${d[0]===k?' selected':''}>${d[1]}</option>`).join('');
  const thumb=k=>k==='home'||k==='kitchen'||k==='living'||k==='bedroom'?(k==='home'?pic('weather'):pic('room-'+k)):k==='outside'?pic('cam-driveway'):k==='hallway'?pic('cam-front'):'';
- return `<div class="bar g"><div style="display:flex;align-items:center;gap:10px"><span class="chip">${ic('gear',18)}</span><div><div class="t1">GlassHome</div><div class="t2">Settings</div></div></div>
+ return `<div class="bar g"><div style="display:flex;align-items:center;gap:10px"><span class="chip">${ic('gear',18)}</span><div><div class="t1">A.D.A.</div><div class="t2">Settings</div></div></div>
    <div style="display:flex;gap:8px"><button class="btn sec" style="height:38px;padding:0 14px" data-act="pictures">${ic('img',16)} Pictures</button><button class="btn sec" style="height:38px;padding:0 14px" data-act="browser">${ic('puzzle',16)} Browse</button></div></div>
  <div class="page">
   <section class="card g"><h2>Individual settings</h2><p>Each person and device picks their own main dashboard, dock and dark mode.</p>
@@ -1467,7 +1467,7 @@ function setup(){ const done=S.setupDone; return `<div class="scrim t-fade"><div
   <div class="radar"><i></i><i></i><i></i><span class="ring"></span><div class="hub">${haI(60)}${done?`<span class="ok">${ic('check',16,3)}</span>`:''}</div></div>
   <p style="margin:0;text-align:center;font-size:17px">${done?'Found Home Assistant at <b>homeassistant.local:8123</b>':'Looking for Home Assistant on your network…'}</p>${done?'<button class="btn pri" data-act="close">Connect</button>':''}</div></div>`; }
 
-function signin(){ return `<div class="si t-fade" role="dialog" aria-label="Wall tablet sign in">${slot('signin-bg','fill')}<div class="veil"></div><div class="brand">${ic('home',16)} GlassHome <b>Dash</b></div>
+function signin(){ return `<div class="si t-fade" role="dialog" aria-label="Wall tablet sign in">${slot('signin-bg','fill')}<div class="veil"></div><div class="brand">${ic('home',16)} A.D.A. <b>Dash</b></div>
   <div class="box"><form id="signform" class="t-input-wrap" style="display:flex;flex-direction:column;gap:12px;max-width:420px"><h2>Welcome<br>back.</h2>
    <div class="sif t-input"><label for="sn">Your name</label><div><input id="sn" autocomplete="username" placeholder="Kitchen"></div></div>
    <div class="sif t-input"><label for="sp">Password</label><div><input id="sp" type="password" autocomplete="current-password" placeholder="••••••••"><button type="button" data-act="peek" aria-label="Show password" style="color:rgba(255,255,255,.7)">${ic('eye',18)}</button></div></div>
