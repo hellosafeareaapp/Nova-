@@ -47,6 +47,23 @@ Telegram works too (bot token and chat ID). Settings live in
 `hub_config.json` next to `hub.py` (not committed); tokens are write-only
 from the dashboard.
 
+## Building setup, generator and deliveries
+
+**Power → Building setup** sets the generator tank size, litres per running
+hour, battery bank size, diesel price, generator service interval and the
+alert levels. They are saved in `hub_config.json` and every estimate, alert
+and report uses them.
+
+The hub keeps an hour meter for the generator. The diesel panel shows the
+hours left to the next service, **Mark serviced** restarts the countdown,
+and an alert goes out when it is due.
+
+**Log delivery** records what the vendor says (litres, price, vendor). The
+hub matches it to the rise it measures at the tank (logged before or after,
+within two simulated hours); a gap of 5% or more (2 L at least) raises a
+"delivery came up short" alert. Deliveries and the shortfall are in the
+report.
+
 ## Reports
 
 **This week → Weekly report / Monthly** opens a printable page: diesel used
@@ -79,8 +96,10 @@ Both files must sit in the same folder.
 | `GET /api` | a plain page listing these endpoints |
 | `GET /report.json?days=7` | per-day history and totals the report is built from |
 | `GET /config` | site name, diesel price, whether phone alerts are set up (no secrets) |
-| `POST /config` | `{"site_name", "diesel_price", "ntfy_topic", "telegram_token", "telegram_chat"}` |
+| `POST /config` | `site_name`, `diesel_price`, `diesel_cap`, `gen_lph`, `battery_kwh`, `service_hours`, `alert_diesel_l`, `alert_battery_pct`, `alert_tank_pct`, `ntfy_topic`, `telegram_token`, `telegram_chat` |
 | `POST /notify/test` | sends a test alert |
+| `POST /delivery` | `{"litres": 50, "price": 1300, "vendor": "Sunny Oil"}`; checked against the measured refill |
+| `POST /service` | `{"note": "oil + filter"}`; restarts the generator service countdown |
 | `POST /source` | demo: `{"source": "inverter"}`; refused while the ESP32 reports the source |
 | `POST /fuel` | demo: `{"delta": -5}` refill or siphon; refused once a real fuel sensor reports |
 | `GET /state` | `source`, `voltage`, `tank`, `battery`, `fuel` (litres), `draw`, every load with its state, the last 30 events, recent `alerts` and the `device` block |

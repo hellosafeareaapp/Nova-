@@ -1044,6 +1044,15 @@ body.dense .pn .btn.sm{height:32px;padding:0 14px;border-radius:999px;font-size:
 body.dense .pn .btn.sm.pri{background:var(--d-ink);border-color:var(--d-ink);color:var(--d-bg)}
 body.dense .pn .btn::before,body.dense .pn .btn::after,body.dense .bsh .btn::before,body.dense .bsh .btn::after{display:none}
 @media (max-width:719px){.alf.two{grid-template-columns:1fr}}
+
+.gsv{display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:var(--d-box);border:1px solid var(--d-line)}
+.gsv-h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}.gsv-h>span{display:inline-flex;align-items:center;gap:6px;font-size:13.5px}
+.gsv-bar{height:8px;border-radius:99px;background:rgba(var(--d-pn),.9);border:1px solid var(--d-line);overflow:hidden}.gsv-bar i{display:block;height:100%;border-radius:99px;background:var(--d-ok)}
+.gsv.soon .gsv-bar i{background:var(--d-amber)}.gsv.due{border-color:var(--d-warn)}.gsv.due .gsv-bar i{background:var(--d-warn)}.gsv.due b{color:var(--d-warn)}
+.gsv-s{font-size:11.5px;color:var(--d-ink2)}
+.bldg{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bldg .alf:first-child{grid-column:1/-1}
+.alf .u{text-transform:none;letter-spacing:0;font-weight:600;opacity:.8}.alf .hint{font-size:11.5px;color:var(--d-ink2,#6b6052)}
+@media (max-width:719px){.bldg{grid-template-columns:1fr}}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1343,6 +1352,8 @@ function overlays(){ let o='';
  if(S.ov==='ask') o+=askPanel();
  if(S.ov==='bld') o+=bldSheet();
  if(S.ov==='alerts') o+=alertsSheet();
+ if(S.ov==='building') o+=buildingSheet();
+ if(S.ov==='delivery') o+=deliverySheet();
  return o; }
 
 function holdSheet(){ const s=S.sheet; let cls='',body='';
@@ -1493,7 +1504,7 @@ function tick(){
  if(s==='inv'){ SIM.batt=Math.max(0,SIM.batt-w/5000*100/60); if(SIM.batt===0) setSrc('off'); }
  else if(s==='nepa'||s==='gen') SIM.batt=Math.min(100,SIM.batt+.08);
  if(s==='nepa') SIM.units=Math.max(0,SIM.units-w/1000/60);
- if(s==='gen') SIM.fuel=Math.max(0,SIM.fuel-(2.6/60)/50*100);
+ if(s==='gen'){ SIM.fuel=Math.max(0,SIM.fuel-(GEN_LPH/60)/DIESEL_CAP*100); DEMO_GEN.total+=1/60; }
  SIM.tank=SIM.on.pump&&s!=='off'?Math.min(110,SIM.tank+.5):Math.max(0,SIM.tank-.03);
  SIM.tl[new Date().getHours()]=s;
  rules(); SIM.lastOk=Date.now();
@@ -1507,7 +1518,7 @@ const fmt=n=>n.toLocaleString('en-NG');
 /* --- panels --- */
 const pnh=(icon,label,sum='',end='')=>`<div class="pnh"><span class="lb">${ic(icon,14,2)}${label}</span>${sum?`<span class="sm">${sum}</span>`:''}${end?`<span class="end">${end}</span>`:''}</div>`;
 function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.v>250||(SIM.v>0&&SIM.v<190);
- const run=w>0?SIM.batt/100*5000/w:0, rh=Math.floor(run), rm=Math.round((run-rh)*60);
+ const run=w>0?SIM.batt/100*BATT_WH/w:0, rh=Math.floor(run), rm=Math.round((run-rh)*60);
  const pos=Math.max(0,Math.min(100,(SIM.v-160)/(300-160)*100));
  const vh=SIM.vh, mx=320, mn=150, pts=vh.map((x,i)=>`${(i/(vh.length-1)*100).toFixed(1)},${(40-(Math.max(mn,Math.min(mx,x||mn))-mn)/(mx-mn)*40).toFixed(1)}`).join(' ');
  const solar=(()=>{const h=new Date().getHours();return h>=7&&h<18?Math.round(1400*Math.sin((h-7)/11*Math.PI)):0})();
@@ -1520,7 +1531,7 @@ function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.
    <div class="box"><span class="k">Inverter</span><span class="v">${np('batt',String(Math.round(SIM.batt)))}<small>%</small></span><span class="s">${s==='inv'?`≈ ${rh}h ${rm}m left`:s==='off'?'flat':'charging'}</span></div>
    <div class="box"><span class="k">Solar</span><span class="v">${solar?(solar/1000).toFixed(1):'0'}<small>${solar?'kW':'W'}</small></span><span class="s">${solar?'from 6 panels':'night'}</span></div>
    <div class="box"><span class="k">Prepaid meter</span><span class="v">${np('units',SIM.units.toFixed(1))}<small>kWh</small></span><span class="s">≈ ₦${fmt(Math.round(SIM.units*209.5))} · Band A</span></div>
-   <div class="box"><span class="k">Gen fuel</span><span class="v">${Math.round(SIM.fuel)}<small>%</small></span><span class="s">${(SIM.fuel/100*50).toFixed(1)} L · ${fuelSrcTxt()}</span></div>
+   <div class="box"><span class="k">Gen fuel</span><span class="v">${Math.round(SIM.fuel)}<small>%</small></span><span class="s">${(SIM.fuel/100*DIESEL_CAP).toFixed(1)} L · ${fuelSrcTxt()}</span></div>
    <div class="box"><span class="k">Today’s cost</span><span class="v">₦${fmt(3420)}</span><span class="s">Gen ₦2,100 · NEPA ₦1,320</span></div>
    <div class="box"><span class="k">Load</span><span class="v">${np('load',(w/1000).toFixed(2))}<small>kW</small></span><span class="s">${Object.keys(LOADS).filter(k=>SIM.on[k]).length+1} things running</span></div>
   </div>
@@ -1562,7 +1573,7 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
  const layouts={
   living:RL,bedroom:RL,kitchen:RL,
   home:{monitor:[[()=>pPower(),pInverter,pWater],[pForecast,pAutopilot,pDiesel,pLights,pClimate],[pAlerts,()=>pSecurity(),pReport,pLog,pWeather]],tablet:[[()=>pPower(),pAlerts,pInverter,pForecast,pWater],[pAutopilot,pDiesel,pReport,pLights,pClimate,()=>pSecurity(),pLog,pWeather]],phone:[[pAlerts,pForecast,pAutopilot,()=>pPower(),pInverter,pDiesel,pReport,pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
-  power:{monitor:[[()=>pPower(true),pInverter],[pDiesel,pAlerts,pForecast],[pReport,pLoads,pLog,pNet]],tablet:[[()=>pPower(true),pInverter,pDiesel,pReport],[pAlerts,pForecast,pLoads,pLog,pNet]],phone:[[()=>pPower(true),pAlerts,pInverter,pDiesel,pReport,pForecast,pLoads,pLog,pNet]]},
+  power:{monitor:[[()=>pPower(true),pInverter,pSetup],[pDiesel,pAlerts,pForecast],[pReport,pLoads,pLog,pNet]],tablet:[[()=>pPower(true),pInverter,pDiesel,pReport],[pAlerts,pSetup,pForecast,pLoads,pLog,pNet]],phone:[[()=>pPower(true),pAlerts,pInverter,pDiesel,pReport,pSetup,pForecast,pLoads,pLog,pNet]]},
   water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
   security:{monitor:[[()=>pSecurity(true)],[pLights],[pLog]],tablet:[[()=>pSecurity(true)],[pLights,pLog]],phone:[[()=>pSecurity(true),pLights,pLog]]}
  }[pg][dv];
@@ -1590,6 +1601,11 @@ function denseAct(a,v){
  if(a==='alsave'){ alertsSave(); return 'done'; }
  if(a==='altest'){ alertsTest(); return 'done'; }
  if(a==='report'){ openReport(+v||7); return 'done'; }
+ if(a==='bldopen'){ S.ov='building'; return true; }
+ if(a==='bldsave'){ buildingSave(); return 'done'; }
+ if(a==='dlvopen'){ S.ov='delivery'; return true; }
+ if(a==='dlvsave'){ deliverySave(); return 'done'; }
+ if(a==='svcdone'){ serviceDone(); return true; }
  if(a==='askopen'){ S.ov='ask'; return true; }
  if(a==='rscene'){ const [r,k]=v.split(':'); runScene(r,k); return true; }
  if(a==='acset'){ if(isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; } const [id,d]=v.split(':'); const nv=Math.max(16,Math.min(30,SIM.acSet[id]+(+d))); if(nv!==SIM.acSet[id]){ SIM.acSet[id]=nv; slog(`SET ${LOADS[id].n.toLowerCase()} ${nv}°`,'from dashboard'); } return true; }
@@ -1616,7 +1632,7 @@ function denseAct(a,v){
 
 /* ============ AI: explain + predict (mockup; the real app asks Claude when online) ============ */
 const OUT_P=[.62,.66,.68,.66,.6,.5,.3,.18,.14,.2,.34,.4,.3,.22,.18,.2,.24,.3,.38,.46,.56,.66,.71,.66]; // sample: chance NEPA is off, by hour, last 14 days
-const BATT_WH=5000, UNITS_PER_DAY=9.2, FUEL_L=50, GEN_L_PER_DAY=5.2;
+let BATT_WH=5000; const UNITS_PER_DAY=9.2, GEN_L_PER_DAY=5.2;
 const L=(en,pg)=>S.lang==='pg'?pg:en;
 const durTxt=h=>{ if(!isFinite(h)||h>99) return L('well over a day','pass one day'); const tm=Math.round(h*60), hh=Math.floor(tm/60), mm=tm%60; return hh?`${hh}h ${mm}m`:`${mm}m`; };
 const sheddableNames=()=>Object.keys(LOADS).filter(k=>LOADS[k].shed&&SIM.on[k]).map(k=>LOADS[k].n.replace('Bedroom AC','bedroom AC').replace('Living room AC','living-room AC').replace('TV & DStv','TV').toLowerCase().replace(' ac',' AC').replace('tv','TV')).join(', ');
@@ -1625,7 +1641,7 @@ function forecast(){ const w=Math.max(60,drawW()||lightW()+380), lean=Math.max(6
  const h=new Date().getHours(); let next=-1; for(let i=1;i<=24;i++){ const hh=(h+i)%24; if(OUT_P[hh]>=.55){ next=hh; break; } }
  const offNights=Math.round(OUT_P[22]*14);
  return { runNow:SIM.batt/100*BATT_WH/w, runLean:SIM.batt/100*BATT_WH/lean, sheddable:sheddableOnW(), next, nextP:next>=0?OUT_P[next]:0, offNights,
-  unitDays:SIM.units/UNITS_PER_DAY, fuelDays:(SIM.fuel/100*FUEL_L)/GEN_L_PER_DAY }; }
+  unitDays:SIM.units/UNITS_PER_DAY, fuelDays:(SIM.fuel/100*DIESEL_CAP)/GEN_L_PER_DAY }; }
 const hh2=x=>String(x).padStart(2,'0')+':00';
 const lastLog=re=>SIM.log.find(l=>re.test((l.what+' '+l.why).toLowerCase()));
 
@@ -1717,7 +1733,7 @@ function askPanel(){ const msgs=(S.chat&&S.chat.length)?S.chat:[{who:'ai',t:L(`H
 
 
 /* ============ Measured diesel (fuel-level sensor) + inverter battery (inverter data port) ============ */
-const DIESEL_CAP=50, GEN_LPH=2.6, BATT_V_NOM=48;
+let DIESEL_CAP=50, GEN_LPH=2.6; const BATT_V_NOM=48;
 const dieselL=()=>SIM.fuel/100*DIESEL_CAP;
 SIM.fuelLog=[{d:'Today',t:'02:40',kind:'theft',l:-6,note:'while generator was off'},{d:'Today',t:'11:05',kind:'use',l:-5.2,note:'gen ran 2h 05m'},{d:'Tue',t:'09:14',kind:'refill',l:30,note:'vendor delivery'}];
 SIM.usedToday=5.2; SIM.socH=[]; SIM.socMin=SIM.batt;
@@ -1728,7 +1744,7 @@ function battState(){ if(SIM.src==='inv') return 'dis'; if(SIM.src==='off') retu
 function sensorTick(){ if(SIM.offline) return;
  SIM.socH.push(SIM.batt); if(SIM.socH.length>60) SIM.socH.shift(); SIM.socMin=Math.min(SIM.socMin,SIM.batt);
  if(SIM.src==='gen'){ const d=GEN_LPH/60; SIM.usedToday+=d; } }
-function fuelEvent(kind,l){ const t=hhmm(); SIM.fuelLog.unshift({d:'Today',t,kind,l,note:kind==='refill'?'added at the tank':'while generator was off'}); SIM.fuelLog.length=Math.min(SIM.fuelLog.length,8);
+function fuelEvent(kind,l){ const t=hhmm(); if(kind==='refill'&&!LIVE.on){ const p=DEMO_DLV.find(d=>d.measured_l==null&&Date.now()-(d.at||0)<120000); if(p) setTimeout(()=>{ demoSettle(p,l); refreshDense(); },0); else demoRefill={l,at:Date.now()}; } SIM.fuelLog.unshift({d:'Today',t,kind,l,note:kind==='refill'?'added at the tank':'while generator was off'}); SIM.fuelLog.length=Math.min(SIM.fuelLog.length,8);
  if(kind==='theft'){ slog('DIESEL DROP',`${Math.abs(l)} L while gen off`,'bad'); toast(`Diesel alert: ${Math.abs(l)} L gone while the generator was off`); }
  else slog('DIESEL REFILL',`+${l} L`); }
 
@@ -1743,6 +1759,7 @@ function pDiesel(){ const L0=dieselL(), pct=SIM.fuel, run=SIM.src==='gen', hrs=L
    <div class="box"><span class="k">${L('Run time left','Time wey remain')}</span><span class="v">${durTxt(hrs)}</span><span class="s">${L('at current burn','as e dey burn now')}</span></div>
   </div>
   <div class="rows2">${SIM.fuelLog.slice(0,4).map(e=>`<div class="r2"><span class="fdot ${e.kind}">${ic(e.kind==='refill'?'drop':e.kind==='theft'?'alert':'gen',13,2)}</span><span class="t"><b>${e.kind==='refill'?L('Refill','Refill'):e.kind==='theft'?L('Unexplained drop','Drop wey no get reason'):L('Generator use','Gen use')}</b><span>${e.d} ${e.t} · ${e.note}</span></span><span class="w" style="color:${e.kind==='refill'?'var(--d-ok)':e.kind==='theft'?'var(--d-warn)':'var(--d-ink2)'}">${e.l>0?'+':''}${e.l} L</span></div>`).join('')}</div>
+  ${pGenService()}
   <div class="demo"><span>Demo:</span><button data-act="frefill">${L('Refill 20 L','Refill 20 L')}</button><button data-act="ftheft">${L('Siphon 5 L','Siphon 5 L')}</button></div>
   <div class="fcnote">${ic('gen',12)} ${LIVE.on&&!LIVE.fuelMeasured?L('Estimated by the hub at 2.6 L per generator hour until the fuel-level sensor is wired.','Hub dey estimate am (2.6 L every gen hour) until fuel sensor dey wired.'):L('Measured by a fuel-level sensor in the generator tank. Drops while the generator is off are flagged.','Fuel-level sensor for gen tank dey measure am. If diesel drop when gen off, e go flag am.')}</div>
  </section>`; }
@@ -1913,7 +1930,7 @@ const HUBREV=Object.fromEntries(Object.entries(HUBMAP).map(([a,b])=>[b,a]));
 const SRCMAP={grid:'nepa',gen:'gen',inverter:'inv',none:'off'}, SRCREV={nepa:'grid',gen:'gen',inv:'inverter',off:'none'};
 const fuelSrcTxt=()=>LIVE.on&&!LIVE.fuelMeasured?L('estimated','estimate'):L('measured','measured');
 const LIVE={battMeasured:false,on:false,base:'',dev:null,cfg:null,alerts:[],seenAlert:0,seenEv:new Set(),local:[],busy:false,rep:{},clock:'',fuelMeasured:false,first:true};
-const BAD_EV=/VOLTAGE SPIKE|BATTERY FLAT|DIESEL DROP|DIESEL FINISHED|DEVICE OFFLINE|^ALERT|TANK LOW|DIESEL LOW|TANK OVERFLOWING|NO POWER|NEPA TOOK LIGHT/;
+const BAD_EV=/DELIVERY SHORT|SERVICE DUE|BATTERY LOW|VOLTAGE SPIKE|BATTERY FLAT|DIESEL DROP|DIESEL FINISHED|DEVICE OFFLINE|^ALERT|TANK LOW|DIESEL LOW|TANK OVERFLOWING|NO POWER|NEPA TOOK LIGHT/;
 function hubName(n){ if(n==='lights') return 'lights'; const k=HUBREV[n]; return k?LOADS[k].n.toLowerCase():n; }
 function hubEv(e){ const m=/^(ON|OFF)\s+(\S+)$/.exec(e.what), what=m?`${m[1]==='ON'?'ON ':'OFF'} ${hubName(m[2])}`:e.what;
  const cls=BAD_EV.test(e.what)?'bad':/^(shed|spike|tank|restored)/.test(e.why||'')?'rule':'';
@@ -1924,7 +1941,7 @@ async function hubFetch(path,body){ const ctl=new AbortController(), to=setTimeo
 function applyHub(d){
  SIM.src=SRCMAP[d.source]||'off'; SIM.v=d.voltage; SIM.vh.push(d.voltage); if(SIM.vh.length>60) SIM.vh.shift();
  SIM.batt=d.battery; SIM.tank=d.tank; if(typeof d.fuel==='number') SIM.fuel=d.fuel/(d.diesel_cap||DIESEL_CAP)*100;
- LIVE.fuelMeasured=!!d.fuel_measured; LIVE.battMeasured=!!d.battery_measured; LIVE.dev=d.device||null; LIVE.clock=d.clock;
+ LIVE.gen=d.gen||LIVE.gen; LIVE.deliv=d.deliveries||LIVE.deliv; LIVE.fuelMeasured=!!d.fuel_measured; LIVE.battMeasured=!!d.battery_measured; LIVE.dev=d.device||null; LIVE.clock=d.clock;
  (d.loads||[]).forEach(l=>{ if(l.name==='lights') SIM.lights=SIM.lights.map(()=>l.on?1:0); else if(HUBREV[l.name]) SIM.on[HUBREV[l.name]]=l.on?1:0; });
  const h=parseInt(d.clock,10); if(!isNaN(h)) SIM.tl[h]=SIM.src;
  // diesel events from the hub feed the diesel panel's history
@@ -1941,7 +1958,7 @@ function applyHub(d){
 async function liveTick(){ if(!LIVE.on||LIVE.busy) return; LIVE.busy=true;
  try{ const r=await hubFetch('/state'); if(r.ok&&r.j&&r.j.loads) applyHub(r.j); }catch(e){ /* stays stale; the bar says so */ } finally{ LIVE.busy=false; } }
 async function liveExtras(){ if(!LIVE.on) return;
- try{ const c=await hubFetch('/config'); if(c.ok) LIVE.cfg=c.j; }catch(e){}
+ try{ const c=await hubFetch('/config'); if(c.ok){ LIVE.cfg=c.j; applyBuilding(); } }catch(e){}
  for(const n of [7,30]){ try{ const r=await hubFetch('/report.json?days='+n); if(r.ok) LIVE.rep[n]=r.j; }catch(e){} } }
 async function liveStart(){
  const q=new URLSearchParams(location.search).get('hub');
@@ -1973,7 +1990,7 @@ async function demoPush(title,body,prio='default',tags='warning'){ if(!DEMO_NTFY
  try{ const r=await fetch(u,{method:'POST',body:body?`${title} - ${body}`:title}); if(r.ok){ DEMO_NTFY.sent=hhmm(); return true; } toast(r.status===429?'ntfy is rate-limiting, try again in a minute':'ntfy refused the alert ('+r.status+')'); }
  catch(e){ toast('Could not reach ntfy. Check the internet connection.'); } return false; }
 function demoAlertFromLog(what,why){ if(LIVE.on||!DEMO_NTFY.topic) return;
- const map={'DIESEL DROP':['Diesel dropped while the generator was off','high','rotating_light'],'NO POWER':['No power: battery flat','high','rotating_light'],'ALERT':['Inverter battery is low','default','warning'],'VOLTAGE SPIKE':['Voltage spike','default','warning'],'HUB OFFLINE':['Hub stopped answering','high','rotating_light']}, m=map[what];
+ const map={'DIESEL DROP':['Diesel dropped while the generator was off','high','rotating_light'],'NO POWER':['No power: battery flat','high','rotating_light'],'ALERT':['Inverter battery is low','default','warning'],'VOLTAGE SPIKE':['Voltage spike','default','warning'],'HUB OFFLINE':['Hub stopped answering','high','rotating_light'],'DELIVERY SHORT':['Diesel delivery came up short','high','rotating_light']}, m=map[what];
  if(!m) return; const now=Date.now(); if(now-(DEMO_NTFY.last[what]||0)<60000) return; DEMO_NTFY.last[what]=now; demoPush(m[0],why,m[1],m[2]); }
 function pAlerts(){ const al=LIVE.on?LIVE.alerts:demoAlerts(), c=LIVE.cfg, on=LIVE.on&&c&&(c.ntfy_topic_set||c.telegram_set);
  const status=!LIVE.on?(DEMO_NTFY.topic?L(`On · demo, sent from this browser${DEMO_NTFY.sent?' · last sent '+DEMO_NTFY.sent:''}`,'E dey on · demo'):L('Off · tap Phone alerts to try it on your phone','E dey off · tap Phone alerts')):on?L(`On · ${[c.ntfy_topic_set?'ntfy':'',c.telegram_set?'Telegram':''].filter(Boolean).join(' + ')}${c.last_sent?' · last sent '+c.last_sent:''}`,`E dey on · ${c.ntfy_topic_set?'ntfy':''}${c.telegram_set?' Telegram':''}`):L('Off · not set up yet','E dey off · never set am');
@@ -2013,7 +2030,7 @@ function demoReport(n){ let seed=11; const rnd=()=>(seed=(seed*9301+49297)%23328
   days.push({date:d.toISOString().slice(0,10),hours,min_grid:grid,min_gen:gen,min_none:none,min_inverter:sum(2),gen_l:+(gen/60*GEN_LPH).toFixed(1),refill_l:i%9===4?20:0,drop_l:i===1?6:0,drops:i===1?1:0,pump_min:ri(40,110),wh:ri(9000,16000),spikes:ri(0,3),alerts:ri(0,4),overflow_min:0,offline_min:i%11===5?12:0,batt_min:ri(18,60)}); }
  const F=['min_grid','min_gen','min_inverter','min_none','gen_l','refill_l','drop_l','drops','pump_min','wh','spikes','alerts','overflow_min','offline_min'], tot={};
  F.forEach(f=>tot[f]=+days.reduce((a,d)=>a+d[f],0).toFixed(1)); tot.batt_min=Math.min(...days.map(d=>d.batt_min));
- return {site:'Demo home, Lekki',diesel_price:1300,from:days[0].date,to:days[days.length-1].date,days_requested:n,days,totals:tot,seeded:true,demo:true,gen_lph:GEN_LPH,diesel_cap:DIESEL_CAP,generated:new Date().toISOString().slice(0,16).replace('T',' ')}; }
+ const dd=days[Math.max(0,days.length-4)].date; return {deliveries:[{date:dd,time:'09:14',vendor:'Sunny Oil',claimed_l:50,price:1300,measured_l:43.5,short_l:6.5},...DEMO_DLV.filter(d=>d.measured_l!=null&&d.date==='Today').map(d=>Object.assign({},d,{date:days[days.length-1].date}))],gen:genStatus(),site:bcfg().site_name||'Demo home, Lekki',diesel_price:+bcfg().diesel_price||1300,from:days[0].date,to:days[days.length-1].date,days_requested:n,days,totals:tot,seeded:true,demo:true,gen_lph:GEN_LPH,diesel_cap:DIESEL_CAP,generated:new Date().toISOString().slice(0,16).replace('T',' ')}; }
 const repData=n=>LIVE.on?LIVE.rep[n]:demoReport(n);
 const hrsT=m=>(m/60).toFixed(m>=600?0:1);
 const naira=n=>'₦'+Math.round(n).toLocaleString('en-NG');
@@ -2062,6 +2079,9 @@ function reportHTML(r){ const t=r.totals, p=r.diesel_price, nd=Math.max(1,r.days
  if(t.spikes>0) notes.push(`${t.spikes} voltage spike${t.spikes>1?'s':''} were caught; sensitive equipment was cut each time.`);
  if(t.offline_min>0) notes.push(`The controller was offline for ${Math.round(t.offline_min)} minutes in total. Check the Wi-Fi near the panel.`);
  if(t.overflow_min>0) notes.push(`The water tank overflowed for ${Math.round(t.overflow_min)} minutes.`);
+ const DV=(r.deliveries||[]), shortD=DV.filter(d=>d.short_l!=null&&d.short_l>=Math.max(2,d.claimed_l*.05)), shortL=shortD.reduce((a,d)=>a+d.short_l,0);
+ if(shortD.length) notes.unshift(`<b>${shortD.length} diesel deliver${shortD.length>1?'ies':'y'} came up short by ${shortL.toFixed(1)} L</b> in total (≈ ${naira(shortL*p)} paid for diesel that never reached the tank): ${shortD.map(d=>esc(d.vendor||'vendor')+' on '+fmtD(d.date)).join(', ')}.`);
+ if(r.gen&&r.gen.left_h<=r.gen.interval_h*.1) notes.push(r.gen.left_h<=0?`<b>The generator is due for service</b> (${Math.round(r.gen.since_service_h)} running hours since the last one).`:`Generator service due in about ${Math.round(r.gen.left_h)} running hours.`);
  if(!notes.length) notes.push('Nothing unusual this period.');
  const row=d=>`<tr><td>${fmtD(d.date)}</td><td>${hrsT(d.min_grid)}</td><td>${hrsT(d.min_gen)}</td><td>${hrsT(d.min_inverter)}</td><td>${hrsT(d.min_none)}</td><td>${(+d.gen_l).toFixed(1)}</td><td>${d.refill_l?'+'+d.refill_l:''}</td><td class="${d.drop_l?'bad':''}">${d.drop_l?'−'+d.drop_l:''}</td><td>${hrsT(d.pump_min)}</td><td>${Math.round(d.batt_min)}%</td></tr>`;
  const kpi=(k,v,s,cls='')=>`<div class="k ${cls}"><span>${k}</span><b>${v}</b><i>${s}</i></div>`;
@@ -2106,6 +2126,8 @@ ${chartSVG}
 <table><thead><tr><th>Day</th><th>NEPA h</th><th>Gen h</th><th>Inverter h</th><th>Off h</th><th>Diesel L</th><th>Refill L</th><th>Lost L</th><th>Pump h</th><th>Low batt</th></tr></thead>
 <tbody>${ds.map(row).join('')}</tbody>
 <tfoot><tr><td>Total</td><td>${hrsT(t.min_grid)}</td><td>${hrsT(t.min_gen)}</td><td>${hrsT(t.min_inverter)}</td><td>${hrsT(t.min_none)}</td><td>${(+t.gen_l).toFixed(1)}</td><td>${t.refill_l||''}</td><td class="${t.drop_l?'bad':''}">${t.drop_l?'−'+t.drop_l:''}</td><td>${hrsT(t.pump_min)}</td><td>${Math.round(t.batt_min)}%</td></tr></tfoot></table>
+${DV.length?`<h2>Diesel deliveries</h2><table><thead><tr><th>Day</th><th style="text-align:left">Vendor</th><th>Said L</th><th>Tank rose L</th><th>Short L</th><th>Paid</th></tr></thead><tbody>${DV.map(d=>`<tr><td>${fmtD(d.date)} ${esc(d.time||'')}</td><td style="text-align:left">${esc(d.vendor||'—')}</td><td>${d.claimed_l}</td><td>${d.measured_l==null?'not yet':d.measured_l}</td><td class="${d.short_l>=Math.max(2,d.claimed_l*.05)?'bad':''}">${d.short_l?'−'+d.short_l:''}</td><td>${naira(d.claimed_l*d.price)}</td></tr>`).join('')}</tbody></table>`:''}
+${r.gen?`<h2>Generator</h2><p style="margin:0">${Math.round(r.gen.since_service_h)} of ${r.gen.interval_h} running hours used since the last service${r.gen.last_service?` (${esc(r.gen.last_service.date)}${r.gen.last_service.note?', '+esc(r.gen.last_service.note):''})`:''}. ${r.gen.left_h<=0?'<b style="color:#c2522c">Service is due now.</b>':`About ${Math.round(r.gen.left_h)} hours to the next service.`}</p>`:''}
 <div class="ft"><span>Diesel figures ${r.demo?'are simulated':'come from the hub'}${r.gen_lph?`; without a fuel sensor they are estimated at ${r.gen_lph} L per generator hour`:''}. Costs use the price set in the dashboard.</span><span>Generated ${esc(r.generated)} · A.D.A.</span></div>
 </div></body></html>`; }
 function openReport(n){ const w=window.open('','_blank');
@@ -2113,6 +2135,60 @@ function openReport(n){ const w=window.open('','_blank');
  if(!LIVE.on){ go(demoReport(n)); return; }
  hubFetch('/report.json?days='+n).then(r=>{ if(r.ok){ LIVE.rep[n]=r.j; go(r.j); } else { if(w) w.close(); toast('The hub could not make the report'); } }).catch(()=>{ if(LIVE.rep[n]) go(LIVE.rep[n]); else { if(w) w.close(); toast('The hub didn’t answer'); } }); }
 
+
+/* ============ building setup, generator service, diesel deliveries ============ */
+const BLD_DEF={site_name:'Demo home, Lekki',diesel_price:1300,diesel_cap:50,gen_lph:2.6,battery_kwh:5,alert_diesel_l:10,alert_battery_pct:20,alert_tank_pct:15,service_hours:250};
+const BLD_CFG=Object.assign({},BLD_DEF,(()=>{ try{ return JSON.parse(localStorage.getItem('ada-bld')||'{}'); }catch(e){ return {}; } })());
+const BLD_FIELDS=[['site_name','Building name','',''],['diesel_cap','Generator tank','L','Size of the diesel tank'],['gen_lph','Generator burn','L/h','Litres per running hour, until a fuel sensor measures it'],['battery_kwh','Inverter battery bank','kWh','e.g. 4 × 200Ah 12V ≈ 9.6 kWh'],['diesel_price','Diesel price','₦/L','Used for every cost in the dashboard and reports'],['service_hours','Generator service every','h','Most generators: 100–250 running hours'],['alert_diesel_l','Alert when diesel below','L',''],['alert_battery_pct','Alert when battery below','%',''],['alert_tank_pct','Alert when water tank below','%','Only when there is no power to pump']];
+const bcfg=()=>LIVE.on&&LIVE.cfg&&LIVE.cfg.diesel_cap?LIVE.cfg:BLD_CFG;
+function applyBuilding(){ const c=bcfg(); DIESEL_CAP=+c.diesel_cap||50; GEN_LPH=+c.gen_lph||2.6; BATT_WH=(+c.battery_kwh||5)*1000; }
+// demo generator hour meter and deliveries
+const DEMO_GEN={total:1840,at:1840-182,services:[{date:'2026-10-12',at_h:1658,note:'oil + filter'}]}, DEMO_DLV=[{id:1,date:'Tue',time:'09:14',vendor:'Sunny Oil',claimed_l:30,price:1300,measured_l:30,short_l:0}];
+let demoRefill=null;
+function genStatus(){ if(LIVE.on&&LIVE.gen) return LIVE.gen; const c=bcfg(), since=(DEMO_GEN.total-DEMO_GEN.at);
+ return {total_h:+DEMO_GEN.total.toFixed(1),since_service_h:+since.toFixed(1),interval_h:+c.service_hours,left_h:Math.max(0,+(c.service_hours-since).toFixed(1)),last_service:DEMO_GEN.services[DEMO_GEN.services.length-1]||null}; }
+const deliveries=()=>LIVE.on?(LIVE.deliv||[]):DEMO_DLV;
+function demoSettle(d,measured){ d.measured_l=+measured.toFixed(1); d.short_l=+Math.max(0,d.claimed_l-measured).toFixed(1);
+ if(d.short_l>=Math.max(2,d.claimed_l*.05)){ slog('DELIVERY SHORT',`${d.vendor||'vendor'} said ${d.claimed_l} L, tank rose ${d.measured_l} L`,'bad'); toast(`Short delivery: ${d.short_l} L missing`); }
+ else slog('DELIVERY OK',`${d.claimed_l} L confirmed at the tank`); }
+function pGenService(){ const g=genStatus(), pct=Math.min(100,g.since_service_h/g.interval_h*100), due=g.left_h<=0, soon=!due&&g.left_h<=g.interval_h*.1;
+ const dl=deliveries().slice(0,3);
+ return `<div class="gsv ${due?'due':soon?'soon':''}"><div class="gsv-h"><span>${ic('gen',14,2)} <b>${due?L('Generator service is due','Gen service don reach'):L(`Service in ${Math.round(g.left_h)} running hours`,`Service remain ${Math.round(g.left_h)} hours`)}</b></span><button class="mini-b" data-act="svcdone">${ic('check',12,2.4)} ${L('Mark serviced','E don service')}</button></div>
+  <div class="gsv-bar" role="img" aria-label="${Math.round(g.since_service_h)} of ${g.interval_h} hours since last service"><i style="width:${pct}%"></i></div>
+  <div class="gsv-s">${Math.round(g.since_service_h)} / ${g.interval_h} h ${L('since last service','since last service')}${g.last_service?` · ${L('last','last')}: ${esc(g.last_service.date)}${g.last_service.note?' · '+esc(g.last_service.note):''}`:''} · ${L('total','total')} ${Math.round(g.total_h)} h</div></div>
+  <div class="pnh" style="min-height:0"><span class="lb">${ic('drop',14,2)}${L('Deliveries','Deliveries')}</span><span class="end"><button class="mini-b" data-act="dlvopen">${ic('list',12)} ${L('Log delivery','Log delivery')}</button></span></div>
+  <div class="rows2">${dl.length?dl.map(d=>{ const short=d.short_l>=Math.max(2,d.claimed_l*.05); return `<div class="r2"><span class="fdot ${d.measured_l==null?'use':short?'theft':'refill'}">${ic(d.measured_l==null?'clock':short?'alert':'check',13,2)}</span><span class="t"><b>${esc(d.vendor||L('Vendor','Vendor'))} · ${d.claimed_l} L ${L('said','talk')}</b><span>${esc(d.date)} ${esc(d.time)} · ${d.measured_l==null?L('waiting for the tank to rise','dey wait make tank rise'):L(`${d.measured_l} L went into the tank`,`${d.measured_l} L enter tank`)} · ${naira(d.claimed_l*d.price)}</span></span><span class="w" style="color:${d.measured_l==null?'var(--d-ink2)':short?'var(--d-warn)':'var(--d-ok)'}">${d.measured_l==null?'—':short?'−'+d.short_l+' L':'OK'}</span></div>`; }).join(''):`<p class="sub" style="font-size:13px">${L('No deliveries logged yet.','Nobody log delivery yet.')}</p>`}</div>`; }
+function pSetup(){ const c=bcfg();
+ return `<section class="pn g" aria-label="Building setup">${pnh('building',L('Building setup','Building setup'),esc(c.site_name||''),`<button class="mini-b" data-act="bldopen">${ic('palette',12)} ${L('Edit','Edit')}</button>`)}
+  <div class="boxes">${[['diesel_cap','Tank','L'],['gen_lph','Burn','L/h'],['battery_kwh','Battery','kWh'],['diesel_price','Diesel','₦/L'],['service_hours','Service','h'],['alert_battery_pct','Battery alert','%']].map(([k,n,u])=>`<div class="box"><span class="k">${n}</span><span class="v">${u==='₦/L'?fmt(+c[k]):+c[k]}<small>${u}</small></span></div>`).join('')}</div>
+  <div class="fcnote">${ic('shield',12)} ${LIVE.on?L('Saved on the hub. Every reading, estimate, alert and report uses these numbers.','E dey saved for hub. Everything dey use these numbers.'):L('Demo: saved in this browser only.','Demo: e dey only for this browser.')}</div></section>`; }
+function buildingSheet(){ const c=bcfg();
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid bsh" role="dialog" aria-label="Building setup">
+  <div class="sh"><div><h2>${L('Building setup','Building setup')}</h2><div class="sub">${L('Tell A.D.A. about this building so its numbers are right.','Tell A.D.A. about this building make the numbers correct.')}</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+  <div class="bldg">${BLD_FIELDS.map(([k,n,u,h])=>`<div class="alf"><label for="b-${k}">${n}${u?` <span class="u">${u}</span>`:''}</label><input id="b-${k}" ${k==='site_name'?'':'inputmode="decimal"'} value="${esc(String(c[k]??''))}">${h?`<span class="hint">${h}</span>`:''}</div>`).join('')}</div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="bldsave">${L('Save','Save')}</button><button class="btn sec" data-act="close">${L('Cancel','Cancel')}</button></div></div></div>`; }
+function deliverySheet(){ const c=bcfg();
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid bsh" role="dialog" aria-label="Log a diesel delivery">
+  <div class="sh"><div><h2>${L('Log a diesel delivery','Log diesel delivery')}</h2><div class="sub">${L('Enter what the vendor says. A.D.A. checks it against how much the tank actually rose.','Put wetin vendor talk. A.D.A. go check am with how tank rise.')}</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+  <div class="alf"><label for="d-vendor">${L('Vendor','Vendor')}</label><input id="d-vendor" placeholder="e.g. Sunny Oil"></div>
+  <div class="alf two"><div><label for="d-litres">${L('Litres delivered','Litres')}</label><input id="d-litres" inputmode="decimal" placeholder="50"></div><div><label for="d-price">${L('Price per litre (₦)','Price per litre (₦)')}</label><input id="d-price" inputmode="decimal" value="${+c.diesel_price}"></div></div>
+  ${!LIVE.on?`<div class="bst">${L('Demo: save, then press <b>Refill 20 L</b> on the diesel panel. Log 25 L to see a short delivery caught.','Demo: save, then press <b>Refill 20 L</b>. Log 25 L make you see short delivery.')}</div>`:''}
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="dlvsave">${L('Save delivery','Save delivery')}</button><button class="btn sec" data-act="close">${L('Cancel','Cancel')}</button></div></div></div>`; }
+async function buildingSave(){ const body={};
+ BLD_FIELDS.forEach(([k])=>{ const el=document.getElementById('b-'+k); if(!el) return; const v=el.value.trim(); if(k==='site_name'){ if(v) body[k]=v; } else { const n=parseFloat(v.replace(/[^\d.]/g,'')); if(n>0||(n===0&&k.startsWith('alert'))) body[k]=n; } });
+ if(LIVE.on){ try{ const r=await hubFetch('/config',body); if(r.ok){ LIVE.cfg=r.j; applyBuilding(); S.ov=null; toast(L('Saved on the hub','E don save for hub')); update(); } else toast(r.j.error||'Could not save'); }catch(e){ toast('The hub didn’t answer'); } return; }
+ Object.assign(BLD_CFG,body); try{ localStorage.setItem('ada-bld',JSON.stringify(BLD_CFG)); }catch(e){} applyBuilding(); S.ov=null; toast(L('Saved','E don save')); update(); }
+async function deliverySave(){ const g=id=>(document.getElementById(id)||{}).value||'', litres=parseFloat(g('d-litres')), price=parseFloat(g('d-price'))||+bcfg().diesel_price, vendor=g('d-vendor').trim();
+ if(!(litres>0)){ toast(L('Enter the litres delivered','Put how many litres')); return; }
+ if(LIVE.on){ try{ const r=await hubFetch('/delivery',{litres,price,vendor}); if(r.ok){ applyHub(r.j); S.ov=null; toast(r.j.delivery.measured_l==null?L('Logged. A.D.A. will check it when the tank rises.','E don log. A.D.A. go check am when tank rise.'):L('Logged and checked against the tank','E don log and check am')); update(); } else toast(r.j.error||'Could not save'); }catch(e){ toast('The hub didn’t answer'); } return; }
+ const d={id:DEMO_DLV.length+1,date:'Today',time:hhmm(),at:Date.now(),vendor,claimed_l:litres,price,measured_l:null,short_l:null}; DEMO_DLV.unshift(d);
+ slog('DIESEL DELIVERY',`${vendor||'vendor'} ${litres} L at ₦${fmt(price)}/L`);
+ if(demoRefill&&Date.now()-demoRefill.at<120000){ demoSettle(d,demoRefill.l); demoRefill=null; }
+ S.ov=null; update(); }
+async function serviceDone(){ if(LIVE.on){ try{ const r=await hubFetch('/service',{note:'serviced'}); if(r.ok){ applyHub(r.j); toast(L('Service logged. Countdown restarted.','Service don log.')); refreshDense(); } }catch(e){ toast('The hub didn’t answer'); } return; }
+ DEMO_GEN.services.push({date:new Date().toISOString().slice(0,10),at_h:DEMO_GEN.total,note:'serviced'}); DEMO_GEN.at=DEMO_GEN.total; slog('GEN SERVICED',''); toast(L('Service logged. Countdown restarted.','Service don log.')); }
+
+applyBuilding();
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their
 // previous state and flipped after a reflow. AN remembers the last value per key.

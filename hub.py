@@ -81,13 +81,22 @@ CONFIG_DEFAULTS = {
     "ntfy_topic": "",            # pick something long and unguessable
     "telegram_token": "",
     "telegram_chat": "",
+    # the building, so one hub fits more than the demo house
+    "diesel_cap": 50.0,          # generator tank, litres
+    "gen_lph": 2.6,              # litres per running hour, until a sensor measures it
+    "battery_kwh": 5.0,          # inverter bank
+    "alert_diesel_l": 10.0,
+    "alert_battery_pct": 20.0,
+    "alert_tank_pct": 15.0,
+    "service_hours": 250.0,      # generator service interval
 }
+CONFIG_LIMITS = {"diesel_cap": (5, 5000), "gen_lph": (0.2, 100), "battery_kwh": (0.5, 500),
+                 "alert_diesel_l": (0, 1000), "alert_battery_pct": (5, 90),
+                 "alert_tank_pct": (0, 90), "service_hours": (10, 5000), "diesel_price": (0, 100000)}
 
 # Generator tank. The ESP32 can report a measured level ("fuel_l"); until one
-# does, the hub burns diesel at GEN_LPH while the generator runs.
-DIESEL_CAP = 50.0
-GEN_LPH = 2.6
-DIESEL_LOW = 10.0                # litres
+# does, the hub burns diesel at gen_lph (hub_config.json) while the gen runs.
+GEN_LPH = 2.6                    # only for the sample week; live uses cfg("gen_lph")
 DROP_ALERT_L = 2.0               # unexplained loss while the gen is off
 REFILL_MIN_L = 3.0
 
@@ -294,20 +303,32 @@ class HubHouse(house_sim.House):
         alert_from_event(self, what, why)
 
     def tick(self):
+        was_inv = self.source == "inverter"
         super().tick()
+        if was_inv and self.source in ("inverter", "none") and not self.battery_measured:
+            # house_sim drains as if the bank were 10 kWh; rescale to this building's
+            self.battery += self.draw / 6000.0
+            self.battery = max(0.0, self.battery - self.draw * 100.0 / (60.0 * cfg("battery_kwh") * 1000))
         if self.minute % DAY == 0:
             self.simday += 1
         if self.source == "gen" and not self.fuel_measured:
-            self.fuel = max(0.0, self.fuel - GEN_LPH / 60.0)
-            STATS.add("gen_l", GEN_LPH / 60.0)
+            self.fuel = max(0.0, self.fuel - cfg("gen_lph") / 60.0)
+            STATS.add("gen_l", cfg("gen_lph") / 60.0)
             if self.fuel == 0:
                 self.event("DIESEL FINISHED", "generator stopped")
                 self.source = "inverter" if self.battery > 0 else "none"
 
+    def delivery_checked(self, d):
+        if d["short_l"] >= max(2.0, d["claimed_l"] * 0.05):
+            self.event("DELIVERY SHORT", "{} said {:.0f} L, tank rose {:.1f} L".format(
+                d["vendor"] or "vendor", d["claimed_l"], d["measured_l"]))
+        else:
+            self.event("DELIVERY OK", "{:.0f} L confirmed at the tank".format(d["claimed_l"]))
+
     def set_fuel(self, litres, measured=False):
         """A new tank level, from the sensor or the demo buttons. Drops while
         the generator is off and refills are noticed here, nowhere else."""
-        litres = max(0.0, min(DIESEL_CAP, float(litres)))
+        litres = max(0.0, min(cfg("diesel_cap"), float(litres)))
         if measured:
             self.fuel_measured = True
         prev, self.fuel = self.fuel, litres
@@ -317,9 +338,13 @@ class HubHouse(house_sim.House):
             self.fuel_base = litres
             return
         if litres >= self.fuel_base + REFILL_MIN_L:
-            STATS.add("refill_l", litres - self.fuel_base)
-            self.event("DIESEL REFILL", "+{:.1f} L".format(litres - self.fuel_base))
+            added = litres - self.fuel_base
+            STATS.add("refill_l", added)
+            self.event("DIESEL REFILL", "+{:.1f} L".format(added))
             self.fuel_base = litres
+            d = STATS.refill_seen(added, self.simday * DAY + self.minute % DAY)
+            if d:
+                self.delivery_checked(d)
         elif litres <= self.fuel_base - DROP_ALERT_L:
             lost = self.fuel_base - litres
             STATS.add("drop_l", lost)
@@ -342,9 +367,30 @@ def load_config():
     out = dict(CONFIG_DEFAULTS)
     if isinstance(raw, dict):
         for k in CONFIG_DEFAULTS:
-            if k in raw and isinstance(raw[k], type(CONFIG_DEFAULTS[k])):
-                out[k] = raw[k]
+            if k in raw:
+                v = clean_config_value(k, raw[k])
+                if v is not None:
+                    out[k] = v
     return out
+
+
+def clean_config_value(k, v):
+    """One setting, checked: right type, inside sane limits. None if not."""
+    d = CONFIG_DEFAULTS[k]
+    if isinstance(d, str):
+        return v.strip()[:200] if isinstance(v, str) else None
+    if isinstance(v, bool) or not isinstance(v, (int, float)):
+        return None
+    lo, hi = CONFIG_LIMITS.get(k, (float("-inf"), float("inf")))
+    v = min(hi, max(lo, float(v)))
+    return int(v) if isinstance(d, int) else v
+
+
+CFG = {}                         # cached copy for the sim thread; refreshed on save
+
+
+def cfg(k):
+    return CFG.get(k, CONFIG_DEFAULTS[k])
 
 
 def save_config(cfg):
@@ -357,7 +403,8 @@ def save_config(cfg):
 def public_config(cfg):
     """What the dashboard may see: whether alerts are set up, not the secrets."""
     topic = cfg["ntfy_topic"]
-    return {
+    building = {k: cfg[k] for k in CONFIG_LIMITS}
+    return dict(building, **{
         "site_name": cfg["site_name"],
         "diesel_price": cfg["diesel_price"],
         "ntfy_server": cfg["ntfy_server"],
@@ -366,7 +413,7 @@ def public_config(cfg):
         "telegram_set": bool(cfg["telegram_token"] and cfg["telegram_chat"]),
         "last_error": NOTIFY_STATE["last_error"],
         "last_sent": NOTIFY_STATE["last_sent"],
-    }
+    })
 
 
 # ---------------------------------------------------------------- alerts
@@ -384,6 +431,9 @@ ALERT_RULES = {
     "TANK LOW":         ("warn", "Water tank is low and there is no power to pump"),
     "DEVICE OFFLINE":   ("bad",  "Controller went offline"),
     "DEVICE ONLINE":    ("ok",   "Controller is back online"),
+    "BATTERY LOW":      ("warn", "Inverter battery is low"),
+    "SERVICE DUE":      ("warn", "Generator service is due"),
+    "DELIVERY SHORT":   ("bad",  "Diesel delivery came up short"),
 }
 ALERTS = deque(maxlen=ALERT_LIMIT)
 ALERT_LAST = {}                  # key -> absolute sim minute last raised
@@ -395,8 +445,6 @@ _alert_seq = [0]
 
 def alert_from_event(h, what, why):
     rule = ALERT_RULES.get(what)
-    if what == "ALERT" and "battery" in why:
-        rule = ("warn", "Inverter battery is low")
     if not rule:
         return
     key = what
@@ -418,14 +466,23 @@ def alert_from_event(h, what, why):
 def check_conditions(h):
     """Alerts that are states rather than events. Each fires once on the way
     in and re-arms on the way out, so a slow drain does not spam the phone."""
-    low_tank = h.tank <= 15 and h.source not in ("grid", "gen")
+    low_tank = h.tank <= cfg("alert_tank_pct") and h.source not in ("grid", "gen")
     if low_tank and not h.__dict__.get("_tank_low"):
         h.event("TANK LOW", "{:.0f}% and on {}".format(h.tank, h.source))
     h._tank_low = low_tank
-    low_fuel = h.fuel <= DIESEL_LOW
+    low_fuel = h.fuel <= cfg("alert_diesel_l")
     if low_fuel and not h.__dict__.get("_fuel_low"):
         h.event("DIESEL LOW", "{:.1f} L left".format(h.fuel))
     h._fuel_low = low_fuel
+    low_batt = h.source == "inverter" and h.battery <= cfg("alert_battery_pct")
+    if low_batt and not h.__dict__.get("_batt_low"):
+        h.event("BATTERY LOW", "{:.0f}% left".format(h.battery))
+    h._batt_low = low_batt
+    g = STATS.gen_status()
+    due = g["since_service_h"] >= g["interval_h"]
+    if due and not h.__dict__.get("_service_due"):
+        h.event("SERVICE DUE", "generator ran {:.0f} h since its last service".format(g["since_service_h"]))
+    h._service_due = due
 
 
 def _post(url, data, headers):
@@ -493,6 +550,9 @@ class Stats:
         self.seeded = False
         self.start = date.today()
         self.today_key = self.start.isoformat()
+        # generator hour meter and diesel deliveries, kept with the history
+        self.meta = {"gen_total_min": 0, "service_at_min": 0, "services": [], "deliveries": []}
+        self.last_refill = None          # {"l", "at", "matched"} for matching a delivery
 
     def _bucket(self):
         b = self.days.get(self.today_key)
@@ -515,6 +575,8 @@ class Stats:
         with self.lock:
             b = self._bucket()
             b["min_" + h.source] += 1
+            if h.source == "gen":
+                self.meta["gen_total_min"] += 1
             hrs = b.get("hours")
             if not isinstance(hrs, list) or len(hrs) != 24:
                 hrs = b["hours"] = [[0, 0, 0, 0] for _ in range(24)]
@@ -534,6 +596,11 @@ class Stats:
                 raw = json.load(fh)
             self.days = {k: v for k, v in raw.get("days", {}).items() if isinstance(v, dict)}
             self.seeded = bool(raw.get("seeded"))
+            m = raw.get("meta")
+            if isinstance(m, dict):
+                for k in self.meta:
+                    if isinstance(m.get(k), type(self.meta[k])):
+                        self.meta[k] = m[k]
             if raw.get("start"):
                 self.start = date.fromisoformat(raw["start"])
         except (OSError, ValueError, TypeError):
@@ -541,7 +608,8 @@ class Stats:
 
     def save(self):
         with self.lock:
-            data = {"start": self.start.isoformat(), "seeded": self.seeded, "days": self.days}
+            data = {"start": self.start.isoformat(), "seeded": self.seeded, "days": self.days,
+                    "meta": self.meta}
         tmp = HISTORY_FILE + ".tmp"
         try:
             with open(tmp, "w", encoding="utf-8") as fh:
@@ -562,6 +630,52 @@ class Stats:
             self.seeded = True
         self.save()
 
+    def gen_status(self):
+        with self.lock:
+            total = self.meta["gen_total_min"] / 60.0
+            since = (self.meta["gen_total_min"] - self.meta["service_at_min"]) / 60.0
+            last = self.meta["services"][-1] if self.meta["services"] else None
+        interval = float(cfg("service_hours"))
+        return {"total_h": round(total, 1), "since_service_h": round(since, 1),
+                "interval_h": interval, "left_h": round(max(0.0, interval - since), 1),
+                "last_service": last}
+
+    def service_done(self, note, today):
+        with self.lock:
+            self.meta["services"].append({"date": today, "at_h": round(self.meta["gen_total_min"] / 60.0, 1),
+                                          "note": note[:120]})
+            self.meta["services"] = self.meta["services"][-20:]
+            self.meta["service_at_min"] = self.meta["gen_total_min"]
+        self.save()
+
+    def refill_seen(self, litres, at):
+        """A measured rise in the tank. Matched to a delivery logged just before
+        or just after, so a short delivery is caught either way round."""
+        with self.lock:
+            for d in reversed(self.meta["deliveries"]):
+                if d.get("measured_l") is None and at - d.get("at", -10**9) <= 120:
+                    return self._settle(d, litres)
+            self.last_refill = {"l": litres, "at": at, "matched": False}
+        return None
+
+    def add_delivery(self, vendor, litres, price, at, today, clock):
+        with self.lock:
+            d = {"id": len(self.meta["deliveries"]) + 1, "date": today, "time": clock, "at": at,
+                 "vendor": vendor[:60], "claimed_l": round(litres, 1), "price": price,
+                 "measured_l": None, "short_l": None}
+            self.meta["deliveries"].append(d)
+            self.meta["deliveries"] = self.meta["deliveries"][-60:]
+            r = self.last_refill
+            if r and not r["matched"] and at - r["at"] <= 120:
+                r["matched"] = True
+                return d, self._settle(d, r["l"])
+        return d, None
+
+    def _settle(self, d, measured):
+        d["measured_l"] = round(measured, 1)
+        d["short_l"] = round(max(0.0, d["claimed_l"] - measured), 1)
+        return d
+
     def report(self, days, cfg):
         with self.lock:
             end = date.fromisoformat(self.today_key)
@@ -576,8 +690,10 @@ class Stats:
         return {"site": cfg["site_name"], "diesel_price": cfg["diesel_price"],
                 "from": keys[0], "to": keys[-1], "days_requested": days,
                 "days": rows, "totals": tot, "seeded": self.seeded,
-                "gen_lph": GEN_LPH, "diesel_cap": DIESEL_CAP,
-                "generated": time.strftime("%Y-%m-%d %H:%M")}
+                "gen_lph": cfg["gen_lph"], "diesel_cap": cfg["diesel_cap"],
+                "generated": time.strftime("%Y-%m-%d %H:%M"),
+                "deliveries": [d for d in self.meta["deliveries"] if keys[0] <= d["date"] <= keys[-1]],
+                "gen": self.gen_status()}
 
 
 def sample_day(rnd, back):
@@ -733,7 +849,9 @@ def snapshot():
         "fuel": round(HOUSE.fuel, 2),
         "fuel_measured": HOUSE.fuel_measured,
         "battery_measured": HOUSE.battery_measured,
-        "diesel_cap": DIESEL_CAP,
+        "diesel_cap": cfg("diesel_cap"),
+        "gen": STATS.gen_status(),
+        "deliveries": STATS.meta["deliveries"][-6:][::-1],
         "alerts": list(ALERTS)[:20],
         "loads": [
             {"name": name, "watts": load["watts"], "on": load["on"]}
@@ -888,7 +1006,7 @@ class Hub(BaseHTTPRequestHandler):
         if route == "/device":
             self._device()
             return
-        if route in ("/config", "/notify/test", "/source", "/fuel"):
+        if route in ("/config", "/notify/test", "/source", "/fuel", "/service", "/delivery"):
             try:
                 body = self._body()
             except (ValueError, TypeError):
@@ -933,12 +1051,17 @@ class Hub(BaseHTTPRequestHandler):
         with CONFIG_LOCK:
             cfg = load_config()
             for k, v in body.items():
-                if k in CONFIG_DEFAULTS and isinstance(v, type(CONFIG_DEFAULTS[k])):
-                    cfg[k] = v.strip()[:200] if isinstance(v, str) else v
+                if k in CONFIG_DEFAULTS:
+                    v = clean_config_value(k, v)
+                    if v is not None:
+                        cfg[k] = v
             try:
                 save_config(cfg)
             except OSError as err:
                 self._json(500, {"error": "could not save: %s" % err}); return
+            CFG.update(cfg)
+            with LOCK:
+                HOUSE.fuel = min(HOUSE.fuel, cfg["diesel_cap"])
         self._json(200, public_config(cfg))
 
     def _notify_test(self, _body):
@@ -949,6 +1072,39 @@ class Hub(BaseHTTPRequestHandler):
              "title": "Test alert", "body": "Phone alerts from A.D.A. are working"}
         sent, errors = send_alert(a, cfg)
         self._json(200 if sent else 502, {"sent": sent, "errors": errors})
+
+    def _service(self, body):
+        """The generator was serviced: restart its hour countdown."""
+        STATS.service_done(str(body.get("note") or ""), STATS.today_key)
+        with LOCK:
+            with quiet():
+                HOUSE.event("GEN SERVICED", str(body.get("note") or "")[:60])
+            payload = snapshot()
+        self._json(200, payload)
+
+    def _delivery(self, body):
+        """A diesel delivery as the vendor tells it. The tank sensor says how
+        much actually went in; a gap of 5% (2 L at least) raises an alert."""
+        try:
+            litres = float(body.get("litres"))
+            price = float(body.get("price") or cfg("diesel_price"))
+            if not 0 < litres <= 5000 or price < 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            self._json(400, {"error": "expected {litres, price, vendor}"}); return
+        with LOCK:
+            at = HOUSE.simday * DAY + HOUSE.minute % DAY
+            d, settled = STATS.add_delivery(str(body.get("vendor") or ""), litres, price, at,
+                                            STATS.today_key, HOUSE.clock)
+            with quiet():
+                HOUSE.event("DIESEL DELIVERY", "{} {:.0f} L at N{:,.0f}/L".format(
+                    d["vendor"] or "vendor", litres, price))
+                if settled:
+                    HOUSE.delivery_checked(settled)
+            payload = snapshot()
+        STATS.save()
+        payload["delivery"] = d
+        self._json(200, payload)
 
     def _source(self, body):
         """Demo only: change the power source while no controller owns it."""
@@ -1080,6 +1236,7 @@ def main():
             sys.exit("usage: python hub.py [port] [--seed-week]")
 
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
+    CFG.update(load_config())
     STATS.load()
     if "--seed-week" in sys.argv:
         STATS.seed_week()
