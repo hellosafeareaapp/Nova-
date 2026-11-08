@@ -1010,6 +1010,23 @@ body.dense .bsh{background:rgba(var(--d-pn),.98);color:var(--d-ink)}
 .falert span{color:var(--d-ink)}
 .fdot{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--d-box);border:1px solid var(--d-line);color:var(--d-ink2)}
 .fdot.refill{color:var(--d-ok)}.fdot.theft{color:var(--d-warn);border-color:rgba(194,82,44,.4)}
+
+.rban{position:relative;height:132px;border-radius:14px;overflow:hidden;background:var(--d-box);border:1px solid var(--d-line)}
+.rban .slot{position:absolute;inset:0;background-size:cover;background-position:center}
+.rban .rph{background:linear-gradient(135deg,var(--d-box),rgba(var(--d-pn),.6))}
+.rban::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(20,14,8,.72),rgba(20,14,8,0) 70%);pointer-events:none}
+.rban-t{position:absolute;left:14px;right:14px;bottom:12px;z-index:2;display:flex;flex-direction:column;gap:2px;color:#fff;pointer-events:none}
+.rban-t b{font-family:var(--serif);font-weight:500;font-size:26px;line-height:1.05}
+.rban-t span{font-size:12.5px;opacity:.92}.rban-t i{font-style:normal;font-weight:700}
+.kicker2{font-size:10.5px!important;letter-spacing:.12em;text-transform:uppercase;font-weight:700}
+.rac{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.rac>div:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}
+.rbig{font-size:46px;line-height:1}.rbig small{font-family:var(--font);font-size:15px;color:var(--d-ink2);margin-left:2px}
+.lab2{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--d-ink2)}
+.rset{display:flex;align-items:center;gap:8px}.rset .iconbtn{width:40px;height:40px;font-size:20px;font-weight:600}
+.rsc{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.rscb{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:12px;border-radius:13px;border:1px solid var(--d-line);background:var(--d-box);text-align:left;color:var(--d-ink);transition:transform .15s,background .25s}
+.rscb:active{transform:scale(.97)}.rscb svg{color:var(--d-amber)}.rscb b{font-size:13.5px}.rscb span{font-size:11.5px;color:var(--d-ink2);line-height:1.3}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1426,7 +1443,7 @@ const SIM={src:'nepa',v:226,vh:[],batt:78,fuel:42,units:84.2,tank:62,offline:fal
  on:{freezer:1,pump:0,tv:1,kettle:0,acBed:1,acLiv:0,fans:1,iron:0}, lights:LIGHTS.map(l=>l[1]), acSet:{acBed:24,acLiv:25},
  log:[], tl:['inv','inv','inv','inv','inv','inv','nepa','nepa','nepa','nepa','off','gen','gen','nepa','nepa','nepa','nepa','nepa','nepa','nepa','gen','inv','inv','inv']};
 const SRC={nepa:['NEPA','Grid power','bolt'],gen:['Gen','Generator','gen'],inv:['Inverter','On battery','battery'],off:['No power','Everything off','power']};
-const DENSE_PAGES=['home','estate','power','water','security'];
+const DENSE_PAGES=['home','estate','power','water','security','living','bedroom','kitchen'];
 const hhmm=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 function slog(what,why,cls=''){ SIM.log.unshift({t:hhmm(),what,why,cls}); SIM.log.length=Math.min(SIM.log.length,40); }
 const gauss=(m,s)=>{let u=0,v=0;while(!u)u=Math.random();while(!v)v=Math.random();return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)};
@@ -1518,7 +1535,9 @@ function pNet(){ return `<section class="pn g" aria-label="Internet and TV">${pn
 function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHours(), greet=h<12?'Good morning':h<16?'Good afternoon':'Good evening', st=isStale();
  document.body.classList.toggle('stale',st);
  if(pg==='estate'){ document.body.classList.remove('stale'); return headerHTML(false)+`<div class="cols" style="grid-template-columns:minmax(0,1fr)"><div class="col">${estateView()}</div></div>`; }
+ const RL={monitor:[[()=>pRoomMain(pg)],[()=>pRoomClimate(pg)],[()=>pRoomScenes(pg)]],tablet:[[()=>pRoomMain(pg),()=>pRoomScenes(pg)],[()=>pRoomClimate(pg)]],phone:[[()=>pRoomMain(pg),()=>pRoomClimate(pg),()=>pRoomScenes(pg)]]};
  const layouts={
+  living:RL,bedroom:RL,kitchen:RL,
   home:{monitor:[[()=>pPower(),pInverter,pWater],[pForecast,pAutopilot,pDiesel,pLights,pClimate],[()=>pSecurity(),pLog,pWeather]],tablet:[[()=>pPower(),pInverter,pForecast,pWater],[pAutopilot,pDiesel,pLights,pClimate,()=>pSecurity(),pLog,pWeather]],phone:[[pForecast,pAutopilot,()=>pPower(),pInverter,pDiesel,pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
   power:{monitor:[[()=>pPower(true),pInverter],[pDiesel,pForecast],[pLoads,pLog,pNet]],tablet:[[()=>pPower(true),pInverter,pDiesel],[pForecast,pLoads,pLog,pNet]],phone:[[()=>pPower(true),pInverter,pDiesel,pForecast,pLoads,pLog,pNet]]},
   water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
@@ -1544,6 +1563,8 @@ function denseAct(a,v){
  if(a==='dlight'){ SIM.lights[+v]=SIM.lights[+v]?0:1; slog(`${SIM.lights[+v]?'ON ':'OFF'} ${LIGHTS[+v][0].toLowerCase()} light`,'from dashboard'); return true; }
  if(a==='dlall'){ SIM.lights=SIM.lights.map(()=>0); slog('ALL LIGHTS OFF','from dashboard'); return true; }
  if(a==='askopen'){ S.ov='ask'; return true; }
+ if(a==='rscene'){ const [r,k]=v.split(':'); runScene(r,k); return true; }
+ if(a==='acset'){ if(isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; } const [id,d]=v.split(':'); const nv=Math.max(16,Math.min(30,SIM.acSet[id]+(+d))); if(nv!==SIM.acSet[id]){ SIM.acSet[id]=nv; slog(`SET ${LOADS[id].n.toLowerCase()} ${nv}°`,'from dashboard'); } return true; }
  if(a==='frefill'){ const add=Math.min(20,DIESEL_CAP-dieselL()); SIM.fuel=Math.min(100,SIM.fuel+add/DIESEL_CAP*100); fuelEvent('refill',+add.toFixed(1)); return true; }
  if(a==='ftheft'){ if(SIM.src==='gen'){ toast('Theft check only flags drops while the generator is off. Switch the demo to NEPA or Inverter first.'); return true; } SIM.fuel=Math.max(0,SIM.fuel-5/DIESEL_CAP*100); fuelEvent('theft',-5); return true; }
  if(a==='efilter'){ S.efilter=v; return true; }
@@ -1568,7 +1589,7 @@ function denseAct(a,v){
 const OUT_P=[.62,.66,.68,.66,.6,.5,.3,.18,.14,.2,.34,.4,.3,.22,.18,.2,.24,.3,.38,.46,.56,.66,.71,.66]; // sample: chance NEPA is off, by hour, last 14 days
 const BATT_WH=5000, UNITS_PER_DAY=9.2, FUEL_L=50, GEN_L_PER_DAY=5.2;
 const L=(en,pg)=>S.lang==='pg'?pg:en;
-const durTxt=h=>{ if(!isFinite(h)||h>99) return L('well over a day','pass one day'); const hh=Math.floor(h), mm=Math.round((h-hh)*60); return hh?`${hh}h ${mm}m`:`${mm}m`; };
+const durTxt=h=>{ if(!isFinite(h)||h>99) return L('well over a day','pass one day'); const tm=Math.round(h*60), hh=Math.floor(tm/60), mm=tm%60; return hh?`${hh}h ${mm}m`:`${mm}m`; };
 const sheddableNames=()=>Object.keys(LOADS).filter(k=>LOADS[k].shed&&SIM.on[k]).map(k=>LOADS[k].n.replace('Bedroom AC','bedroom AC').replace('Living room AC','living-room AC').replace('TV & DStv','TV').toLowerCase().replace(' ac',' AC').replace('tv','TV')).join(', ');
 const sheddableOnW=()=>Object.keys(LOADS).reduce((a,k)=>a+(LOADS[k].shed&&SIM.on[k]?LOADS[k].w:0),0);
 function forecast(){ const w=Math.max(60,drawW()||lightW()+380), lean=Math.max(60,w-sheddableOnW());
@@ -1800,6 +1821,56 @@ function pAutopilot(){ const m=S.auto, items=S.aiLog.slice(0,4);
   <div class="rows2">${items.length?items.map(e=>`<div class="r2 ai-r"><span class="fdot" style="color:var(--d-amber)">${ic(e.src==='auto'?'sparkle':'list',13,2)}</span><span class="t"><b>${e.state==='ask'?L('Suggests: ','E suggest: '):e.state==='pending'?L('Waiting: ','E dey wait: '):''}${e.text}</b><span>${e.t} · ${e.src==='auto'?e.short:L('you asked in chat','you ask for chat')}</span></span>${aiCard(e)}</div>`).join(''):`<p class="sub" style="font-size:13px">${L('No decisions yet. Try “turn off the AC” in Ask A.D.A., or switch the demo to Inverter.','No decision yet. Try “off the AC” for Ask A.D.A., or change demo to Inverter.')}</p>`}</div>
   <div class="fcnote">${ic('shield',12)} ${L('Safety rules always win. The freezer and security lights are never switched off by A.D.A., and nothing is switched while the hub isn’t live.','Safety rules dey always win. A.D.A. no go ever off freezer or security light, and nothing go switch if hub no dey live.')}</div>
  </section>`; }
+
+
+/* ============ Room pages in the power-first style ============ */
+const ROOMS={
+ living:{name:'Living room',photo:'room-living',temp:28.5,hum:71,lights:[0],ac:'acLiv',loads:['tv','fans'],scenes:[['movie','Movie night','tv'],['read','Reading','bulb'],['roff','All off','power']]},
+ bedroom:{name:'Bedroom',photo:'room-bedroom',temp:27,hum:66,lights:[1,7],ac:'acBed',loads:['fans','iron'],scenes:[['night','Good night','moon'],['wake','Wake up','sun'],['roff','All off','power']]},
+ kitchen:{name:'Kitchen',photo:'room-kitchen',temp:31,hum:69,lights:[2],ac:null,loads:['freezer','kettle'],scenes:[['cook','Cooking','fork'],['roff','All off','power']]}
+};
+const ROOM_PAGES=Object.keys(ROOMS);
+const roomW=r=>r.lights.reduce((a,i)=>a+(SIM.lights[i]?20:0),0)+[r.ac,...r.loads].filter(Boolean).reduce((a,k)=>a+(SIM.on[k]&&SIM.src!=='off'?LOADS[k].w:0),0);
+function roomNames(r){ return [...r.lights.map(i=>LIGHTS[i][0].toLowerCase()+' light'),...[r.ac,...r.loads].filter(Boolean).map(k=>LOADS[k].n.toLowerCase())]; }
+function pRoomMain(key){ const r=ROOMS[key], u=pic(r.photo), on=r.lights.filter(i=>SIM.lights[i]).length;
+ return `<section class="pn g" aria-label="${r.name}">
+  <div class="rban">${slot(r.photo,'fill'+(u?'':' rph'))}<div class="rban-t"><span class="kicker2">${L('Room','Room')}</span><b>${r.name}</b><span>${r.temp.toFixed(1)}° · ${r.hum}% ${L('humidity','humidity')} · <i>${np('rw-'+key,fmt(roomW(r)))} W</i> ${L('in use','dey use')}</span></div></div>
+  <div><div class="pnh" style="min-height:0"><span class="lb">${ic('bulb',14,2)}${L('Lights','Lights')}</span><span class="sm"><i>${on}</i> ${L('on','on')}</span></div>
+   <div class="lgrid" style="margin-top:8px">${r.lights.map(i=>`<button class="lt" ${an('lt-'+i,'aria-pressed',!!SIM.lights[i])} data-act="dlight" data-v="${i}"><span class="bulb2">${ic('bulb',14)}</span><span style="min-width:0"><b>${LIGHTS[i][0]}</b><span>${SIM.lights[i]?L('On','On'):L('Off','Off')}</span></span></button>`).join('')}</div></div>
+  <div><div class="pnh" style="min-height:0"><span class="lb">${ic('plug',14,2)}${L('Appliances','Appliances')}</span></div>
+   <div class="rows2">${r.loads.map(k=>{ const l=LOADS[k], shedNow=l.shed&&SIM.src==='inv'; return `<div class="r2">${ic(l.ic,16,1.8)}<span class="t"><b>${l.n}</b><span>${SIM.on[k]?(k==='freezer'?L('−18° · running','−18° · e dey run'):L('On','On')):shedNow?L('Off · shed on inverter','Off · shed for inverter'):L('Off','Off')}</span></span>${l.shed?'<span class="badge2 shed">Shed</span>':''}<span class="w">${fmt(l.w)} W</span><button class="tgl" role="switch" ${an('tgl-'+k,'aria-checked',!!SIM.on[k])} aria-label="${l.n}" data-act="dload" data-v="${k}"></button></div>`; }).join('')}</div></div>
+ </section>`; }
+function pRoomClimate(key){ const r=ROOMS[key];
+ if(!r.ac){ return `<section class="pn g" aria-label="Kitchen climate">${pnh('snowflake',L('Cold storage','Cold storage'),`<i>${r.temp.toFixed(1)}°</i> ${L('in the kitchen','for kitchen')}`)}
+  <div class="rac"><div><span class="ser rbig">−18<small>°C</small></span><span class="sub2">${L('Freezer · holding temperature','Freezer · e dey hold the cold')}</span></div><span class="pill"><span class="dot" style="background:${SIM.on.freezer?'var(--d-ok)':'var(--d-warn)'}"></span>${SIM.on.freezer?L('Running','E dey run'):L('Off','Off')}</span></div>
+  <div class="boxes"><div class="box"><span class="k">${L('Room','Room')}</span><span class="v">${r.temp.toFixed(1)}<small>°</small></span></div><div class="box"><span class="k">${L('Humidity','Humidity')}</span><span class="v">${r.hum}<small>%</small></span></div><div class="box"><span class="k">${L('Freezer today','Freezer today')}</span><span class="v">${SIM.on.freezer?'22':'20'}<small>h on</small></span><span class="s">${L('rest is overnight','e dey rest for night')}</span></div></div>
+  <div class="fcnote">${ic('shield',12)} ${L('A.D.A. never switches the freezer off on its own except the overnight inverter rule, and restores it when mains returns.','A.D.A. no dey off freezer by itself except the night inverter rule, and e go on am back when light come.')}</div></section>`; }
+ const ac=r.ac, on=!!SIM.on[ac], shed=SIM.src==='inv', set=SIM.acSet[ac];
+ return `<section class="pn g" aria-label="${r.name} climate">${pnh('snow',L('Cooling','Cooling'),`<i>${r.temp.toFixed(1)}°</i> ${L('now','now')} · ${r.hum}% ${L('humid','humid')}`,`<span class="pill"><span class="dot" style="background:${on?'var(--d-blue)':'var(--d-grey)'}"></span>${on?L('Cooling','E dey cool'):shed?L('Shed on inverter','Shed for inverter'):L('Off','Off')}</span>`)}
+  <div class="rac"><div><span class="lab2">${LOADS[ac].n}</span><span class="ser rbig">${np('set-'+ac,String(set))}<small>°C</small></span><span class="sub2">${on?L(`cooling to ${set}° · ${fmt(LOADS[ac].w)} W`,`e dey cool reach ${set}° · ${fmt(LOADS[ac].w)} W`):shed?L('can come back on when NEPA or gen returns','e fit on again when NEPA or gen come'):L('off','off')}</span></div>
+   <div class="rset"><button class="iconbtn" data-act="acset" data-v="${ac}:-1" aria-label="Lower temperature">−</button><button class="iconbtn" data-act="acset" data-v="${ac}:1" aria-label="Raise temperature">+</button><button class="tgl" role="switch" ${an('tgl-'+ac,'aria-checked',on)} aria-label="${LOADS[ac].n}" data-act="dload" data-v="${ac}"></button></div></div>
+  <div class="boxes"><div class="box"><span class="k">${L('Room','Room')}</span><span class="v">${r.temp.toFixed(1)}<small>°</small></span><span class="s">${L('feels','feels')} ${Math.round(r.temp+4)}°</span></div><div class="box"><span class="k">${L('Humidity','Humidity')}</span><span class="v">${r.hum}<small>%</small></span></div>
+   <div class="box"><span class="k">${L('Fans','Fans')}</span><span class="v">${SIM.on.fans?L('On','On'):L('Off','Off')}</span><button class="tgl" role="switch" ${an('tgl-fans-'+key,'aria-checked',!!SIM.on.fans)} aria-label="Fans" data-act="dload" data-v="fans" style="margin-top:4px"></button></div></div>
+  <div class="fcnote">${ic('battery',12)} ${L(`On inverter the AC is shed automatically: at ${fmt(LOADS[ac].w)} W it would drain the battery in about ${durTxt(SIM.batt/100*BATT_WH/(LOADS[ac].w+200))}.`,`For inverter, A.D.A. go shed the AC: with ${fmt(LOADS[ac].w)} W e go finish battery in like ${durTxt(SIM.batt/100*BATT_WH/(LOADS[ac].w+200))}.`)}</div></section>`; }
+function pRoomScenes(key){ const r=ROOMS[key], names=roomNames(r), log=SIM.log.filter(l=>names.some(n=>(l.what.toLowerCase()).includes(n))||(/SCENE/.test(l.what)&&l.why.toLowerCase().includes(r.name.toLowerCase()))).slice(0,6);
+ return `<section class="pn g" aria-label="${r.name} scenes">${pnh('sparkle',L('Scenes','Scenes'),L('One tap for the room','One tap for the room'))}
+  <div class="rsc">${r.scenes.map(([k,n,icn])=>`<button class="rscb" data-act="rscene" data-v="${key}:${k}">${ic(icn,18,1.8)}<b>${n}</b><span>${sceneDesc(key,k)}</span></button>`).join('')}</div>
+  <div><div class="pnh" style="min-height:0"><span class="lb">${ic('list',14,2)}${L('In this room today','For this room today')}</span></div>
+   <div class="log" style="max-height:220px">${log.length?log.map((l,i)=>`<div class="lg ${l.cls}"><time>${l.t}</time><span><b>${esc(l.what)}</b>${l.why?` <span>· ${esc(l.why)}</span>`:''}</span><button class="why" data-act="whylog" data-v="${SIM.log.indexOf(l)}" aria-label="Why: ${esc(l.what)}">Why?</button></div>`).join(''):`<p class="sub" style="font-size:13px;padding:6px 0">${L('Nothing has changed in this room today.','Nothing change for this room today.')}</p>`}</div></div>
+ </section>`; }
+function sceneDesc(room,k){ return {movie:L('TV on, light off, AC on','TV on, light off, AC on'),read:L('Light on, TV off','Light on, TV off'),roff:L('Everything in the room off','Everything for room off'),night:L('Lights off, AC on, iron off','Lights off, AC on, iron off'),wake:L('Light on, kettle on','Light on, kettle on'),cook:L('Light on','Light on')}[k]; }
+function runScene(room,k){ if(isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return; }
+ const r=ROOMS[room], setL=(i,v)=>{ if(!!SIM.lights[i]!==!!v){ SIM.lights[i]=v?1:0; slog(`${v?'ON ':'OFF'} ${LIGHTS[i][0].toLowerCase()} light`,'scene'); } }, setD=(id,v)=>setLoad(id,v,'scene');
+ const name=r.scenes.find(s=>s[0]===k)[1]; slog('SCENE '+name.toUpperCase(),r.name.toLowerCase());
+ if(k==='movie'){ setL(0,0); setD('tv',1); if(r.ac) setD(r.ac,1); }
+ if(k==='read'){ setL(0,1); setD('tv',0); }
+ if(k==='roff'){ r.lights.forEach(i=>setL(i,0)); r.loads.filter(x=>x!=='freezer').forEach(x=>setD(x,0)); if(r.ac) setD(r.ac,0); }
+ if(k==='night'){ [0,2,3,6,7].forEach(i=>setL(i,0)); setL(1,0); setD('tv',0); setD('iron',0); setD('kettle',0); if(r.ac) setD(r.ac,1); }
+ if(k==='wake'){ setL(1,1); setD('kettle',1); }
+ if(k==='cook'){ setL(2,1); }
+ const before=SIM.log.length; rules();
+ const over=SIM.log.slice(0,4).find(l=>/shed: on inverter/.test(l.why));
+ toast(over?L(`${name} on, but the ${lc(over.what.replace(/^OFF\s+/,''))} stays off on inverter`,`${name} don on, but ${lc(over.what.replace(/^OFF\s+/,''))} go stay off for inverter`):L(`${name} on`,`${name} don on`)); }
 
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their
@@ -2050,7 +2121,7 @@ document.addEventListener('pointerdown',e=>{
  if(!lh&&e.target.closest('button,input,select')&&!e.target.closest('[data-hold]')) return;
  hold={x:e.clientX,y:e.clientY,t:setTimeout(()=>{ eatClick=true; setTimeout(()=>eatClick=false,900);
   if(lh){ const [wid,i]=lh.dataset.lamphold.split(':'), w=find(wid); w.lamps.forEach((l,j)=>l[1]=j===+i); update(); toast(`Only ${w.lamps[+i][0]} is on`); return; }
-  if(h.dataset.hold==='dock'){ if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)){ toast('Home, Power, Water and Security panels are fixed for now. Room dashboards can be edited.'); return; } S.edit=true; S.view='dash'; S.device=null; update(); toast('Editing. Drag, resize or pinch widgets'); return; }
+  if(h.dataset.hold==='dock'){ if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)){ toast('These panels are fixed for now. The glass dashboards can still be edited from Settings.'); return; } S.edit=true; S.view='dash'; S.device=null; update(); toast('Editing. Drag, resize or pinch widgets'); return; }
   const w=find(h.dataset.wid); S.sheet={kind:['weather','thermo','light'].includes(w.type)?w.type:'other',id:w.id}; update(); },520)};
 });
 document.addEventListener('pointermove',e=>{
