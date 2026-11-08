@@ -1,0 +1,138 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>A.D.A. — Technical sheet</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;600&display=swap"><style>
+@page{size:A4;margin:0}
+:root{--ink:#0b1b2b;--ink2:#4a5562;--ink3:#8a939e;--line:#dfe3e7;--paper:#ffffff;--soft:#f3f5f7;--sig:#f5b800;--ok:#1e8e5a;--warn:#c8462c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Archivo,"Liberation Sans",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);page-break-after:always;padding:13mm 15mm 16mm;display:flex;flex-direction:column;gap:5.5mm}
+.page:last-child{page-break-after:auto}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.run{position:absolute;left:15mm;right:15mm;bottom:8mm;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--ink3);border-top:1px solid var(--line);padding-top:2.5mm}
+.mark{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-stretch:85%;font-size:13pt;letter-spacing:.06em}
+.mark .sq{width:6mm;height:6mm;background:var(--sig);display:grid;place-items:center;font-size:8pt;font-weight:900;color:var(--ink)}
+.kicker{font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+h2{margin:0;font-size:21pt;font-weight:800;font-stretch:80%;line-height:1.05;letter-spacing:-.005em}
+h3{margin:0 0 1.5mm;font-size:11pt;font-weight:700}
+p{margin:0;font-size:9.8pt;line-height:1.5;color:var(--ink2)}
+.rule{height:1.2mm;width:16mm;background:var(--sig)}
+.sec{display:flex;flex-direction:column;gap:3mm}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.item{border-top:1.5px solid var(--ink);padding-top:2.5mm}
+.item p{font-size:9.2pt}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;vertical-align:top;padding:2.4mm 2mm;border-bottom:1px solid var(--line);font-size:9.2pt;line-height:1.4}
+th{font-size:7.5pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700;border-bottom:1.5px solid var(--ink)}
+td:first-child{font-weight:700;width:34%;color:var(--ink)}
+td{color:var(--ink2)}
+.img{border:1px solid var(--line)}
+.img img{display:block;width:100%}
+.cap{font-size:7.8pt;color:var(--ink3);margin-top:1.5mm}
+.note{font-size:7.8pt;color:var(--ink3)}
+/* cover */
+.cover{padding:0;gap:0}
+.cover .top{padding:14mm 15mm 0;display:flex;justify-content:space-between;align-items:center}
+.cover .hero{padding:16mm 15mm 0}
+.cover h1{margin:0;font-size:44pt;font-weight:900;font-stretch:78%;line-height:.98;letter-spacing:-.01em;max-width:170mm}
+.cover h1 span{background:linear-gradient(transparent 62%,var(--sig) 62%,var(--sig) 92%,transparent 92%)}
+.cover .sub{margin-top:6mm;font-size:12.5pt;line-height:1.45;color:var(--ink2);max-width:150mm}
+.cover .facts{margin:9mm 15mm 0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid var(--ink)}
+.cover .facts div{padding:3mm 4mm 0 0;font-size:9pt;line-height:1.4;color:var(--ink2)}
+.cover .facts b{display:block;font-size:10.5pt;color:var(--ink);margin-bottom:.8mm}
+.cover .shot{margin-top:auto;background:var(--ink);padding:9mm 15mm 0;position:relative}
+.cover .shot img{display:block;width:100%;border-top-left-radius:2mm;border-top-right-radius:2mm;box-shadow:0 -2mm 8mm rgba(0,0,0,.4)}
+.cover .prep{position:absolute;top:3mm;left:15mm;right:15mm;display:flex;justify-content:space-between;font-size:8pt;color:#c9d1da;letter-spacing:.06em}
+.cover .prep b{color:var(--sig);font-weight:700}
+/* diagram */
+.flow{display:grid;grid-template-columns:1fr 6mm 1.15fr 6mm 1.1fr 6mm 1fr;align-items:stretch}
+.node{border:1.5px solid var(--ink);padding:3mm;display:flex;flex-direction:column;gap:1mm}
+.node b{font-size:10pt}
+.node span{font-size:8.3pt;line-height:1.35;color:var(--ink2)}
+.node.key{background:var(--ink);color:#fff}
+.node.key span{color:#c9d1da}
+.arr{display:grid;place-items:center;color:var(--ink);font-weight:900}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+.bubble{padding:3mm 3.5mm;font-size:9pt;line-height:1.45}
+.q{background:var(--sig);font-weight:700;color:var(--ink);margin-bottom:1.5mm}
+.a{background:var(--soft);color:var(--ink2)}
+.report{border:1.5px solid var(--ink)}
+.report .hd{background:var(--ink);color:#fff;padding:2.5mm 4mm;display:flex;justify-content:space-between;font-size:8.5pt;letter-spacing:.06em}
+.report .bd{padding:3.5mm 4mm;display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}
+.report .k{font-size:7.3pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.report .v{font-size:17pt;font-weight:800;font-stretch:85%}
+.report .s{font-size:8pt;color:var(--ink2)}
+.report .ft{padding:0 4mm 3.5mm;font-size:8.6pt;color:var(--ink2);line-height:1.45}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);border-top:1.5px solid var(--ink)}
+.tl div{padding:3mm 3mm 0 0;position:relative}
+.tl div::before{content:"";position:absolute;top:-2.1mm;left:0;width:3mm;height:3mm;background:var(--sig);border:1.5px solid var(--ink)}
+.tl b{display:block;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:1mm}
+.tl h3{font-size:10pt}
+.tl p{font-size:8.8pt}
+.st{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.st ul{margin:0;padding:0;list-style:none}
+.st li{font-size:9pt;line-height:1.4;color:var(--ink2);padding:1.6mm 0 1.6mm 5mm;border-bottom:1px solid var(--line);position:relative}
+.st li::before{content:"";position:absolute;left:0;top:2.9mm;width:2.2mm;height:2.2mm}
+.st .done li::before{background:var(--ok)}
+.st .next li::before{border:1.5px solid var(--ink)}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 6mm}
+.faq h3{font-size:9.8pt;margin-bottom:.8mm}
+.faq p{font-size:8.9pt;line-height:1.42}
+.contact{margin-top:auto;background:var(--ink);color:#fff;padding:6mm 7mm;display:flex;justify-content:space-between;align-items:flex-end}
+.contact .nm{font-size:18pt;font-weight:800;font-stretch:85%}
+.contact .rl{font-size:9pt;color:#c9d1da}
+.contact .dt{text-align:right;font-size:10pt;line-height:1.6}
+.contact .dt b{color:var(--sig)}
+
+.dochd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.5px solid var(--ink);padding-bottom:4mm}
+.dochd .t{text-align:right}
+.dochd .t b{display:block;font-size:12pt}
+.dochd .t span{font-size:8.5pt;color:var(--ink3)}
+.big{color:var(--ink)!important;font-size:26pt;font-weight:900;font-stretch:80%;line-height:1.02;margin:0}
+.kv td:first-child{width:30%}
+.box{background:var(--soft);padding:4mm 5mm}
+.box p{font-size:9.3pt}
+ol.num{margin:0;padding-left:5mm} ol.num li{font-size:9.4pt;line-height:1.5;color:var(--ink2);margin-bottom:1.2mm} ol.num li b{color:var(--ink)}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:4mm}
+.sign div{border-top:1px solid var(--ink);padding-top:2mm;font-size:8.5pt;color:var(--ink3)}
+
+td,th{padding:1.7mm 2mm!important;font-size:8.7pt!important}
+ol.num li{font-size:8.9pt!important;margin-bottom:.8mm!important}
+.page{gap:4.5mm!important}
+.contact{padding:4.5mm 6mm!important}
+</style></head><body><section class="page">
+<div class="dochd"><div class="mark"><span class="sq">A</span>A.D.A.</div><div class="t"><b>Technical sheet</b><span>System overview, installation, safety and data</span></div></div>
+<div class="sec" style="gap:2mm"><div class="kicker">System architecture</div>
+<div class="flow">
+  <div class="node"><b>Power sources</b><span>NEPA, generator, inverter, solar</span></div><div class="arr">→</div>
+  <div class="node key"><b>Controller</b><span>ESP32 · source &amp; voltage sensing · relay outputs</span></div><div class="arr">→</div>
+  <div class="node key"><b>Hub</b><span>Rules engine · event log · forecasts · local web server</span></div><div class="arr">→</div>
+  <div class="node"><b>Dashboard</b><span>Browser on phone, tablet or wall screen</span></div>
+</div></div>
+<div class="sec"><div class="kicker">Components</div>
+<table class="kv"><tr><th>Component</th><th>Details</th></tr>
+<tr><td>Controller</td><td>ESP32 (Wi-Fi) microcontroller in an enclosure near the distribution board. Reports power source, relay states and signal strength to the hub once per second. Relay outputs for the borehole pump and selected heavy loads.</td></tr>
+<tr><td>Sensing</td><td>Mains voltage and source detection through isolated sensor modules. Ultrasonic level sensor on the overhead tank. (Being added in the next build stage.)</td></tr>
+<tr><td>Hub</td><td>Runs the automation rules, keeps the event log and serves the dashboard on the local network. Written in Python with no external dependencies; runs on a small always-on device, or a laptop/phone during a pilot.</td></tr>
+<tr><td>Dashboard</td><td>Web app, nothing to install. Live status, controls, forecasts, event log, Ask A.D.A. Layouts for phone, tablet and wall-mounted screens; per-person access (off, view, edit).</td></tr>
+<tr><td>Connectivity</td><td>Building Wi-Fi or a dedicated hotspot. The controller always initiates contact with the hub, so no inbound ports are needed on the controller side.</td></tr></table></div>
+<div class="sec"><div class="kicker">Automation rules (default set)</div>
+<table class="kv"><tr><th>Rule</th><th>Behaviour</th></tr>
+<tr><td>Shed on inverter</td><td>When the source is inverter, heavy loads (pump, kettle, AC, iron, TV) are switched off and the reason is logged.</td></tr>
+<tr><td>Spike protection</td><td>Above 260 V, sensitive loads are cut immediately. Safe band shown on the dashboard: 200–250 V.</td></tr>
+<tr><td>Pump control</td><td>Pump starts when the tank is at or below 20% and NEPA or generator is available; stops at 95%.</td></tr>
+<tr><td>Night load control</td><td>Selected loads (e.g. freezer) can be scheduled off overnight on inverter and restored when mains returns.</td></tr>
+<tr><td>Rules have the last word</td><td>A manual command that breaks a rule is reversed, and the dashboard shows which rule and why.</td></tr></table></div>
+<div class="cols2">
+ <div class="sec"><div class="kicker">Safety</div><ol class="num">
+  <li><b>Fail-safe relays:</b> if the controller cannot reach the hub for 10 seconds, every relay goes to its safe state.</li>
+  <li><b>Staleness:</b> if the dashboard's last reading is more than 5 seconds old, it says so, shows the age, and refuses switch commands. Nothing is queued.</li>
+  <li><b>Device offline:</b> if a controller stops reporting for 5 seconds, the hub marks it offline and logs it.</li>
+  <li><b>Electrical work:</b> all mains connections are made by a qualified electrician.</li></ol></div>
+ <div class="sec"><div class="kicker">Data &amp; access</div><ol class="num">
+  <li><b>Local first:</b> the event log and readings are kept on the hub, on site.</li>
+  <li><b>Device key:</b> each controller authenticates to the hub with a key generated at setup.</li>
+  <li><b>Access control:</b> each person gets off, view or edit rights per dashboard.</li>
+  <li><b>Online assistant:</b> only when enabled, a short summary of the building's state is sent to answer a question.</li></ol></div>
+</div>
+<div class="run"><span>A.D.A. · Technical sheet</span><span>1</span></div>
+</section></body></html>

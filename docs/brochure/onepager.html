@@ -1,0 +1,122 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>A.D.A. — One-page summary</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;600&display=swap"><style>
+@page{size:A4;margin:0}
+:root{--ink:#0b1b2b;--ink2:#4a5562;--ink3:#8a939e;--line:#dfe3e7;--paper:#ffffff;--soft:#f3f5f7;--sig:#f5b800;--ok:#1e8e5a;--warn:#c8462c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Archivo,"Liberation Sans",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);page-break-after:always;padding:13mm 15mm 16mm;display:flex;flex-direction:column;gap:5.5mm}
+.page:last-child{page-break-after:auto}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.run{position:absolute;left:15mm;right:15mm;bottom:8mm;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--ink3);border-top:1px solid var(--line);padding-top:2.5mm}
+.mark{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-stretch:85%;font-size:13pt;letter-spacing:.06em}
+.mark .sq{width:6mm;height:6mm;background:var(--sig);display:grid;place-items:center;font-size:8pt;font-weight:900;color:var(--ink)}
+.kicker{font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+h2{margin:0;font-size:21pt;font-weight:800;font-stretch:80%;line-height:1.05;letter-spacing:-.005em}
+h3{margin:0 0 1.5mm;font-size:11pt;font-weight:700}
+p{margin:0;font-size:9.8pt;line-height:1.5;color:var(--ink2)}
+.rule{height:1.2mm;width:16mm;background:var(--sig)}
+.sec{display:flex;flex-direction:column;gap:3mm}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.item{border-top:1.5px solid var(--ink);padding-top:2.5mm}
+.item p{font-size:9.2pt}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;vertical-align:top;padding:2.4mm 2mm;border-bottom:1px solid var(--line);font-size:9.2pt;line-height:1.4}
+th{font-size:7.5pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700;border-bottom:1.5px solid var(--ink)}
+td:first-child{font-weight:700;width:34%;color:var(--ink)}
+td{color:var(--ink2)}
+.img{border:1px solid var(--line)}
+.img img{display:block;width:100%}
+.cap{font-size:7.8pt;color:var(--ink3);margin-top:1.5mm}
+.note{font-size:7.8pt;color:var(--ink3)}
+/* cover */
+.cover{padding:0;gap:0}
+.cover .top{padding:14mm 15mm 0;display:flex;justify-content:space-between;align-items:center}
+.cover .hero{padding:16mm 15mm 0}
+.cover h1{margin:0;font-size:44pt;font-weight:900;font-stretch:78%;line-height:.98;letter-spacing:-.01em;max-width:170mm}
+.cover h1 span{background:linear-gradient(transparent 62%,var(--sig) 62%,var(--sig) 92%,transparent 92%)}
+.cover .sub{margin-top:6mm;font-size:12.5pt;line-height:1.45;color:var(--ink2);max-width:150mm}
+.cover .facts{margin:9mm 15mm 0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid var(--ink)}
+.cover .facts div{padding:3mm 4mm 0 0;font-size:9pt;line-height:1.4;color:var(--ink2)}
+.cover .facts b{display:block;font-size:10.5pt;color:var(--ink);margin-bottom:.8mm}
+.cover .shot{margin-top:auto;background:var(--ink);padding:9mm 15mm 0;position:relative}
+.cover .shot img{display:block;width:100%;border-top-left-radius:2mm;border-top-right-radius:2mm;box-shadow:0 -2mm 8mm rgba(0,0,0,.4)}
+.cover .prep{position:absolute;top:3mm;left:15mm;right:15mm;display:flex;justify-content:space-between;font-size:8pt;color:#c9d1da;letter-spacing:.06em}
+.cover .prep b{color:var(--sig);font-weight:700}
+/* diagram */
+.flow{display:grid;grid-template-columns:1fr 6mm 1.15fr 6mm 1.1fr 6mm 1fr;align-items:stretch}
+.node{border:1.5px solid var(--ink);padding:3mm;display:flex;flex-direction:column;gap:1mm}
+.node b{font-size:10pt}
+.node span{font-size:8.3pt;line-height:1.35;color:var(--ink2)}
+.node.key{background:var(--ink);color:#fff}
+.node.key span{color:#c9d1da}
+.arr{display:grid;place-items:center;color:var(--ink);font-weight:900}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+.bubble{padding:3mm 3.5mm;font-size:9pt;line-height:1.45}
+.q{background:var(--sig);font-weight:700;color:var(--ink);margin-bottom:1.5mm}
+.a{background:var(--soft);color:var(--ink2)}
+.report{border:1.5px solid var(--ink)}
+.report .hd{background:var(--ink);color:#fff;padding:2.5mm 4mm;display:flex;justify-content:space-between;font-size:8.5pt;letter-spacing:.06em}
+.report .bd{padding:3.5mm 4mm;display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}
+.report .k{font-size:7.3pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.report .v{font-size:17pt;font-weight:800;font-stretch:85%}
+.report .s{font-size:8pt;color:var(--ink2)}
+.report .ft{padding:0 4mm 3.5mm;font-size:8.6pt;color:var(--ink2);line-height:1.45}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);border-top:1.5px solid var(--ink)}
+.tl div{padding:3mm 3mm 0 0;position:relative}
+.tl div::before{content:"";position:absolute;top:-2.1mm;left:0;width:3mm;height:3mm;background:var(--sig);border:1.5px solid var(--ink)}
+.tl b{display:block;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:1mm}
+.tl h3{font-size:10pt}
+.tl p{font-size:8.8pt}
+.st{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.st ul{margin:0;padding:0;list-style:none}
+.st li{font-size:9pt;line-height:1.4;color:var(--ink2);padding:1.6mm 0 1.6mm 5mm;border-bottom:1px solid var(--line);position:relative}
+.st li::before{content:"";position:absolute;left:0;top:2.9mm;width:2.2mm;height:2.2mm}
+.st .done li::before{background:var(--ok)}
+.st .next li::before{border:1.5px solid var(--ink)}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 6mm}
+.faq h3{font-size:9.8pt;margin-bottom:.8mm}
+.faq p{font-size:8.9pt;line-height:1.42}
+.contact{margin-top:auto;background:var(--ink);color:#fff;padding:6mm 7mm;display:flex;justify-content:space-between;align-items:flex-end}
+.contact .nm{font-size:18pt;font-weight:800;font-stretch:85%}
+.contact .rl{font-size:9pt;color:#c9d1da}
+.contact .dt{text-align:right;font-size:10pt;line-height:1.6}
+.contact .dt b{color:var(--sig)}
+
+.dochd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.5px solid var(--ink);padding-bottom:4mm}
+.dochd .t{text-align:right}
+.dochd .t b{display:block;font-size:12pt}
+.dochd .t span{font-size:8.5pt;color:var(--ink3)}
+.big{color:var(--ink)!important;font-size:26pt;font-weight:900;font-stretch:80%;line-height:1.02;margin:0}
+.kv td:first-child{width:30%}
+.box{background:var(--soft);padding:4mm 5mm}
+.box p{font-size:9.3pt}
+ol.num{margin:0;padding-left:5mm} ol.num li{font-size:9.4pt;line-height:1.5;color:var(--ink2);margin-bottom:1.2mm} ol.num li b{color:var(--ink)}
+.sign{display:grid;grid-template-columns:1fr 1fr;gap:10mm;margin-top:4mm}
+.sign div{border-top:1px solid var(--ink);padding-top:2mm;font-size:8.5pt;color:var(--ink3)}
+</style></head><body><section class="page">
+<div class="dochd"><div class="mark"><span class="sq">A</span>A.D.A.</div><div class="t"><b>One-page summary</b><span>Prepared for Max-Migold · November 2026</span></div></div>
+<p class="big">Power and water control for Nigerian buildings.</p>
+<p style="font-size:11pt;max-width:170mm">A.D.A. is a small controller and dashboard that knows whether a building is on NEPA, generator or inverter, logs every generator hour, runs the borehole pump on tank level, sheds heavy loads on inverter, and protects equipment from voltage spikes. Every automatic action is recorded with its reason.</p>
+<div class="cols2">
+ <div class="sec"><div class="kicker">The problem it solves</div>
+  <table><tr><td>Diesel</td><td>No reliable record of generator hours, so reconciliation is guesswork.</td></tr>
+  <tr><td>Water</td><td>Pumps left running overflow tanks; forgotten pumps leave tanks dry.</td></tr>
+  <tr><td>Batteries</td><td>Heavy loads on inverter drain batteries overnight and shorten their life.</td></tr>
+  <tr><td>Equipment</td><td>Voltage spikes damage TVs, fridges, CCTV and access control.</td></tr></table></div>
+ <div class="sec"><div class="kicker">What it does</div>
+  <table><tr><td>Live source</td><td>NEPA, gen, inverter or none, with voltage, for every building.</td></tr>
+  <tr><td>Gen &amp; diesel log</td><td>Run-hours per generator per day, with estimated diesel.</td></tr>
+  <tr><td>Borehole</td><td>Starts on low tank when power is available, stops at 95%.</td></tr>
+  <tr><td>Protection</td><td>Sheds heavy loads on inverter; cuts sensitive loads on spikes.</td></tr>
+  <tr><td>Forecasts</td><td>Battery runtime, usual outage times, days of diesel and units left.</td></tr>
+  <tr><td>Ask A.D.A.</td><td>Explains what happened and why, in English or Pidgin.</td></tr></table></div>
+</div>
+<div class="cols3">
+ <div class="item"><h3>Works offline</h3><p>Rules, log and forecasts run on site. Internet adds remote access and the full assistant.</p></div>
+ <div class="item"><h3>Fails safe</h3><p>If the controller loses the hub for 10 s, relays drop to safe states. Stale data is never shown as live.</p></div>
+ <div class="item"><h3>Fits what you have</h3><p>Works alongside the existing generator, inverter and changeover. Mains wiring by a qualified electrician.</p></div>
+</div>
+<div class="box"><div class="kicker" style="margin-bottom:1.5mm">Status &amp; proposal</div><p><b style="color:var(--ink)">Working prototype:</b> ESP32 controller reporting live to the hub, automation rules running, dashboard built. <b style="color:var(--ink)">Proposal:</b> a pilot on one Max-Migold building for about six weeks, to record its power and water, automate the routine switching, and review the results together.</p></div>
+<div class="contact"><div><div class="rl">Contact</div><div class="nm">Ajala David</div><div class="rl">Founder, A.D.A.</div></div><div class="dt"><b>+234 916 107 8549</b> · call or WhatsApp<br>segdav1228@gmail.com</div></div>
+</section></body></html>
