@@ -1065,6 +1065,17 @@ body.dense .pn .btn::before,body.dense .pn .btn::after,body.dense .bsh .btn::bef
 .pav{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--d-box);border:1px solid var(--d-line);font-weight:700;font-size:13px;flex:none}
 .ppl .mini-b.on{background:var(--d-ink);color:var(--d-bg);border-color:var(--d-ink)}
 .psel{height:42px;border-radius:11px;border:1px solid var(--d-line,#ddd);background:var(--d-box,#fff);padding:0 10px;font-size:14px;color:var(--d-ink,#222);width:100%}
+
+.insh{width:min(620px,100%)}
+.insteps{display:flex;align-items:center;gap:0}.insteps span{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;border:1.5px solid var(--d-line);color:var(--d-ink2);flex:none}
+.insteps span.cur{border-color:var(--d-ink);color:var(--d-ink)}.insteps span.done{background:var(--d-ink);border-color:var(--d-ink);color:var(--d-bg)}.insteps i{flex:1;height:1.5px;background:var(--d-line)}
+.inlist{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.45}
+.inkey{display:flex;align-items:center;gap:8px;margin-top:6px}.inkey code{font:600 16px/1 ui-monospace,Menlo,Consolas,monospace;padding:9px 12px;border-radius:10px;background:var(--d-box);border:1px solid var(--d-line);letter-spacing:.04em}
+.indev{display:flex;align-items:center;gap:10px;padding:12px;border-radius:12px;border:1px dashed var(--d-line);font-size:13.5px}.indev .dot{width:10px;height:10px;border-radius:50%;background:var(--d-amber);flex:none;animation:blink 1.4s ease-in-out infinite}
+.indev.on{border-style:solid;border-color:var(--d-ok)}.indev.on .dot{background:var(--d-ok);animation:none}
+.inok{display:flex;align-items:center;gap:8px;font-weight:650;color:var(--d-ok)}
+.insum{display:flex;flex-direction:column;gap:3px;padding:12px;border-radius:12px;background:var(--d-box);border:1px solid var(--d-line);font-size:13px}
+.innav{display:flex;justify-content:space-between;gap:8px;padding-top:6px;border-top:1px solid var(--d-line)}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1365,6 +1376,7 @@ function overlays(){ let o='';
  if(S.ov==='bld') o+=bldSheet();
  if(S.ov==='alerts') o+=alertsSheet();
  if(S.ov==='people') o+=peopleSheet();
+ if(S.ov==='install') o+=installSheet();
  if(S.ov==='login') o+=loginView();
  if(S.ov==='building') o+=buildingSheet();
  if(S.ov==='delivery') o+=deliverySheet();
@@ -1613,6 +1625,11 @@ function denseAct(a,v){
  if(a==='logout'){ S.ov=null; logout(); return true; }
  if(a==='demoas'){ DEMO_ME=v; toast(L(`Now viewing as ${ROLE_NM[v]}`,`You be ${ROLE_NM[v]} now`)); return true; }
  if(gate(a)) return 'done';
+ if(a==='instopen'){ instOpen(); return 'done'; }
+ if(a==='instgo'){ instGo(+v); return 'done'; }
+ if(a==='rtest'){ relayTest(v); return 'done'; }
+ if(a==='rok'){ const [k,ok]=v.split(':'); INST.ok[k]=ok==='1'; return true; }
+ if(a==='copykey'){ (navigator.clipboard?navigator.clipboard.writeText(v):Promise.reject()).then(()=>toast(L('Copied','E don copy'))).catch(()=>toast(v)); return 'done'; }
  if(['dload','dlight','dlall','dgate'].includes(a)&&isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; }
  if(a==='dsrc'){ if(LIVE.on){ hubFetch('/source',{source:SRCREV[v]}).then(r=>{ if(r.ok){ applyHub(r.j); refreshDense(); } else toast(r.status===409?'The controller is reporting the power source. Press BOOT on the ESP32 to change it.':(r.j.error||'Refused')); }).catch(()=>toast('The hub didn’t answer')); return 'done'; } setSrc(v); return true; }
  if(a==='doff'&&LIVE.on){ toast('Live mode: stop hub.py to see what happens when the hub goes quiet'); return 'done'; }
@@ -2185,7 +2202,7 @@ function pGenService(){ const g=genStatus(), pct=Math.min(100,g.since_service_h/
   <div class="pnh" style="min-height:0"><span class="lb">${ic('drop',14,2)}${L('Deliveries','Deliveries')}</span><span class="end"><button class="mini-b" data-act="dlvopen">${ic('list',12)} ${L('Log delivery','Log delivery')}</button></span></div>
   <div class="rows2">${dl.length?dl.map(d=>{ const short=d.short_l>=Math.max(2,d.claimed_l*.05); return `<div class="r2"><span class="fdot ${d.measured_l==null?'use':short?'theft':'refill'}">${ic(d.measured_l==null?'clock':short?'alert':'check',13,2)}</span><span class="t"><b>${esc(d.vendor||L('Vendor','Vendor'))} · ${d.claimed_l} L ${L('said','talk')}</b><span>${esc(d.date)} ${esc(d.time)} · ${d.measured_l==null?L('waiting for the tank to rise','dey wait make tank rise'):L(`${d.measured_l} L went into the tank`,`${d.measured_l} L enter tank`)} · ${naira(d.claimed_l*d.price)}</span></span><span class="w" style="color:${d.measured_l==null?'var(--d-ink2)':short?'var(--d-warn)':'var(--d-ok)'}">${d.measured_l==null?'—':short?'−'+d.short_l+' L':'OK'}</span></div>`; }).join(''):`<p class="sub" style="font-size:13px">${L('No deliveries logged yet.','Nobody log delivery yet.')}</p>`}</div>`; }
 function pSetup(){ const c=bcfg();
- return `<section class="pn g" aria-label="Building setup">${pnh('building',L('Building setup','Building setup'),esc(c.site_name||''),`<button class="mini-b" data-act="bldopen">${ic('palette',12)} ${L('Edit','Edit')}</button>`)}
+ return `<section class="pn g" aria-label="Building setup">${pnh('building',L('Building setup','Building setup'),esc(c.site_name||''),`<span style="display:inline-flex;gap:6px"><button class="mini-b" data-act="instopen">${ic('sparkle',12)} ${L('Installer setup','Installer setup')}</button><button class="mini-b" data-act="bldopen">${ic('palette',12)} ${L('Edit','Edit')}</button></span>`)}
   <div class="boxes">${[['diesel_cap','Tank','L'],['gen_lph','Burn','L/h'],['battery_kwh','Battery','kWh'],['diesel_price','Diesel','₦/L'],['service_hours','Service','h'],['alert_battery_pct','Battery alert','%']].map(([k,n,u])=>`<div class="box"><span class="k">${n}</span><span class="v">${u==='₦/L'?fmt(+c[k]):+c[k]}<small>${u}</small></span></div>`).join('')}</div>
   <div class="fcnote">${ic('shield',12)} ${LIVE.on?L('Saved on the hub. Every reading, estimate, alert and report uses these numbers.','E dey saved for hub. Everything dey use these numbers.'):L('Demo: saved in this browser only.','Demo: e dey only for this browser.')}</div></section>`; }
 function buildingSheet(){ const c=bcfg();
@@ -2219,7 +2236,7 @@ applyBuilding();
 /* ============ people, PINs and roles ============ */
 const ROLE_LV={resident:1,caretaker:2,manager:3,owner:4}, ROLE_NM={resident:'Resident',caretaker:'Caretaker',manager:'Manager',owner:'Owner'};
 const ROLE_CAN={resident:L('See everything, switch nothing','See everything, no fit switch'),caretaker:L('Switch things, log deliveries and services','Switch things, log delivery and service'),manager:L('Everything, plus setup, alerts and people','Everything, plus setup, alerts and people'),owner:L('Everything','Everything')};
-const NEED={dload:2,dlight:2,dlall:2,dgate:2,acset:2,rscene:2,aido:2,aiundo:2,dsrc:2,frefill:2,ftheft:2,svcdone:2,dlvopen:2,dlvsave:2,bldopen:3,bldsave:3,alsave:3,altest:3,aimode:3,aiallow:3};
+const NEED={dload:2,dlight:2,dlall:2,dgate:2,acset:2,rscene:2,aido:2,aiundo:2,dsrc:2,frefill:2,ftheft:2,svcdone:2,dlvopen:2,dlvsave:2,bldopen:3,bldsave:3,instopen:3,rtest:2,alsave:3,altest:3,aimode:3,aiallow:3};
 const DEMO_PEOPLE=[{name:'Alex',role:'owner'},{name:'Ada',role:'manager'},{name:'Musa',role:'caretaker'},{name:'Tolu',role:'resident'}];
 let DEMO_ME='owner';
 const tokKey=()=>'ada-token-'+(LIVE.base||location.host);
@@ -2263,6 +2280,51 @@ function mePill(){ const r=myRole();
  if(LIVE.on&&LIVE.me&&!LIVE.me.pins) return `<button class="pill me-pill warn" data-act="pplopen">${ic('shield',12,2)} ${L('No PINs','No PIN')}</button>`;
  const nm=LIVE.on?(LIVE.me&&LIVE.me.name)||'':(DEMO_PEOPLE.find(p=>p.role===DEMO_ME)||{}).name;
  return `<button class="pill me-pill" data-act="pplopen" aria-label="People and sign-in">${ic('shield',12,2)} ${esc(nm||'')} · ${ROLE_NM[r]}</button>`; }
+
+
+/* ============ installer setup: building, owner, controller, relays, alerts ============ */
+const IN_STEPS=[L('Start','Start'),L('Building','Building'),L('Owner PIN','Owner PIN'),L('Controller','Controller'),L('Relays','Relays'),L('Alerts','Alerts')];
+const INST={step:0,setup:null,ok:{},testing:'',demoAt:0,timer:0};
+async function instLoad(){ if(!LIVE.on){ if(!INST.demoAt) INST.demoAt=Date.now(); return; } try{ const r=await hubFetch('/setup'); if(r.ok) INST.setup=r.j; }catch(e){} }
+function instDevice(){ if(!LIVE.on){ const on=INST.demoAt&&Date.now()-INST.demoAt>4000; return {id:on?'ada-node-01':null,online:on,rssi:on?-58:null,relays:on?{pump:!!SIM.on.pump,kettle:!!SIM.on.kettle}:{}}; }
+ return LIVE.dev||(INST.setup&&INST.setup.device)||{}; }
+function instOpen(){ S.ov='install'; INST.step=0; instLoad().then(()=>{ if(S.ov==='install') update(); });
+ clearInterval(INST.timer); INST.timer=setInterval(()=>{ if(S.ov!=='install'){ clearInterval(INST.timer); return; } if(INST.step===3||INST.step===4){ if(LIVE.on) liveTick(); update(); } },2000); }
+function instBody(){ const st=INST.step, c=bcfg(), dev=instDevice(), su=INST.setup||{};
+ if(st===0) return `<p style="margin:0">${L('This sets up A.D.A. in a new building in about ten minutes. You will need:','This one go set A.D.A. for new building in like ten minutes. You go need:')}</p>
+  <ul class="inlist"><li>${L('The hub running (<b>python hub.py</b>) on a laptop or mini-PC that stays in the building','Hub dey run (<b>python hub.py</b>) for laptop or mini-PC wey go stay for the building')}</li><li>${L('The ESP32 controller flashed with <b>ada_node.ino</b>, on the same Wi-Fi','ESP32 controller wey get <b>ada_node.ino</b>, for the same Wi-Fi')}</li><li>${L('An electrician for anything on 230 V (contactors, pump, freezer)','Electrician for anything wey be 230 V')}</li></ul>
+  ${!LIVE.on?`<div class="bst">${L('Demo: the controller and relays are simulated so you can walk through every step.','Demo: controller and relays na simulation so you fit follow every step.')}</div>`:''}`;
+ if(st===1) return `<div class="bldg">${BLD_FIELDS.slice(0,5).map(([k,n,u,h])=>`<div class="alf"><label for="b-${k}">${n}${u?` <span class="u">${u}</span>`:''}</label><input id="b-${k}" ${k==='site_name'?'':'inputmode="decimal"'} value="${esc(String(c[k]??''))}">${h?`<span class="hint">${h}</span>`:''}</div>`).join('')}</div>
+  <p class="sub" style="margin:0;font-size:12px">${L('Alert levels and the service interval can be changed later under Building setup.','You fit change alert levels later for Building setup.')}</p>`;
+ if(st===2){ const pins=LIVE.on?(LIVE.me&&LIVE.me.pins):true;
+  return pins?`<div class="inok">${ic('check',16,2.6)} ${LIVE.on?L(`PINs are on (${su.users||(LIVE.people||[]).length||1} people).`,`PIN don dey on.`):L('Demo: Alex is the owner, with a manager, a caretaker and a resident.','Demo: Alex na owner.')}</div><button class="btn sec" data-act="pplopen">${L('Manage people','Manage people')}</button>`
+  :`<p style="margin:0">${L('Create the owner. After this, every phone needs a PIN.','Create the owner. After this, every phone go need PIN.')}</p><div class="alf two"><div><label for="p-name">${L('Your name','Your name')}</label><input id="p-name" autocomplete="off"></div><div><label for="p-pin">${L('PIN (4–8 digits)','PIN (4–8 numbers)')}</label><input id="p-pin" type="password" inputmode="numeric" maxlength="8" autocomplete="off"></div></div><input type="hidden" id="p-role" value="owner"><button class="btn pri" data-act="ppladd">${L('Create owner','Create owner')}</button>`; }
+ if(st===3){ const key=LIVE.on?(su.device_key||'…'):'demo-3f9a12c7', url=LIVE.on?((su.urls||[])[0]||location.origin):'http://192.168.1.50:8000';
+  return `<ol class="inlist"><li>${L('Open <b>firmware/ada_node/ada_node.ino</b> in the Arduino IDE.','Open <b>firmware/ada_node/ada_node.ino</b> for Arduino IDE.')}</li><li>${L('Put in the building Wi-Fi name and password, and this device key:','Put the Wi-Fi name, password, and this device key:')}<div class="inkey"><code>${esc(key)}</code><button class="mini-b" data-act="copykey" data-v="${esc(key)}">${L('Copy','Copy')}</button></div></li><li>${L('Leave <b>HUB_HOST</b> as "" (the controller finds the hub by itself), then Upload.','Leave <b>HUB_HOST</b> as "" (controller go find hub by itself), then Upload.')}</li></ol>
+  <div class="indev ${dev.online?'on':''}"><span class="dot"></span>${dev.online?L(`<b>${esc(dev.id)}</b> is connected · Wi-Fi ${dev.rssi} dBm (${dev.rssi>-67?'good':dev.rssi>-78?'fair, move the hub or add a repeater':'weak, move closer'})`,`<b>${esc(dev.id)}</b> don connect · Wi-Fi ${dev.rssi} dBm`):dev.id?L(`<b>${esc(dev.id)}</b> was seen but is offline now. Check its power and Wi-Fi.`,`<b>${esc(dev.id)}</b> don show before but e no dey now.`):L('Waiting for the controller… (Serial Monitor should say <b>[hub] connected</b>)','Dey wait for controller…')}</div>
+  <p class="sub" style="margin:0;font-size:12px">${L(`Phones in the building open <b>${esc(url)}</b>.`,`Phones for building go open <b>${esc(url)}</b>.`)}</p>`; }
+ if(st===4){ const rl=Object.keys(dev.relays||{});
+  if(!dev.online) return `<div class="bst">${L('Connect the controller first (previous step).','Connect controller first.')}</div>`;
+  return `<p style="margin:0">${L('Test each relay. You should hear it click and see its light change. With an electrician, check the appliance actually turns on.','Test each relay. You go hear click. With electrician, check say the thing on.')}</p>
+  <div class="rows2">${rl.map(k=>{ const nm=hubName(k), on=!!dev.relays[k], ok=INST.ok[k]; return `<div class="r2"><span class="fdot ${ok===true?'refill':ok===false?'theft':'use'}">${ic(ok===true?'check':ok===false?'alert':'plug',13,2)}</span><span class="t"><b>${esc(nm[0].toUpperCase()+nm.slice(1))}</b><span>${L('relay is','relay dey')} ${on?'ON':'off'}${INST.testing===k?' · '+L('testing…','dey test…'):''}</span></span><button class="mini-b" data-act="rtest" data-v="${k}" ${INST.testing?'disabled':''}>${L('Test','Test')}</button><button class="mini-b" data-act="rok" data-v="${k}:1" aria-label="It worked">✓</button><button class="mini-b" data-act="rok" data-v="${k}:0" aria-label="It did not work">✗</button></div>`; }).join('')||`<p class="sub">${L('The controller reported no relays. Check the RELAYS list in ada_node.ino.','Controller no report relay.')}</p>`}</div>
+  ${Object.values(INST.ok).includes(false)?`<div class="bst">${L('If a relay doesn’t click: check its wire to the ESP32 pin, and try RELAY_ACTIVE_LOW = false in the sketch.','If relay no click: check the wire, and try RELAY_ACTIVE_LOW = false.')}</div>`:''}`; }
+ if(st===5){ const cfgd=LIVE.on?(LIVE.cfg&&(LIVE.cfg.ntfy_topic_set||LIVE.cfg.telegram_set)):!!DEMO_NTFY.topic;
+  return `${cfgd?`<div class="inok">${ic('check',16,2.6)} ${L('Phone alerts are set up.','Phone alerts don set.')}</div>`:`<p style="margin:0">${L('Last step: send alerts to the owner’s or manager’s phone.','Last step: make alerts dey go owner or manager phone.')}</p>`}
+  <button class="btn ${cfgd?'sec':'pri'}" data-act="alopen">${ic('bell',14)} ${L('Phone alerts','Phone alerts')}</button>
+  <div class="insum"><b>${L('Summary','Summary')}</b><span>${esc(c.site_name)} · ${+c.diesel_cap} L ${L('tank','tank')} · ${+c.battery_kwh} kWh</span><span>${L('Controller','Controller')}: ${dev.online?L('connected','connected'):L('not connected','no connect')}</span><span>${L('Relays tested','Relays tested')}: ${Object.values(INST.ok).filter(x=>x).length} ${L('of','of')} ${Object.keys(dev.relays||{}).length}</span></div>`; }
+ return ''; }
+function installSheet(){ const st=INST.step;
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid bsh insh" role="dialog" aria-label="Installer setup">
+  <div class="sh"><div><h2>${L('Installer setup','Installer setup')}</h2><div class="sub">${L(`Step ${st+1} of ${IN_STEPS.length} · ${IN_STEPS[st]}`,`Step ${st+1} of ${IN_STEPS.length} · ${IN_STEPS[st]}`)}</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+  <div class="insteps" role="list">${IN_STEPS.map((n,i)=>`<span role="listitem" class="${i<st?'done':i===st?'cur':''}">${i<st?ic('check',11,3):i+1}</span>`).join('<i></i>')}</div>
+  ${instBody()}
+  <div class="innav">${st>0?`<button class="btn sec" data-act="instgo" data-v="-1">${L('Back','Back')}</button>`:'<span></span>'}<button class="btn pri" data-act="instgo" data-v="1">${st===IN_STEPS.length-1?L('Finish','Finish'):st===1?L('Save and continue','Save and continue'):L('Next','Next')}</button></div></div></div>`; }
+async function instGo(d){ if(d>0&&INST.step===1){ await buildingSave(); S.ov='install'; }
+ if(d>0&&INST.step===IN_STEPS.length-1){ S.ov=null; toast(L('Setup complete. The building is live.','Setup don complete.')); update(); return; }
+ INST.step=Math.max(0,Math.min(IN_STEPS.length-1,INST.step+d)); if(INST.step>=3) instLoad(); update(); }
+async function relayTest(k){ INST.testing=k; update();
+ if(LIVE.on){ await hubSwitch(k,true,hubName(k)); setTimeout(async()=>{ await hubSwitch(k,false,hubName(k)); INST.testing=''; update(); },3000); }
+ else { const id=HUBREV[k]||k; SIM.on[id]=1; setTimeout(()=>{ SIM.on[id]=0; INST.testing=''; update(); },3000); } }
 
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their

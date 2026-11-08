@@ -364,6 +364,7 @@ ROLE_LABEL = {"resident": "Resident", "caretaker": "Caretaker", "manager": "Mana
 NEEDS = {  # minimum role level per route
     ("GET", "/state"): 1, ("GET", "/report.json"): 1, ("GET", "/alerts"): 1,
     ("GET", "/config"): 1, ("GET", "/settings"): 1, ("GET", "/users"): 3,
+    ("GET", "/setup"): 3,
     ("POST", "/switch"): 2, ("POST", "/source"): 2, ("POST", "/fuel"): 2,
     ("POST", "/service"): 2, ("POST", "/delivery"): 2,
     ("POST", "/config"): 3, ("POST", "/notify/test"): 3, ("POST", "/settings"): 3,
@@ -810,6 +811,7 @@ def quiet():
 
 
 HOUSE = HubHouse()
+HUB_URLS = []                    # filled in by main(): where phones can reach this hub
 LOCK = threading.Lock()
 
 # What the hub knows about the controller. Guarded by LOCK.
@@ -1079,6 +1081,14 @@ class Hub(BaseHTTPRequestHandler):
             return
         if path == "/users":
             self._json(200, {"users": public_users(load_users())})
+            return
+        if path == "/setup":
+            # what an installer needs to pair the controller
+            with LOCK:
+                dev = snapshot()["device"]
+            self._json(200, {"device_key": DEVICE_KEY, "urls": HUB_URLS,
+                             "discovery_port": DISCOVERY_PORT, "device": dev,
+                             "loads": list(HOUSE.loads), "users": len(load_users()["users"])})
             return
         if path == "/report.json":
             days = 7
@@ -1425,6 +1435,7 @@ def main():
 
     print("A.D.A. hub")
     print("  http://127.0.0.1:{}".format(port))
+    HUB_URLS.append("http://127.0.0.1:{}".format(port))
     try:
         # the address this machine would use to reach the network; no packet
         # is sent, and it is right more often than gethostbyname(hostname)
@@ -1434,6 +1445,7 @@ def main():
         probe.close()
         if not lan.startswith("127."):
             print("  http://{}:{}   (same wifi)".format(lan, port))
+            HUB_URLS.insert(0, "http://{}:{}".format(lan, port))
     except OSError:
         pass
     print("  open the address above on any phone or laptop on the same wifi")

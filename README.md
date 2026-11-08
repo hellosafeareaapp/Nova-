@@ -83,6 +83,21 @@ within two simulated hours); a gap of 5% or more (2 L at least) raises a
 "delivery came up short" alert. Deliveries and the shortfall are in the
 report.
 
+## Installer setup
+
+**Power → Building setup → Installer setup** walks a new building through
+six steps: what you need, the building's numbers, the owner PIN, pairing
+the controller (it shows the device key and waits until the ESP32 reports
+in, with its Wi-Fi strength), testing every relay (on for three seconds,
+then mark it worked or not), and phone alerts. Owners and managers only.
+
+## Without internet
+
+Nothing needs the internet except phone alerts. The dashboard is one
+self-contained file (no CDN, no web fonts), the hub is standard-library
+Python, and phones reach it over the building's Wi-Fi even when the
+internet is down. Alerts that can't be sent still show in the dashboard.
+
 ## Reports
 
 **This week → Weekly report / Monthly** opens a printable page: diesel used
@@ -117,6 +132,7 @@ Both files must sit in the same folder.
 | `GET /config` | site name, diesel price, whether phone alerts are set up (no secrets) |
 | `POST /config` | `site_name`, `diesel_price`, `diesel_cap`, `gen_lph`, `battery_kwh`, `service_hours`, `alert_diesel_l`, `alert_battery_pct`, `alert_tank_pct`, `ntfy_topic`, `telegram_token`, `telegram_chat` |
 | `POST /notify/test` | sends a test alert |
+| `GET /setup` | managers and owners: device key, hub addresses and controller status for pairing |
 | `GET /me` | who this request is signed in as, and whether PINs are on |
 | `POST /login` | `{"pin": "2468"}` returns a token; send it as `X-ADA-Token` |
 | `POST /logout` | ends this token's session |
