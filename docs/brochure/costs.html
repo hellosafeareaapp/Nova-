@@ -1,0 +1,83 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>A.D.A. — Pilot costs</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;600&display=swap"><style>
+@page{size:A4;margin:0}
+:root{--ink:#0b1b2b;--ink2:#4a5562;--ink3:#8a939e;--line:#dfe3e7;--paper:#ffffff;--soft:#f3f5f7;--sig:#f5b800;--ok:#1e8e5a;--warn:#c8462c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Archivo,"Liberation Sans",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);page-break-after:always;padding:13mm 15mm 16mm;display:flex;flex-direction:column;gap:5.5mm}
+.page:last-child{page-break-after:auto}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.run{position:absolute;left:15mm;right:15mm;bottom:8mm;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--ink3);border-top:1px solid var(--line);padding-top:2.5mm}
+.mark{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-stretch:85%;font-size:13pt;letter-spacing:.06em}
+.mark .sq{width:6mm;height:6mm;background:var(--sig);display:grid;place-items:center;font-size:8pt;font-weight:900;color:var(--ink)}
+.kicker{font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+h2{margin:0;font-size:21pt;font-weight:800;font-stretch:80%;line-height:1.05;letter-spacing:-.005em}
+h3{margin:0 0 1.5mm;font-size:11pt;font-weight:700}
+p{margin:0;font-size:9.8pt;line-height:1.5;color:var(--ink2)}
+.rule{height:1.2mm;width:16mm;background:var(--sig)}
+.sec{display:flex;flex-direction:column;gap:3mm}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.item{border-top:1.5px solid var(--ink);padding-top:2.5mm}
+.item p{font-size:9.2pt}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;vertical-align:top;padding:2.4mm 2mm;border-bottom:1px solid var(--line);font-size:9.2pt;line-height:1.4}
+th{font-size:7.5pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700;border-bottom:1.5px solid var(--ink)}
+td:first-child{font-weight:700;width:34%;color:var(--ink)}
+td{color:var(--ink2)}
+.img{border:1px solid var(--line)}
+.img img{display:block;width:100%}
+.cap{font-size:7.8pt;color:var(--ink3);margin-top:1.5mm}
+.note{font-size:7.8pt;color:var(--ink3)}
+
+.tot td{font-weight:800;color:var(--ink);border-bottom:1.5px solid var(--ink);border-top:1.5px solid var(--ink)}
+td.n,th.n{text-align:right;white-space:nowrap;width:auto;font-weight:600;color:var(--ink)}
+.big3{display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid var(--ink)}
+.big3>div{padding:3mm 4mm 0 0;display:flex;flex-direction:column;gap:1mm}
+.big3 .k{font-size:7.5pt;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.big3 .v{font-size:19pt;font-weight:800;font-stretch:80%;line-height:1.05}
+.big3 .s{font-size:8.6pt;line-height:1.4;color:var(--ink2)}
+.pill{display:inline-block;background:var(--sig);color:var(--ink);font-weight:800;font-size:7.5pt;letter-spacing:.1em;padding:.8mm 2mm;text-transform:uppercase}
+.box{background:var(--soft);padding:4mm 4.5mm;display:flex;flex-direction:column;gap:1.8mm}
+.box p{font-size:9.2pt}
+
+.page{gap:3.6mm!important;padding:11mm 14mm 15mm!important}
+td,th{padding:1.55mm 2mm!important;font-size:8.7pt!important}
+.big3 .v{font-size:17pt}.big3 .s{font-size:8.2pt}
+.box{padding:3mm 4mm}.box p{font-size:8.7pt}
+p{font-size:9.2pt}h2{font-size:19pt}
+</style></head><body>
+<div class="page">
+ <div style="display:flex;justify-content:space-between;align-items:center"><div class="mark"><span class="sq">A</span>A.D.A.</div><span class="kicker">Prepared for Max-Migold · November 2026</span></div>
+ <div class="sec"><div class="rule"></div><h2>What a pilot costs, for one building</h2><p>Honest ranges. The exact figure depends on how many circuits the building has and what is already there; it is fixed after a short site visit.</p></div>
+ <div class="big3">
+  <div><span class="k">1 · Parts</span><span class="v">₦400k–₦800k</span><span class="s">Bought by you, or by us with your money and every receipt handed over. No markup on parts.</span></div>
+  <div><span class="k">2 · Installation &amp; setup</span><span class="v">₦150k–₦250k</span><span class="s"><span class="pill">Free for the pilot</span><br>Wiring with your electrician, rules, dashboard, phone alerts, training.</span></div>
+  <div><span class="k">3 · Monthly support</span><span class="v">₦20k–₦30k</span><span class="s">Monitoring, updates, weekly reports. Only after the pilot, and only if you continue.</span></div>
+ </div>
+ <div class="sec"><h3>Parts, line by line (estimates)</h3>
+ <table><thead><tr><th>Part</th><th>What it does</th><th class="n">Estimate</th></tr></thead><tbody>
+  <tr><td>Controller + relay board</td><td>ESP32 controller that reads the building and switches loads</td><td class="n">₦15k – ₦30k</td></tr>
+  <tr><td>Contactors × 3 (25–40 A)</td><td>Safely switch the borehole pump and heavy loads such as ACs</td><td class="n">₦45k – ₦120k</td></tr>
+  <tr><td>Power meters × 3</td><td>Voltage, current and energy per circuit (PZEM-004T class)</td><td class="n">₦40k – ₦75k</td></tr>
+  <tr><td>Diesel tank level sensor</td><td>Measured litres; catches siphoning and short deliveries</td><td class="n">₦60k – ₦150k</td></tr>
+  <tr><td>Inverter data reader</td><td>Battery % and current from the inverter's RS485 port, or a shunt</td><td class="n">₦15k – ₦60k</td></tr>
+  <tr><td>Enclosure, breakers, cabling</td><td>Lockable panel, DIN rail, protection and wiring</td><td class="n">₦70k – ₦150k</td></tr>
+  <tr><td>Hub computer</td><td>Mini-PC that runs A.D.A. in the building, offline. An existing computer can do it</td><td class="n">₦150k – ₦220k</td></tr>
+  <tr class="tot"><td>Total parts</td><td></td><td class="n">≈ ₦400k – ₦800k</td></tr>
+ </tbody></table></div>
+ <div class="cols2">
+  <div class="box"><h3 style="margin:0">Cheaper way to start</h3><p><b>Monitoring only, no switching:</b> controller, power meters, diesel sensor, inverter reader and hub. About <b>₦330k – ₦640k</b>, less if an existing computer runs the hub. You see the diesel, power and battery picture first and add switching later.</p></div>
+  <div class="box"><h3 style="margin:0">How it pays back</h3><p>If A.D.A. stops <b>20 litres a week</b> being wasted, siphoned or short-delivered, at ₦1,300 per litre that is about <b>₦113,000 a month</b>. The parts pay back in roughly <b>4 – 7 months</b>, before counting generator hours saved or equipment protected.</p></div>
+ </div>
+ <div class="sec"><h3>The pilot</h3>
+ <table><tbody>
+  <tr><td>Scope</td><td>One building you choose, for 4 – 6 weeks</td></tr>
+  <tr><td>You cover</td><td>The parts (receipts provided) and an electrician's time for the 230 V wiring</td></tr>
+  <tr><td>We cover</td><td>Installation and setup, the dashboard, phone alerts, weekly reports, and fixes during the pilot</td></tr>
+  <tr><td>In return</td><td>Honest feedback, and if it works, permission to say Max-Migold piloted A.D.A.</td></tr>
+  <tr><td>After the pilot</td><td>You keep the parts. Continue with monthly support, or stop with no further cost</td></tr>
+ </tbody></table></div>
+ <p class="note">All prices are estimates for November 2026 and move with the naira and suppliers. Final quote after a site visit. Electrical work on mains is done by a qualified electrician.</p>
+ <div class="run"><span>A.D.A. · Ajala David · +234 916 107 8549 (call or WhatsApp)</span><span>Pilot costs · 1 / 1</span></div>
+</div></body></html>
