@@ -1019,6 +1019,24 @@ body.dense .bsh{background:rgba(var(--d-pn),.98);color:var(--d-ink)}
 .bseg i{border-radius:2px;background:var(--d-box)}
 .bseg b{position:absolute;right:-7px;top:10px;width:5px;height:12px;border-radius:0 3px 3px 0;background:var(--d-ink3)}
 @media (max-width:719px){.bseg{width:110px}}
+
+/* ===== autopilot ===== */
+.aimode{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:3px;border-radius:12px;background:var(--d-box);border:1px solid var(--d-line)}
+.aimode button{height:34px;border-radius:9px;font-size:13px;font-weight:650;color:var(--d-ink2)}
+.aimode button[aria-pressed=true]{background:var(--d-ink);color:var(--d-bg)}
+.k2{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--d-ink2);margin-bottom:6px}
+.aiallow{display:flex;flex-wrap:wrap;gap:6px}
+.aiallow button{height:28px;padding:0 11px;border-radius:999px;border:1px solid var(--d-line);font-size:12px;font-weight:600;color:var(--d-ink2);display:inline-flex;align-items:center;gap:4px}
+.aiallow button[aria-pressed=true]{border-color:rgba(var(--d-amber-rgb),.6);background:rgba(var(--d-amber-rgb),.14);color:var(--d-ink)}
+.aic{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.r2 .aic{margin-top:0;flex:none}
+.btn.sm{height:30px;padding:0 12px;font-size:12.5px;border-radius:999px}
+.aiok{display:inline-flex;align-items:center;gap:4px;font-size:12.5px;font-weight:650;color:var(--d-ok,#2f9e5b)}
+.ai-r{align-items:flex-start}
+.ai-r .t b{white-space:normal!important;overflow:visible!important;line-height:1.3}
+.ai-r .t b::first-letter{text-transform:uppercase}
+.lg.ai b{color:var(--d-amber)}
+@media (max-width:719px){.ai-r{flex-wrap:wrap}.ai-r .aic{width:100%;padding-left:36px}}
 </style>
 </head>
 <body>
@@ -1493,7 +1511,7 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
  document.body.classList.toggle('stale',st);
  if(pg==='estate'){ document.body.classList.remove('stale'); return headerHTML(false)+`<div class="cols" style="grid-template-columns:minmax(0,1fr)"><div class="col">${estateView()}</div></div>`; }
  const layouts={
-  home:{monitor:[[()=>pPower(),pInverter,pWater],[pForecast,pDiesel,pLights,pClimate],[()=>pSecurity(),pLog,pWeather]],tablet:[[()=>pPower(),pInverter,pForecast,pWater],[pDiesel,pLights,pClimate,()=>pSecurity(),pLog,pWeather]],phone:[[pForecast,()=>pPower(),pInverter,pDiesel,pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
+  home:{monitor:[[()=>pPower(),pInverter,pWater],[pForecast,pAutopilot,pDiesel,pLights,pClimate],[()=>pSecurity(),pLog,pWeather]],tablet:[[()=>pPower(),pInverter,pForecast,pWater],[pAutopilot,pDiesel,pLights,pClimate,()=>pSecurity(),pLog,pWeather]],phone:[[pForecast,pAutopilot,()=>pPower(),pInverter,pDiesel,pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
   power:{monitor:[[()=>pPower(true),pInverter],[pDiesel,pForecast],[pLoads,pLog,pNet]],tablet:[[()=>pPower(true),pInverter,pDiesel],[pForecast,pLoads,pLog,pNet]],phone:[[()=>pPower(true),pInverter,pDiesel,pForecast,pLoads,pLog,pNet]]},
   water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
   security:{monitor:[[()=>pSecurity(true)],[pLights],[pLog]],tablet:[[()=>pSecurity(true)],[pLights,pLog]],phone:[[()=>pSecurity(true),pLights,pLog]]}
@@ -1509,7 +1527,7 @@ function headerHTML(st){ const now=new Date(), h=now.getHours(), greet=h<12?'Goo
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
 function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); postRender(el); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
-setInterval(()=>{ tick(); sensorTick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
+setInterval(()=>{ tick(); sensorTick(); aiTick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
 function denseAct(a,v){
  if(['dload','dlight','dlall','dgate'].includes(a)&&isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; }
  if(a==='dsrc'){ setSrc(v); return true; }
@@ -1524,7 +1542,13 @@ function denseAct(a,v){
  if(a==='bopen'){ S.bld=v; S.ov='bld'; return true; }
  if(a==='bgo'){ S.ov=null; S.dash='home'; return true; }
  if(a==='bask'){ S.ov=null; const b=BLD.find(x=>x.id===v); ask(L(`How is ${b.name} doing?`,`How ${b.name} dey?`),()=>bldAnswer(v)); return 'done'; }
- if(a==='askq'){ const sg=SUGG.find(x=>x[0]===v); ask(sg?(S.lang==='pg'?sg[2]:sg[1]):v,v); return 'done'; }
+ if(a==='askq'){ const sg=SUGG.find(x=>x[0]===v), txt=sg?(S.lang==='pg'?sg[2]:sg[1]):v; if(v.startsWith('cmd')) ask(txt); else ask(txt,v); return 'done'; }
+ if(a==='aimode'){ S.auto=v; return true; }
+ if(a==='aiallow'){ S.allow[v]=!S.allow[v]; return true; }
+ if(a==='aido'){ const e=S.aiLog.find(x=>x.id===+v); if(e&&e.state==='ask'){ if(isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; } const bad=e.acts.map(x=>checkAct(DEVS_AI.find(d=>d.id===x.id),x.on)).find(Boolean); if(bad){ toast(bad.msg.replace(/<[^>]+>/g,'')); e.state='no'; return true; } aiExecute(e); } return true; }
+ if(a==='aino'){ const e=S.aiLog.find(x=>x.id===+v); if(e&&e.state==='ask') e.state='no'; return true; }
+ if(a==='aiundo'){ aiUndo(+v); return true; }
+ if(a==='aipend'){ const e=S.aiLog.find(x=>x.id===+v); if(e&&e.state==='offer'){ e.state='pending'; S.chat.push({who:'ai',t:L('Okay. I’ll switch it on as soon as NEPA or the gen is back.','Okay. I go on am as NEPA or gen come back.')}); } return true; }
  if(a==='whylog'){ const l=SIM.log[+v]; ask(L(`Why: ${l.what.toLowerCase()} at ${l.t}?`,`Why ${l.what.toLowerCase()} for ${l.t}?`),()=>explainLog(l)); return 'done'; }
  if(a==='lang'){ S.lang=v; return true; }
  if(a==='dgate'){ SIM.gateOpen=!SIM.gateOpen; slog(SIM.gateOpen?'GATE OPENED':'GATE CLOSED','from dashboard'); return true; }
@@ -1609,8 +1633,8 @@ function explainLog(l){ const w=(l.what+' '+l.why).toLowerCase(), thing=l.what.r
  if(/hub back|device online/.test(w)) return L(`At ${l.t} the hub started answering again, so readings are live.`,`For ${l.t} hub start to answer again, so the readings dey live.`);
  if(/alert/.test(w)) return L(`At ${l.t} the battery dropped to 20%. Below this the inverter will cut out soon.`,`For ${l.t} battery drop reach 20%. If e go below this one, inverter go soon off.`);
  return L(`${l.what} at ${l.t}${l.why?` (${l.why})`:''}.`,`${l.what} for ${l.t}${l.why?` (${l.why})`:''}.`); }
-const SUGG=[['estate','Which buildings are on gen?','Which building dey use gen?'],['runtime','How long will the inverter last?','How long inverter go carry?'],['pump','Why is the pump off?','Why pump off?'],['nepa','When does light usually go?','When light dey usually go?'],['ac','Why is the AC off?','Why AC off?'],['diesel','How much diesel is left?','How much diesel remain?'],['units','How many days of units left?','How many days unit remain?'],['spike','Any voltage spikes today?','Voltage spike happen today?']];
-function ask(q,intent){ S.chat=S.chat||[]; S.chat.push({who:'me',t:q}); S.ov='ask'; S.typing=true; update();
+const SUGG=[['cmdac','Turn off the AC','Off the AC'],['cmdpump','Pump water now','Pump water now'],['estate','Which buildings are on gen?','Which building dey use gen?'],['runtime','How long will the inverter last?','How long inverter go carry?'],['pump','Why is the pump off?','Why pump off?'],['nepa','When does light usually go?','When light dey usually go?'],['ac','Why is the AC off?','Why AC off?'],['diesel','How much diesel is left?','How much diesel remain?'],['units','How many days of units left?','How many days unit remain?'],['spike','Any voltage spikes today?','Voltage spike happen today?']];
+function ask(q,intent){ if(intent===undefined){ const cmd=parseCommand(q); if(cmd){ handleCommand(cmd,q); return; } } S.chat=S.chat||[]; S.chat.push({who:'me',t:q}); S.ov='ask'; S.typing=true; update();
  setTimeout(()=>{ S.typing=false; S.chat.push({who:'ai',t:typeof intent==='function'?intent():answer(intent||intentOf(q))}); if(S.ov==='ask') update(); },650); }
 
 function pForecast(){ const f=forecast(), h=new Date().getHours();
@@ -1628,7 +1652,7 @@ function askPanel(){ const msgs=(S.chat&&S.chat.length)?S.chat:[{who:'ai',t:L(`H
  return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid askp" role="dialog" aria-label="Ask A.D.A.">
   <div class="sh"><div style="display:flex;align-items:center;gap:10px"><span class="aiav">${ic('sparkle',16)}</span><div><h2 style="font-size:18px">Ask A.D.A.</h2><div class="sub" style="font-size:12px">${isStale()?L('Hub not live: answers use the last reading','Hub no live: answer na from last reading'):L('Reads your home live','E dey read your house live')}</div></div></div>
    <div style="display:flex;gap:8px;align-items:center"><span class="langsw" role="group" aria-label="Language"><button aria-pressed="${S.lang!=='pg'}" data-act="lang" data-v="en">English</button><button aria-pressed="${S.lang==='pg'}" data-act="lang" data-v="pg">Pidgin</button></span><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div></div>
-  <div class="chatlog" aria-live="polite">${msgs.map(m=>`<div class="msg ${m.who}">${m.t}</div>`).join('')}${S.typing?'<div class="msg ai typing" aria-label="A.D.A. is typing"><i></i><i></i><i></i></div>':''}</div>
+  <div class="chatlog" aria-live="polite">${msgs.map(m=>`<div class="msg ${m.who}">${m.t}${m.aiId?aiCard(S.aiLog.find(x=>x.id===m.aiId)||{}):''}</div>`).join('')}${S.typing?'<div class="msg ai typing" aria-label="A.D.A. is typing"><i></i><i></i><i></i></div>':''}</div>
   <div class="suggs">${SUGG.map(([k,en,pg])=>`<button data-act="askq" data-v="${k}">${S.lang==='pg'?pg:en}</button>`).join('')}</div>
   <form id="askform" class="askf"><label class="vh" for="askin">Your question</label><input id="askin" autocomplete="off" placeholder="${L('Ask about light, water, bills…','Ask about light, water, money…')}"><button class="askgo" aria-label="Send">${ic('send',16)}</button></form>
   <div class="fcnote">${L('Mockup: answers are worked out from the live house here. The real app will use Claude when online, and these local answers when offline.','Mockup: the answers na from the live house for here. The real app go use Claude when internet dey, and these local answers when no internet.')}</div></div></div>`; }
@@ -1681,6 +1705,92 @@ function pInverter(){ const st=battState(), v=battV(), a=battA(), w=Math.round(v
   <svg class="spk" viewBox="0 0 100 38" preserveAspectRatio="none" role="img" aria-label="Battery level over the last hour"><line x1="0" x2="100" y1="${36-20/100*34}" y2="${36-20/100*34}" stroke="rgba(194,82,44,.5)" stroke-dasharray="2 2" vector-effect="non-scaling-stroke"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>
   <div class="bandlab"><span>${L('1 h ago','1 h ago')}</span><span style="color:var(--d-warn)">20% ${L('alert line','alert line')}</span><span>${L('now','now')}</span></div>
   <div class="fcnote">${ic('battery',12)} ${L("Read live from the inverter's RS485/Modbus port, or a battery shunt where the inverter has none.","E dey read am live from inverter RS485/Modbus port, or battery shunt if inverter no get port.")}</div>
+ </section>`; }
+
+
+/* ============ A.D.A. Autopilot: the assistant can act, inside limits you set ============ */
+const DEVS_AI=[
+ {id:'pump',kind:'load',grp:'pump',names:['borehole pump','pumping machine','borehole','pump']},
+ {id:'acBed',kind:'load',grp:'ac',names:['bedroom ac','bedroom air','ac for bedroom','ac for the bedroom','ac in the bedroom']},
+ {id:'acLiv',kind:'load',grp:'ac',names:['living room ac','parlour ac','sitting room ac','ac for parlour','ac in the living room','ac for living room']},
+ {id:'fans',kind:'load',grp:'fans',names:['fans','fan']},
+ {id:'kettle',kind:'load',grp:'heat',names:['kettle']},
+ {id:'iron',kind:'load',grp:'heat',names:['pressing iron','iron']},
+ {id:'tv',kind:'load',grp:'tv',names:['television','dstv','tv']},
+ {id:'freezer',kind:'load',grp:'protected',names:['freezer']},
+ ...LIGHTS.map(([n],i)=>({id:'L'+i,kind:'light',idx:i,grp:i===5?'protected':'lights',names:[n.toLowerCase()+' light',n.toLowerCase()+' lights',(n==='Living room'?'parlour light':'~'),(n==='Living room'?'light for parlour':'~'),'light for '+n.toLowerCase(),'light in '+n.toLowerCase()].filter(x=>x!=='~'),label:n+' light'}))
+];
+const GRP_LAB={lights:'Lights',pump:'Borehole pump',ac:'ACs',fans:'Fans',heat:'Kettle & iron',tv:'TV'};
+S.auto=S.auto||'suggest'; S.allow=S.allow||{lights:true,pump:true,ac:true,fans:true,heat:false,tv:false}; S.aiLog=S.aiLog||[]; S.pendingOn=S.pendingOn||[]; let aiSeq=0;
+const devLabel=d=>d.kind==='light'?d.label:LOADS[d.id].n;
+const devOn=d=>d.kind==='light'?!!SIM.lights[d.idx]:!!SIM.on[d.id];
+function devSet(d,on,why){ if(d.kind==='light'){ SIM.lights[d.idx]=on?1:0; slog(`${on?'ON ':'OFF'} ${d.label.toLowerCase()}`,why,'ai'); } else { const prev=!!SIM.on[d.id]; setLoad(d.id,on,why); if(SIM.log[0]&&prev!==on) SIM.log[0].cls='ai'; rules(); } }
+function findDevs(q){ q=' '+q.toLowerCase().replace(/[^a-z ]/g,' ').replace(/\s+/g,' ')+' ';
+ if(/ (everything|all) /.test(q)&&!/ light/.test(q)) return {all:true,devs:DEVS_AI.filter(d=>d.grp!=='protected'||false)};
+ if(/ all (the )?lights? |lights everywhere| every light /.test(q)) return {devs:DEVS_AI.filter(d=>d.kind==='light'&&d.grp!=='protected')};
+ let best=[],len=0; DEVS_AI.forEach(d=>d.names.forEach(n=>{ if(q.includes(' '+n+' ')){ if(n.length>len){ best=[d]; len=n.length; } else if(n.length===len&&!best.includes(d)) best.push(d); } }));
+ if(!best.length&&/ (ac|aircon|air condition\w*) /.test(q)) best=DEVS_AI.filter(d=>d.grp==='ac');
+ if(!best.length&&/ lights? /.test(q)) best=DEVS_AI.filter(d=>d.kind==='light'&&d.grp!=='protected'&&devOn(d));
+ return {devs:best}; }
+function parseCommand(q){ const t=q.toLowerCase().trim();
+ const isCmd=/^(please |abeg |a\.?d\.?a\.?,? )?(turn|switch|put|start|stop|shut|on|off|pump|kill)\b/.test(t)||/\b(turn|switch) (it |them )?(on|off)\b|\b(on|off) the\b|\bpump water\b/.test(t);
+ if(!isCmd) return null;
+ let on=/\b(off|stop|shut|kill)\b/.test(t)?false:/\b(on|start)\b|pump water/.test(t)?true:null;
+ if(on===null) return null;
+ const r=/pump water/.test(t)?{devs:DEVS_AI.filter(d=>d.id==='pump')}:findDevs(t);
+ let devs=r.devs; if(/except|but not|leave/.test(t)){ const keep=findDevs(t.split(/except|but not|leave/)[1]).devs.map(d=>d.id); devs=devs.filter(d=>!keep.includes(d.id)); }
+ if(r.all&&!on) devs=devs.filter(d=>devOn(d));
+ return {on,devs,all:!!r.all}; }
+function checkAct(d,on){ // returns null if allowed, else {msg,offer}
+ if(isStale()) return {msg:L(`The hub isn't answering, so I won't switch anything until readings are live again.`,`Hub no dey answer, so I no go switch anything till reading come back live.`)};
+ if(d.grp==='protected'&&!on) return {msg:L(`I never switch off the ${lc(devLabel(d))}. That one is protected.`,`I no dey ever off the ${lc(devLabel(d))}. E dey protected.`)};
+ if(d.grp!=='protected'&&!S.allow[d.grp]) return {msg:L(`You haven't allowed me to control ${lc(GRP_LAB[d.grp])}. You can change that in Autopilot.`,`You never allow me to control ${lc(GRP_LAB[d.grp])}. You fit change am for Autopilot.`)};
+ if(on&&d.kind==='load'&&LOADS[d.id].shed&&SIM.src==='inv') return {msg:L(`The ${devLabel(d)} can't come on while you're on inverter: the shed rule keeps it off so the battery lasts (${Math.round(SIM.batt)}% now).`,`${devLabel(d)} no fit on now as you dey on inverter: the shed rule dey keep am off make battery last (${Math.round(SIM.batt)}% now).`),offer:'pending'};
+ if(on&&SIM.src==='off') return {msg:L('There is no power at all right now.','No light at all now.')};
+ if(on&&d.id==='pump'&&SIM.tank>=95) return {msg:L(`The tank is already at ${Math.round(SIM.tank)}%, so the pump would stop straight away.`,`Tank don already reach ${Math.round(SIM.tank)}%, pump go just off again.`)};
+ return null; }
+function aiRecord(entry){ entry.id=++aiSeq; entry.t=hhmm(); S.aiLog.unshift(entry); S.aiLog.length=Math.min(S.aiLog.length,10); return entry; }
+function aiExecute(e){ e.prev=e.acts.map(a=>({id:a.id,on:devOn(DEVS_AI.find(x=>x.id===a.id))})); e.acts.forEach(a=>devSet(DEVS_AI.find(x=>x.id===a.id),a.on,'A.D.A.: '+e.short)); e.state='done'; }
+function aiUndo(id){ const e=S.aiLog.find(x=>x.id===id); if(!e||e.state!=='done') return; if(isStale()){ toast('The hub isn’t answering, so nothing was switched'); return; } e.prev.forEach(p=>devSet(DEVS_AI.find(x=>x.id===p.id),p.on,'undo A.D.A. decision')); e.state='undone'; }
+const lc=t=>t.toLowerCase().replace(/\bac\b/g,'AC').replace(/\btv\b/g,'TV').replace(/dstv/g,'DStv');
+const listTxt=a=>a.length<2?a.join(''):a.slice(0,-1).join(', ')+L(' and ',' and ')+a[a.length-1];
+const actsTxt=(acts,past)=>listTxt(acts.map(a=>`${a.on?(past?L('turned on','on'):L('turn on','on')):(past?L('turned off','off'):L('turn off','off'))} the ${lc(devLabel(DEVS_AI.find(x=>x.id===a.id)))}`));
+function aiCard(e){ return e.state==='ask'?`<span class="aic"><button class="btn pri sm" data-act="aido" data-v="${e.id}">${L('Do it','Do am')}</button><button class="btn sec sm" data-act="aino" data-v="${e.id}">${L('Not now','Not now')}</button></span>`:e.state==='done'?`<span class="aic"><span class="aiok">${ic('check',13,2.6)} ${L('Done','Don do am')}</span><button class="btn sec sm" data-act="aiundo" data-v="${e.id}">${L('Undo','Undo')}</button></span>`:e.state==='undone'?`<span class="aic"><span class="sub">${L('Undone','Don undo am')}</span></span>`:e.state==='no'?`<span class="aic"><span class="sub">${L('Dismissed','You cancel am')}</span></span>`:''; }
+function handleCommand(cmd,q){ S.chat=S.chat||[]; S.chat.push({who:'me',t:esc(q)}); S.ov='ask';
+ if(S.auto==='off'){ S.chat.push({who:'ai',t:L('Autopilot is off, so I can only answer questions. Switch it to “Ask first” or “Automatic” to let me control things.','Autopilot dey off, so I fit only answer question. Change am to “Ask first” or “Automatic” make I fit control things.')}); update(); return; }
+ if(!cmd.devs.length){ S.chat.push({who:'ai',t:L(`I couldn't tell which device you mean${cmd.all?'':''}. Try “turn off the bedroom AC” or “on the parlour light”.`,`I no sabi which one you mean. Try “off the bedroom AC” or “on the light for parlour”.`)}); update(); return; }
+ const ok=[],no=[]; cmd.devs.forEach(d=>{ if(devOn(d)===cmd.on){ return; } const c=checkAct(d,cmd.on); if(c) no.push({d,c}); else ok.push({id:d.id,on:cmd.on}); });
+ let msg='';
+ if(no.length) msg+=no.map(x=>x.c.msg).join(' ')+' ';
+ const pend=no.filter(x=>x.c.offer==='pending');
+ if(!ok.length&&!no.length) msg+=L(`${cmd.devs.length>1?'They are':'It is'} already ${cmd.on?'on':'off'}.`,`E don already ${cmd.on?'on':'off'}.`);
+ if(ok.length){ const e=aiRecord({src:'chat',acts:ok,short:L('you asked','you ask am'),text:actsTxt(ok)});
+  if(S.auto==='auto'){ aiExecute(e); msg+=L(`Done: I ${actsTxt(ok,true)}.`,`I don ${e.text}.`); } else { e.state='ask'; msg+=L(`Shall I ${e.text}?`,`Make I ${e.text}?`); }
+  S.chat.push({who:'ai',t:msg,aiId:e.id}); }
+ else S.chat.push({who:'ai',t:msg});
+ if(pend.length){ const e=aiRecord({src:'chat',acts:pend.map(x=>({id:x.d.id,on:true})),short:L('NEPA is back, as you asked','NEPA don come, as you talk'),text:L(`turn on the ${pend.map(x=>lc(devLabel(x.d))).join(' and ')} when NEPA or gen returns`,`on the ${pend.map(x=>lc(devLabel(x.d))).join(' and ')} once NEPA or gen come`),state:'offer'});
+  S.chat.push({who:'ai',t:L(`Want me to ${e.text}?`,`Make I ${e.text}?`)+`<span class="aic"><button class="btn pri sm" data-act="aipend" data-v="${e.id}">${L('Yes, do that','Yes, do am')}</button></span>`}); }
+ update(); }
+function aiPropose(key,acts,short,why){ if(S.auto==='off') return; const recent=S.aiLog.find(e=>e.key===key&&Date.now()-e.at<20*60e3); if(recent) return;
+ acts=acts.filter(a=>{ const d=DEVS_AI.find(x=>x.id===a.id); return devOn(d)!==a.on&&!checkAct(d,a.on); }); if(!acts.length) return;
+ const e=aiRecord({key,at:Date.now(),src:'auto',acts,short,why,text:actsTxt(acts)});
+ if(S.auto==='auto'){ aiExecute(e); toast(L(`A.D.A. ${e.text}: ${short}`,`A.D.A. ${e.text}: ${short}`)); } else { e.state='ask'; toast(L(`A.D.A. suggests: ${e.text}. See Autopilot.`,`A.D.A. talk say: ${e.text}. Check Autopilot.`)); } }
+let aiLastSrc=SIM.src;
+function aiTick(){ if(SIM.offline||isStale()) return;
+ // pending restores when power returns
+ if(aiLastSrc!==SIM.src&&(SIM.src==='nepa'||SIM.src==='gen')){ S.aiLog.filter(e=>e.state==='pending').forEach(e=>{ aiExecute(e); toast(L(`Power is back: A.D.A. ${e.text.replace(/ when.*$/,'')}`,`Light don come: A.D.A. ${e.text.replace(/ once.*$/,'')}`)); }); }
+ aiLastSrc=SIM.src;
+ const h=new Date().getHours(), soon=[1,2].some(k=>OUT_P[(h+k)%24]>=.55)&&OUT_P[h]<.55;
+ if((SIM.src==='nepa'||SIM.src==='gen')&&soon&&SIM.tank<75&&!SIM.on.pump&&S.allow.pump) aiPropose('prepump',[{id:'pump',on:true}],L('light usually goes soon, so filling the tank while there is power','light dey usually go soon, so make tank full while light dey'),'');
+ if(SIM.src==='inv'&&SIM.batt<35){ const acts=DEVS_AI.filter(d=>(d.kind==='light'&&d.grp==='lights'&&devOn(d)&&!['Living room','Bedroom'].includes(LIGHTS[d.idx][0]))||(d.id==='fans'&&devOn(d))).map(d=>({id:d.id,on:false}));
+  if(acts.length) aiPropose('saver',acts,L(`battery is at ${Math.round(SIM.batt)}%, saving power for the night`,`battery don reach ${Math.round(SIM.batt)}%, make we save light for night`),''); } }
+
+function pAutopilot(){ const m=S.auto, items=S.aiLog.slice(0,4);
+ return `<section class="pn g" aria-label="A.D.A. Autopilot">${pnh('sparkle',L('Autopilot','Autopilot'),{off:L('Answers only','Na only answer'),suggest:L('Asks before acting','E go ask before e act'),auto:L('Acts on its own','E dey act by itself')}[m],`<button class="mini-b" data-act="askopen">${ic('sparkle',12)} ${L('Tell A.D.A.','Tell A.D.A.')}</button>`)}
+  <div class="aimode" role="group" aria-label="Autopilot mode">${[['off',L('Off','Off')],['suggest',L('Ask first','Ask first')],['auto',L('Automatic','Automatic')]].map(([k,l])=>`<button aria-pressed="${m===k}" data-act="aimode" data-v="${k}">${l}</button>`).join('')}</div>
+  <div><div class="k2">${L('Allowed to control','E fit control')}</div><div class="aiallow">${Object.keys(GRP_LAB).map(g=>`<button aria-pressed="${!!S.allow[g]}" data-act="aiallow" data-v="${g}">${S.allow[g]?ic('check',11,3):''} ${GRP_LAB[g]}</button>`).join('')}</div></div>
+  <div class="rows2">${items.length?items.map(e=>`<div class="r2 ai-r"><span class="fdot" style="color:var(--d-amber)">${ic(e.src==='auto'?'sparkle':'list',13,2)}</span><span class="t"><b>${e.state==='ask'?L('Suggests: ','E suggest: '):e.state==='pending'?L('Waiting: ','E dey wait: '):''}${e.text}</b><span>${e.t} · ${e.src==='auto'?e.short:L('you asked in chat','you ask for chat')}</span></span>${aiCard(e)}</div>`).join(''):`<p class="sub" style="font-size:13px">${L('No decisions yet. Try “turn off the AC” in Ask A.D.A., or switch the demo to Inverter.','No decision yet. Try “off the AC” for Ask A.D.A., or change demo to Inverter.')}</p>`}</div>
+  <div class="fcnote">${ic('shield',12)} ${L('Safety rules always win. The freezer and security lights are never switched off by A.D.A., and nothing is switched while the hub isn’t live.','Safety rules dey always win. A.D.A. no go ever off freezer or security light, and nothing go switch if hub no dey live.')}</div>
  </section>`; }
 
 /* ============ transitions (transitions-dev) ============ */
