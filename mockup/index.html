@@ -2015,9 +2015,23 @@ function pReport(){ const r=repData(7);
 function reportHTML(r){ const t=r.totals, p=r.diesel_price, nd=Math.max(1,r.days.length), ds=r.days;
  const fmtD=s=>new Date(s+'T12:00').toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
  const longD=s=>new Date(s+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
- const W=640,H=170,bw=W/Math.max(ds.length,1);
- const cols={min_grid:'#3d8a57',min_gen:'#c08a2e',min_inverter:'#3f7fb5',min_none:'#b9b3a8'};
- const bars=ds.map((d,i)=>{ let y=H; return Object.keys(cols).map(k=>{ const h=(d[k]||0)/1440*H; y-=h; return `<rect x="${(i*bw+bw*.18).toFixed(1)}" y="${y.toFixed(1)}" width="${(bw*.64).toFixed(1)}" height="${h.toFixed(1)}" fill="${cols[k]}"/>`; }).join('')+(ds.length<=10?`<text x="${(i*bw+bw/2).toFixed(1)}" y="${H+14}" text-anchor="middle">${fmtD(d.date).split(' ').slice(0,2).join(' ')}</text>`:''); }).join('');
+ // Stacked hours per day. Validated palette (light surface #fffdf8); gen and
+ // no-power also carry hatching so it still reads in black-and-white print.
+ const SER=[['min_grid','NEPA','#2f7d4f',''],['min_gen','Generator','#d6a03c','h45'],['min_inverter','Inverter','#6ea2e6',''],['min_none','No power','#b05a70','h135']];
+ const W=680,H=200,L0=34,T=8,PH=H-T-24,PW=W-L0-4,n=Math.max(ds.length,1),slot=PW/n,bw=Math.max(4,Math.min(28,slot*.62)),y=h=>T+PH-h/24*PH;
+ const fill=sv=>sv[3]?`url(#${sv[3]})`:sv[2];
+ const defs=`<defs>${SER.filter(x=>x[3]).map(x=>`<pattern id="${x[3]}" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(${x[3]==='h45'?45:135})"><rect width="5" height="5" fill="${x[2]}"/><line x1="0" y1="0" x2="0" y2="5" stroke="rgba(42,34,25,.55)" stroke-width="1.6"/></pattern>`).join('')}</defs>`;
+ const grid=[0,6,12,18,24].map(h=>`<line x1="${L0}" x2="${W-4}" y1="${y(h)}" y2="${y(h)}" stroke="${h?'#ece5d8':'#bdb3a3'}" stroke-width="1"/><text x="${L0-6}" y="${y(h)+3.5}" text-anchor="end">${h}h</text>`).join('');
+ const every=n<=10?1:n<=16?2:7;
+ const bars=ds.map((d,i)=>{ const cx=L0+slot*i+slot/2, x=cx-bw/2; let acc=0; const segs=[];
+  SER.forEach(sv=>{ const v=(d[sv[0]]||0)/60; if(v<=0) return; const y1=y(acc+v), y0=y(acc); acc+=v; segs.push({sv,top:y1,h:Math.max(0,y0-y1-(segs.length?0:0))}); });
+  const tip=`${fmtD(d.date)}: `+SER.map(sv=>`${sv[1]} ${hrsT(d[sv[0]]||0)} h`).join(', ');
+  const body=segs.map((g,k)=>{ const gap=k<segs.length-1?2:0, hh=Math.max(0,g.h-gap); return hh>0?`<rect x="${x.toFixed(1)}" y="${(g.top+gap).toFixed(1)}" width="${bw.toFixed(1)}" height="${hh.toFixed(1)}" fill="${fill(g.sv)}"/>`:''; }).join('');
+  const topY=segs.length?segs[segs.length-1].top:y(0);
+  const lab=(i%every===(n-1)%every)?`<text x="${cx.toFixed(1)}" y="${H-8}" text-anchor="middle">${n<=10?fmtD(d.date).split(' ').slice(0,2).join(' '):new Date(d.date+'T12:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</text>`:'';
+  return `<g><title>${tip}</title><clipPath id="c${i}"><rect x="${x.toFixed(1)}" y="${topY.toFixed(1)}" width="${bw.toFixed(1)}" height="${(y(0)-topY+6).toFixed(1)}" rx="${Math.min(4,bw/2)}"/></clipPath><g clip-path="url(#c${i})">${body}</g><rect x="${(cx-slot/2).toFixed(1)}" y="${T}" width="${slot.toFixed(1)}" height="${PH}" fill="transparent"/>${lab}</g>`; }).join('');
+ const chartSVG=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Hours on each power source per day; the daily detail table below has the same numbers">${defs}${grid}${bars}<line x1="${L0}" x2="${W-4}" y1="${y(0)}" y2="${y(0)}" stroke="#2a2219" stroke-width="1"/></svg>`;
+ const legend=SER.map(sv=>`<span><svg width="14" height="14" aria-hidden="true">${sv[3]?defs:''}<rect width="14" height="14" rx="3" fill="${fill(sv)}"/></svg>${sv[1]}</span>`).join('');
  const notes=[];
  if(t.drop_l>0) notes.push(`<b>${t.drop_l} L of diesel disappeared while the generator was off</b> (${t.drops} time${t.drops>1?'s':''}, about ${naira(t.drop_l*p)}). Check the tank and who had access on ${ds.filter(d=>d.drop_l>0).map(d=>fmtD(d.date)).join(', ')}.`);
  if(t.batt_min<25) notes.push(`The inverter battery went down to <b>${Math.round(t.batt_min)}%</b>. Deep discharges shorten battery life; consider shedding more load at night.`);
@@ -2041,7 +2055,7 @@ h2{font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin:26px 0 10
 .kp{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.k{border:1px solid #e3dccf;border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
 .k span{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:#6b6052;font-weight:700}.k b{font:500 24px/1.1 Georgia,serif}.k i{font-style:normal;font-size:12px;color:#6b6052}.k.bad{border-color:#c2522c;background:#fbeee8}.k.bad b{color:#c2522c}
 ul{margin:0;padding-left:18px}li{margin:4px 0}
-svg text{font-size:10px;fill:#6b6052}.lg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:#6b6052;margin-top:6px}.lg i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+*{-webkit-print-color-adjust:exact;print-color-adjust:exact}svg text{font-size:10px;fill:#6b6052}.lg{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:#2a2219;margin:0 0 8px}.lg span{display:inline-flex;align-items:center;gap:6px}
 table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}th,td{padding:6px 6px;text-align:right;border-bottom:1px solid #eee6d8}th:first-child,td:first-child{text-align:left}th{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:#6b6052}td.bad{color:#c2522c;font-weight:700}tfoot td{font-weight:700;border-top:2px solid #2a2219}
 .ft{margin-top:26px;padding-top:12px;border-top:1px solid #e3dccf;font-size:11.5px;color:#6b6052;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media (max-width:640px){.pg{padding:22px 16px}.kp{grid-template-columns:repeat(2,1fr)}.top{flex-direction:column}table{font-size:11px}th,td{padding:5px 3px}}
@@ -2063,8 +2077,8 @@ ${kpi('Borehole pump',`${hrsT(t.pump_min)} h`,`${(t.wh/1000).toFixed(0)} kWh use
 </div>
 <h2>Worth looking at</h2><ul>${notes.map(n=>`<li>${n}</li>`).join('')}</ul>
 <h2>Where the power came from, day by day</h2>
-<svg viewBox="0 0 ${W} ${H+18}" width="100%" role="img" aria-label="Hours on each power source per day">${bars}</svg>
-<div class="lg"><span><i style="background:${cols.min_grid}"></i>NEPA</span><span><i style="background:${cols.min_gen}"></i>Generator</span><span><i style="background:${cols.min_inverter}"></i>Inverter</span><span><i style="background:${cols.min_none}"></i>No power</span></div>
+<div class="lg">${legend}</div>
+${chartSVG}
 <h2>Daily detail</h2>
 <table><thead><tr><th>Day</th><th>NEPA h</th><th>Gen h</th><th>Inverter h</th><th>Off h</th><th>Diesel L</th><th>Refill L</th><th>Lost L</th><th>Pump h</th><th>Low batt</th></tr></thead>
 <tbody>${ds.map(row).join('')}</tbody>
