@@ -999,6 +999,26 @@ body.dense .bsh{background:rgba(var(--d-pn),.98);color:var(--d-ink)}
 .bst b{color:#ffb38f}
 @media (max-width:1180px){.erow{grid-template-columns:minmax(0,1.4fr) 120px 84px 84px minmax(0,1.5fr)}.erow>:nth-child(3),.erow>:nth-child(6){display:none}}
 @media (max-width:719px){.ekpis{grid-template-columns:repeat(2,minmax(0,1fr))}.ehead{display:none}.erow{grid-template-columns:1fr auto;gap:6px 10px}.erow>:nth-child(4),.erow>:nth-child(5){display:none}.erow .est-s{grid-column:1/-1}.erow>:nth-child(3){display:grid;grid-column:1/-1}}
+
+/* ===== diesel + inverter ===== */
+.ftank{position:relative;height:30px;border-radius:9px;background:var(--d-box);border:1px solid var(--d-line);overflow:hidden}
+.ftank i{position:absolute;left:0;top:0;bottom:0;transition:width .8s}
+.ftank b{position:absolute;top:0;bottom:0;width:1px;background:var(--d-line)}
+.ftank span{position:absolute;inset:0;display:flex;align-items:center;padding-left:10px;font-family:var(--serif);font-size:14px;font-weight:600;color:var(--d-ink)}
+.falert{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;border-radius:12px;background:rgba(194,82,44,.1);border:1px solid rgba(194,82,44,.35);color:var(--d-warn);font-size:12.5px;line-height:1.4}
+.falert b{font-weight:700}
+.falert span{color:var(--d-ink)}
+.fdot{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--d-box);border:1px solid var(--d-line);color:var(--d-ink2)}
+.fdot.refill{color:var(--d-ok)}.fdot.theft{color:var(--d-warn);border-color:rgba(194,82,44,.4)}
+.binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
+.bbig{display:flex;flex-direction:column;gap:2px}
+.bbig .ser{font-size:44px;line-height:1}
+.bbig small{font-family:var(--font);font-size:15px;color:var(--d-ink2);margin-left:2px}
+.sub2{font-size:12.5px;color:var(--d-ink2)}
+.bseg{position:relative;display:grid;grid-template-columns:repeat(10,1fr);gap:3px;width:150px;height:34px;padding:4px;border:2px solid var(--d-ink3);border-radius:7px}
+.bseg i{border-radius:2px;background:var(--d-box)}
+.bseg b{position:absolute;right:-7px;top:10px;width:5px;height:12px;border-radius:0 3px 3px 0;background:var(--d-ink3)}
+@media (max-width:719px){.bseg{width:110px}}
 </style>
 </head>
 <body>
@@ -1407,7 +1427,7 @@ function tick(){
  if(s==='inv'){ SIM.batt=Math.max(0,SIM.batt-w/5000*100/60); if(SIM.batt===0) setSrc('off'); }
  else if(s==='nepa'||s==='gen') SIM.batt=Math.min(100,SIM.batt+.08);
  if(s==='nepa') SIM.units=Math.max(0,SIM.units-w/1000/60);
- if(s==='gen') SIM.fuel=Math.max(0,SIM.fuel-.02);
+ if(s==='gen') SIM.fuel=Math.max(0,SIM.fuel-(2.6/60)/50*100);
  SIM.tank=SIM.on.pump&&s!=='off'?Math.min(110,SIM.tank+.5):Math.max(0,SIM.tank-.03);
  SIM.tl[new Date().getHours()]=s;
  rules(); SIM.lastOk=Date.now();
@@ -1434,7 +1454,7 @@ function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.
    <div class="box"><span class="k">Inverter</span><span class="v">${np('batt',String(Math.round(SIM.batt)))}<small>%</small></span><span class="s">${s==='inv'?`≈ ${rh}h ${rm}m left`:s==='off'?'flat':'charging'}</span></div>
    <div class="box"><span class="k">Solar</span><span class="v">${solar?(solar/1000).toFixed(1):'0'}<small>${solar?'kW':'W'}</small></span><span class="s">${solar?'from 6 panels':'night'}</span></div>
    <div class="box"><span class="k">Prepaid meter</span><span class="v">${np('units',SIM.units.toFixed(1))}<small>kWh</small></span><span class="s">≈ ₦${fmt(Math.round(SIM.units*209.5))} · Band A</span></div>
-   <div class="box"><span class="k">Gen fuel</span><span class="v">${Math.round(SIM.fuel)}<small>%</small></span><span class="s">≈ ${Math.round(SIM.fuel/100*20)} L · ${Math.max(1,Math.round(SIM.fuel/100*20/1.4))}h at half load</span></div>
+   <div class="box"><span class="k">Gen fuel</span><span class="v">${Math.round(SIM.fuel)}<small>%</small></span><span class="s">${(SIM.fuel/100*50).toFixed(1)} L · measured</span></div>
    <div class="box"><span class="k">Today’s cost</span><span class="v">₦${fmt(3420)}</span><span class="s">Gen ₦2,100 · NEPA ₦1,320</span></div>
    <div class="box"><span class="k">Load</span><span class="v">${np('load',(w/1000).toFixed(2))}<small>kW</small></span><span class="s">${Object.keys(LOADS).filter(k=>SIM.on[k]).length+1} things running</span></div>
   </div>
@@ -1473,8 +1493,8 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
  document.body.classList.toggle('stale',st);
  if(pg==='estate'){ document.body.classList.remove('stale'); return headerHTML(false)+`<div class="cols" style="grid-template-columns:minmax(0,1fr)"><div class="col">${estateView()}</div></div>`; }
  const layouts={
-  home:{monitor:[[()=>pPower(),pWater],[pForecast,pLights,pClimate,pWeather],[()=>pSecurity(),pLog]],tablet:[[()=>pPower(),pForecast,pWater,pClimate],[pWeather,pLights,()=>pSecurity(),pLog]],phone:[[pForecast,()=>pPower(),pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
-  power:{monitor:[[()=>pPower(true),pForecast],[pLoads],[pLog,pNet]],tablet:[[()=>pPower(true),pNet],[pLoads,pLog]],phone:[[()=>pPower(true),pLoads,pLog,pNet]]},
+  home:{monitor:[[()=>pPower(),pInverter,pWater],[pForecast,pDiesel,pLights,pClimate],[()=>pSecurity(),pLog,pWeather]],tablet:[[()=>pPower(),pInverter,pForecast,pWater],[pDiesel,pLights,pClimate,()=>pSecurity(),pLog,pWeather]],phone:[[pForecast,()=>pPower(),pInverter,pDiesel,pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
+  power:{monitor:[[()=>pPower(true),pInverter],[pDiesel,pForecast],[pLoads,pLog,pNet]],tablet:[[()=>pPower(true),pInverter,pDiesel],[pForecast,pLoads,pLog,pNet]],phone:[[()=>pPower(true),pInverter,pDiesel,pForecast,pLoads,pLog,pNet]]},
   water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
   security:{monitor:[[()=>pSecurity(true)],[pLights],[pLog]],tablet:[[()=>pSecurity(true)],[pLights,pLog]],phone:[[()=>pSecurity(true),pLights,pLog]]}
  }[pg][dv];
@@ -1489,7 +1509,7 @@ function headerHTML(st){ const now=new Date(), h=now.getHours(), greet=h<12?'Goo
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
 function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); postRender(el); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
-setInterval(()=>{ tick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
+setInterval(()=>{ tick(); sensorTick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
 function denseAct(a,v){
  if(['dload','dlight','dlall','dgate'].includes(a)&&isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; }
  if(a==='dsrc'){ setSrc(v); return true; }
@@ -1498,6 +1518,8 @@ function denseAct(a,v){
  if(a==='dlight'){ SIM.lights[+v]=SIM.lights[+v]?0:1; slog(`${SIM.lights[+v]?'ON ':'OFF'} ${LIGHTS[+v][0].toLowerCase()} light`,'from dashboard'); return true; }
  if(a==='dlall'){ SIM.lights=SIM.lights.map(()=>0); slog('ALL LIGHTS OFF','from dashboard'); return true; }
  if(a==='askopen'){ S.ov='ask'; return true; }
+ if(a==='frefill'){ const add=Math.min(20,DIESEL_CAP-dieselL()); SIM.fuel=Math.min(100,SIM.fuel+add/DIESEL_CAP*100); fuelEvent('refill',+add.toFixed(1)); return true; }
+ if(a==='ftheft'){ if(SIM.src==='gen'){ toast('Theft check only flags drops while the generator is off. Switch the demo to NEPA or Inverter first.'); return true; } SIM.fuel=Math.max(0,SIM.fuel-5/DIESEL_CAP*100); fuelEvent('theft',-5); return true; }
  if(a==='efilter'){ S.efilter=v; return true; }
  if(a==='bopen'){ S.bld=v; S.ov='bld'; return true; }
  if(a==='bgo'){ S.ov=null; S.dash='home'; return true; }
@@ -1512,7 +1534,7 @@ function denseAct(a,v){
 
 /* ============ AI: explain + predict (mockup; the real app asks Claude when online) ============ */
 const OUT_P=[.62,.66,.68,.66,.6,.5,.3,.18,.14,.2,.34,.4,.3,.22,.18,.2,.24,.3,.38,.46,.56,.66,.71,.66]; // sample: chance NEPA is off, by hour, last 14 days
-const BATT_WH=5000, UNITS_PER_DAY=9.2, FUEL_L=20, GEN_L_PER_DAY=3.6;
+const BATT_WH=5000, UNITS_PER_DAY=9.2, FUEL_L=50, GEN_L_PER_DAY=5.2;
 const L=(en,pg)=>S.lang==='pg'?pg:en;
 const durTxt=h=>{ if(!isFinite(h)||h>99) return L('well over a day','pass one day'); const hh=Math.floor(h), mm=Math.round((h-hh)*60); return hh?`${hh}h ${mm}m`:`${mm}m`; };
 const sheddableNames=()=>Object.keys(LOADS).filter(k=>LOADS[k].shed&&SIM.on[k]).map(k=>LOADS[k].n.replace('Bedroom AC','bedroom AC').replace('Living room AC','living-room AC').replace('TV & DStv','TV').toLowerCase().replace(' ac',' AC').replace('tv','TV')).join(', ');
@@ -1553,7 +1575,9 @@ function answer(intent){ const f=forecast(), s=SIM.src;
    const e=lastLog(/spike/);
    return e?L(`The last voltage spike was <b>${e.why.replace(/\D/g,'')} V</b> at ${e.t}. A.D.A. cut the TV and kettle straight away, because anything over 260 V can damage them. Safe range is 200–250 V; it's ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'} now.`,`Last voltage spike na <b>${e.why.replace(/\D/g,'')} V</b> for ${e.t}. A.D.A. off TV and kettle sharp-sharp, because anything wey pass 260 V fit spoil them. Safe range na 200–250 V; e be ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'} now.`)
     :L('No voltage spikes recorded today.','No voltage spike today.'); }
-  case 'diesel': return L(`The gen tank is at ${Math.round(SIM.fuel)}% (about ${Math.round(SIM.fuel/100*FUEL_L)} L). At your usual use (~${GEN_L_PER_DAY} L a day), that's about <b>${Math.round(f.fuelDays)} days</b>. Buy diesel before then.`,`Gen tank dey ${Math.round(SIM.fuel)}% (like ${Math.round(SIM.fuel/100*FUEL_L)} L). As you dey use am (~${GEN_L_PER_DAY} L every day), e fit reach <b>${Math.round(f.fuelDays)} days</b>. Buy diesel before then.`);
+  case 'diesel': { const th=SIM.fuelLog.find(e=>e.kind==='theft'&&e.d==='Today'), rf=SIM.fuelLog.find(e=>e.kind==='refill');
+   return L(`The generator tank has <b>${dieselL().toFixed(1)} L</b> (measured). Today the gen used ${SIM.usedToday.toFixed(1)} L at about ${GEN_LPH} L per running hour, so the tank lasts roughly <b>${durTxt(dieselL()/GEN_LPH)}</b> of running. ${rf?`Last refill: ${rf.d} ${rf.t}, +${rf.l} L.`:''} ${th?`<b>Alert:</b> ${Math.abs(th.l)} L disappeared at ${th.t} while the generator was off.`:''}`,
+    `Gen tank get <b>${dieselL().toFixed(1)} L</b> (measured). Today gen use ${SIM.usedToday.toFixed(1)} L, like ${GEN_LPH} L every hour wey e run, so the tank fit run am reach <b>${durTxt(dieselL()/GEN_LPH)}</b>. ${rf?`Last refill: ${rf.d} ${rf.t}, +${rf.l} L.`:''} ${th?`<b>Alert:</b> ${Math.abs(th.l)} L vanish for ${th.t} when gen no dey run.`:''}`); }
   case 'units': return L(`You have <b>${SIM.units.toFixed(1)} kWh</b> left on the prepaid meter (about ₦${fmt(Math.round(SIM.units*209.5))}). At ~${UNITS_PER_DAY} kWh a day on NEPA, that lasts about <b>${Math.round(f.unitDays)} days</b>.`,`You get <b>${SIM.units.toFixed(1)} kWh</b> remain for prepaid meter (like ₦${fmt(Math.round(SIM.units*209.5))}). As you dey use ~${UNITS_PER_DAY} kWh every day for NEPA, e go last like <b>${Math.round(f.unitDays)} days</b>.`);
   case 'cost': return L('Today so far: <b>₦3,420</b>, made of gen ₦2,100 and NEPA ₦1,320. The gen ran 2 hours; most of the cost is diesel.','Today so far: <b>₦3,420</b>. Gen na ₦2,100, NEPA na ₦1,320. Gen run 2 hours, na diesel carry most of the money.');
   case 'estate': return estateAnswer();
@@ -1585,7 +1609,7 @@ function explainLog(l){ const w=(l.what+' '+l.why).toLowerCase(), thing=l.what.r
  if(/hub back|device online/.test(w)) return L(`At ${l.t} the hub started answering again, so readings are live.`,`For ${l.t} hub start to answer again, so the readings dey live.`);
  if(/alert/.test(w)) return L(`At ${l.t} the battery dropped to 20%. Below this the inverter will cut out soon.`,`For ${l.t} battery drop reach 20%. If e go below this one, inverter go soon off.`);
  return L(`${l.what} at ${l.t}${l.why?` (${l.why})`:''}.`,`${l.what} for ${l.t}${l.why?` (${l.why})`:''}.`); }
-const SUGG=[['estate','Which buildings are on gen?','Which building dey use gen?'],['runtime','How long will the inverter last?','How long inverter go carry?'],['pump','Why is the pump off?','Why pump off?'],['nepa','When does light usually go?','When light dey usually go?'],['ac','Why is the AC off?','Why AC off?'],['units','How many days of units left?','How many days unit remain?'],['spike','Any voltage spikes today?','Voltage spike happen today?']];
+const SUGG=[['estate','Which buildings are on gen?','Which building dey use gen?'],['runtime','How long will the inverter last?','How long inverter go carry?'],['pump','Why is the pump off?','Why pump off?'],['nepa','When does light usually go?','When light dey usually go?'],['ac','Why is the AC off?','Why AC off?'],['diesel','How much diesel is left?','How much diesel remain?'],['units','How many days of units left?','How many days unit remain?'],['spike','Any voltage spikes today?','Voltage spike happen today?']];
 function ask(q,intent){ S.chat=S.chat||[]; S.chat.push({who:'me',t:q}); S.ov='ask'; S.typing=true; update();
  setTimeout(()=>{ S.typing=false; S.chat.push({who:'ai',t:typeof intent==='function'?intent():answer(intent||intentOf(q))}); if(S.ov==='ask') update(); },650); }
 
@@ -1608,6 +1632,56 @@ function askPanel(){ const msgs=(S.chat&&S.chat.length)?S.chat:[{who:'ai',t:L(`H
   <div class="suggs">${SUGG.map(([k,en,pg])=>`<button data-act="askq" data-v="${k}">${S.lang==='pg'?pg:en}</button>`).join('')}</div>
   <form id="askform" class="askf"><label class="vh" for="askin">Your question</label><input id="askin" autocomplete="off" placeholder="${L('Ask about light, water, bills…','Ask about light, water, money…')}"><button class="askgo" aria-label="Send">${ic('send',16)}</button></form>
   <div class="fcnote">${L('Mockup: answers are worked out from the live house here. The real app will use Claude when online, and these local answers when offline.','Mockup: the answers na from the live house for here. The real app go use Claude when internet dey, and these local answers when no internet.')}</div></div></div>`; }
+
+
+/* ============ Measured diesel (fuel-level sensor) + inverter battery (inverter data port) ============ */
+const DIESEL_CAP=50, GEN_LPH=2.6, BATT_V_NOM=48;
+const dieselL=()=>SIM.fuel/100*DIESEL_CAP;
+SIM.fuelLog=[{d:'Today',t:'02:40',kind:'theft',l:-6,note:'while generator was off'},{d:'Today',t:'11:05',kind:'use',l:-5.2,note:'gen ran 2h 05m'},{d:'Tue',t:'09:14',kind:'refill',l:30,note:'vendor delivery'}];
+SIM.usedToday=5.2; SIM.socH=[]; SIM.socMin=SIM.batt;
+for(let i=0;i<60;i++) SIM.socH.push(Math.max(20,SIM.batt-12+i*.2));
+function battV(){ return BATT_V_NOM-4+SIM.batt*.08+(SIM.src==='inv'?-.6:SIM.src==='off'?-1.5:.6); }
+function battA(){ const v=battV(); if(SIM.src==='inv') return -drawW()/v; if(SIM.src==='off') return 0; return SIM.batt>=99.5?0.4:18; }
+function battState(){ if(SIM.src==='inv') return 'dis'; if(SIM.src==='off') return 'flat'; return SIM.batt>=99.5?'full':'chg'; }
+function sensorTick(){ if(SIM.offline) return;
+ SIM.socH.push(SIM.batt); if(SIM.socH.length>60) SIM.socH.shift(); SIM.socMin=Math.min(SIM.socMin,SIM.batt);
+ if(SIM.src==='gen'){ const d=GEN_LPH/60; SIM.usedToday+=d; } }
+function fuelEvent(kind,l){ const t=hhmm(); SIM.fuelLog.unshift({d:'Today',t,kind,l,note:kind==='refill'?'added at the tank':'while generator was off'}); SIM.fuelLog.length=Math.min(SIM.fuelLog.length,8);
+ if(kind==='theft'){ slog('DIESEL DROP',`${Math.abs(l)} L while gen off`,'bad'); toast(`Diesel alert: ${Math.abs(l)} L gone while the generator was off`); }
+ else slog('DIESEL REFILL',`+${l} L`); }
+
+function pDiesel(){ const L0=dieselL(), pct=SIM.fuel, run=SIM.src==='gen', hrs=L0/GEN_LPH, theft=SIM.fuelLog.find(e=>e.kind==='theft'&&e.d==='Today');
+ const refill=SIM.fuelLog.find(e=>e.kind==='refill');
+ return `<section class="pn g" aria-label="Generator and diesel">${pnh('gen',L('Generator & diesel','Gen & diesel'),`<i>${np('diesel',L0.toFixed(1))} L</i> ${L('in tank','for tank')}`,`<span class="pill ${run?'src-gen':''}"><span class="dot" style="background:${run?'var(--d-amber)':'var(--d-grey)'}"></span>${run?L('Gen running','Gen dey run'):L('Gen off','Gen off')}</span>`)}
+  <div class="ftank" role="img" aria-label="Generator tank ${Math.round(pct)} percent, ${L0.toFixed(1)} litres of ${DIESEL_CAP}"><i style="width:${pct}%;background:${pct<25?'var(--d-warn)':'var(--d-amber)'}"></i>${[25,50,75].map(x=>`<b style="left:${x}%"></b>`).join('')}<span>${Math.round(pct)}% · ${L0.toFixed(1)} / ${DIESEL_CAP} L</span></div>
+  ${theft?`<div class="falert">${ic('alert',14,2.2)}<span><b>${L(`${Math.abs(theft.l)} L disappeared at ${theft.t}`,`${Math.abs(theft.l)} L vanish for ${theft.t}`)}</b> ${L('while the generator was off. Check the tank and who had access.','when gen no dey run. Check the tank and who get access.')}</span></div>`:''}
+  <div class="boxes">
+   <div class="box"><span class="k">${L('Used today','Use today')}</span><span class="v">${SIM.usedToday.toFixed(1)}<small>L</small></span><span class="s">${L('measured','measured')}</span></div>
+   <div class="box"><span class="k">${L('Per running hour','Per hour wey e run')}</span><span class="v">${GEN_LPH.toFixed(1)}<small>L/h</small></span><span class="s">${L('normal for this gen','normal for this gen')}</span></div>
+   <div class="box"><span class="k">${L('Run time left','Time wey remain')}</span><span class="v">${durTxt(hrs)}</span><span class="s">${L('at current burn','as e dey burn now')}</span></div>
+  </div>
+  <div class="rows2">${SIM.fuelLog.slice(0,4).map(e=>`<div class="r2"><span class="fdot ${e.kind}">${ic(e.kind==='refill'?'drop':e.kind==='theft'?'alert':'gen',13,2)}</span><span class="t"><b>${e.kind==='refill'?L('Refill','Refill'):e.kind==='theft'?L('Unexplained drop','Drop wey no get reason'):L('Generator use','Gen use')}</b><span>${e.d} ${e.t} · ${e.note}</span></span><span class="w" style="color:${e.kind==='refill'?'var(--d-ok)':e.kind==='theft'?'var(--d-warn)':'var(--d-ink2)'}">${e.l>0?'+':''}${e.l} L</span></div>`).join('')}</div>
+  <div class="demo"><span>Demo:</span><button data-act="frefill">${L('Refill 20 L','Refill 20 L')}</button><button data-act="ftheft">${L('Siphon 5 L','Siphon 5 L')}</button></div>
+  <div class="fcnote">${ic('gen',12)} ${L('Measured by a fuel-level sensor in the generator tank. Drops while the generator is off are flagged.','Fuel-level sensor for gen tank dey measure am. If diesel drop when gen off, e go flag am.')}</div>
+ </section>`; }
+
+function pInverter(){ const st=battState(), v=battV(), a=battA(), w=Math.round(v*a), soc=SIM.batt;
+ const lab={dis:L('Discharging','E dey discharge'),chg:L('Charging','E dey charge'),full:L('Full','E don full'),flat:L('Flat','E don finish')}[st];
+ const col={dis:'var(--d-blue)',chg:'var(--d-ok)',full:'var(--d-ok)',flat:'var(--d-warn)'}[st];
+ const h=SIM.socH, pts=h.map((x,i)=>`${(i/(h.length-1)*100).toFixed(1)},${(36-x/100*34).toFixed(1)}`).join(' ');
+ const segs=[...Array(10)].map((_,i)=>`<i class="${soc>i*10+5?'on':''}" style="${soc>i*10+5?`background:${soc<25?'var(--d-warn)':col}`:''}"></i>`).join('');
+ const sub=st==='dis'?L(`≈ ${durTxt(soc/100*BATT_WH/Math.max(60,drawW()))} left at ${fmt(drawW())} W`,`≈ ${durTxt(soc/100*BATT_WH/Math.max(60,drawW()))} remain with ${fmt(drawW())} W`):st==='chg'?L(`full in ≈ ${durTxt((100-soc)/100*BATT_WH/(v*18))}`,`e go full in ≈ ${durTxt((100-soc)/100*BATT_WH/(v*18))}`):st==='full'?L('ready for the next outage','ready for next outage'):L('everything off until power returns','everything off till light come');
+ return `<section class="pn g" aria-label="Inverter and battery">${pnh('battery',L('Inverter & battery','Inverter & battery'),`<i>${(BATT_WH/1000).toFixed(1)} kWh</i> ${L('bank','bank')} · 48 V`,`<span class="pill"><span class="dot" style="background:${col}"></span>${lab}</span>`)}
+  <div class="binv"><div class="bbig"><span class="ser">${np('soc',String(Math.round(soc)))}<small>%</small></span><span class="sub2">${sub}</span></div><div class="bseg" role="img" aria-label="Battery ${Math.round(soc)} percent">${segs}<b></b></div></div>
+  <div class="boxes">
+   <div class="box"><span class="k">${L('Voltage','Voltage')}</span><span class="v">${np('bv',v.toFixed(1))}<small>V</small></span></div>
+   <div class="box"><span class="k">${a<0?L('Discharge','Discharge'):L('Charge','Charge')}</span><span class="v">${np('ba',Math.abs(a).toFixed(1))}<small>A</small></span><span class="s">${fmt(Math.abs(w))} W</span></div>
+   <div class="box"><span class="k">${L('Lowest today','Lowest today')}</span><span class="v">${Math.round(SIM.socMin)}<small>%</small></span><span class="s">${SIM.socMin<30?L('deep discharge','e go down well-well'):L('healthy','e dey okay')}</span></div>
+  </div>
+  <svg class="spk" viewBox="0 0 100 38" preserveAspectRatio="none" role="img" aria-label="Battery level over the last hour"><line x1="0" x2="100" y1="${36-20/100*34}" y2="${36-20/100*34}" stroke="rgba(194,82,44,.5)" stroke-dasharray="2 2" vector-effect="non-scaling-stroke"/><polyline points="${pts}" fill="none" stroke="${col}" stroke-width="1.6" vector-effect="non-scaling-stroke"/></svg>
+  <div class="bandlab"><span>${L('1 h ago','1 h ago')}</span><span style="color:var(--d-warn)">20% ${L('alert line','alert line')}</span><span>${L('now','now')}</span></div>
+  <div class="fcnote">${ic('battery',12)} ${L("Read live from the inverter's RS485/Modbus port, or a battery shunt where the inverter has none.","E dey read am live from inverter RS485/Modbus port, or battery shunt if inverter no get port.")}</div>
+ </section>`; }
 
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their
@@ -1677,7 +1751,7 @@ const BLD=[ // sample buildings; "live" mirrors the house running in this mockup
  {id:'e',name:'Palm Grove',area:'Ikoyi',units:6,src:'nepa',v:219,batt:100,tank:83,gen:0.5},
  {id:'f',name:'Harmony Flats',area:'Yaba',units:20,src:'off',v:0,batt:0,tank:12,gen:6.0},
  {id:'g',name:'Opebi Plaza',area:'Ikeja',units:10,src:'nepa',v:226,batt:92,tank:64,gen:1.0,offlineAt:Date.now()-4*60e3-12e3},
- {id:'h',name:'Marina View',area:'Victoria Island',units:14,src:'gen',v:236,batt:79,tank:47,gen:3.5},
+ {id:'h',name:'Marina View',area:'Victoria Island',units:14,src:'gen',v:236,batt:79,tank:47,gen:3.5,theft:{l:18,t:'02:40'}},
 ];
 BLD.forEach((b,bi)=>{ if(b.live) return; let seed=bi*97+13; const rnd=()=>{ seed=(seed*9301+49297)%233280; return seed/233280; };
  const h=new Date().getHours(), hist=[]; let cur='inv';
@@ -1699,6 +1773,8 @@ function alertsFor(b,s){ const a=[];
  if(s.src==='off') a.push({lvl:'bad',t:L('No power: battery flat, everything off','No light at all: battery don finish')});
  if(s.tank<20) a.push({lvl:'warn',t:L(`Tank low (${Math.round(s.tank)}%)${s.src==='off'||s.src==='inv'?', no power to pump':''}`,`Tank don low (${Math.round(s.tank)}%)${s.src==='off'||s.src==='inv'?', no light to pump':''}`)});
  if(s.src==='inv'&&s.batt<45) a.push({lvl:'warn',t:L(`Battery ${Math.round(s.batt)}% on inverter`,`Battery ${Math.round(s.batt)}% for inverter`)});
+ if(b.theft) a.push({lvl:'bad',t:L(`Diesel: ${b.theft.l} L gone at ${b.theft.t} with gen off`,`Diesel: ${b.theft.l} L vanish for ${b.theft.t} when gen off`)});
+ if(b.live&&SIM.fuelLog.some(e=>e.kind==='theft'&&e.d==='Today')){ const e=SIM.fuelLog.find(e=>e.kind==='theft'&&e.d==='Today'); a.push({lvl:'bad',t:L(`Diesel: ${Math.abs(e.l)} L gone at ${e.t} with gen off`,`Diesel: ${Math.abs(e.l)} L vanish for ${e.t} when gen off`)}); }
  if(s.spikes>=2) a.push({lvl:'warn',t:L(`${s.spikes} voltage spikes today`,`${s.spikes} voltage spike today`)});
  return a; }
 const agoTxt=s=>s<60?`${Math.round(s)}s`:`${Math.floor(s/60)}m ${Math.round(s%60)}s`;
