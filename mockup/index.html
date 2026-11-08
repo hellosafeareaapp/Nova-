@@ -1083,13 +1083,25 @@ body.dense .pn .btn::before,body.dense .pn .btn::after,body.dense .bsh .btn::bef
 .wv{position:absolute;left:0;top:-10px;width:200%;height:13px;animation:wave linear infinite;will-change:transform}
 .wv path{fill:#7aa5cf}.wv.back{top:-13px}.wv.back path{fill:#b3cde6}
 @keyframes wave{to{transform:translateX(-50%)}}
-.wstream{position:absolute;top:0;left:50%;width:5px;margin-left:-2.5px;border-radius:0 0 3px 3px;z-index:1;background:repeating-linear-gradient(180deg,rgba(96,150,204,.95) 0 7px,rgba(63,116,168,.6) 7px 12px);background-size:100% 24px;animation:wpour linear infinite}
-@keyframes wpour{to{background-position:0 24px}}
+.wpipe{position:absolute;top:-2px;left:calc(30% - 7px);width:14px;height:8px;z-index:3;border-radius:0 0 4px 4px;background:linear-gradient(90deg,#7d776c,#d6cfc1 45%,#8f897d);box-shadow:0 1px 0 rgba(0,0,0,.15)}
+.wstream{position:absolute;top:6px;left:30%;width:8px;margin-left:-4px;z-index:2;clip-path:polygon(12% 0,88% 0,72% 100%,28% 100%);
+ background:repeating-linear-gradient(180deg,rgba(255,255,255,.28) 0 2px,rgba(255,255,255,0) 2px 7px,rgba(255,255,255,.16) 7px 8px,rgba(255,255,255,0) 8px 17px),repeating-linear-gradient(180deg,rgba(30,80,140,.16) 0 3px,rgba(30,80,140,0) 3px 11px),linear-gradient(90deg,rgba(96,146,198,.85),rgba(214,232,250,.98) 38%,rgba(140,182,222,.97) 60%,rgba(74,124,178,.88));
+ background-size:100% 17px,100% 11px,100% 100%;animation-name:wpour,wwob;animation-timing-function:linear,ease-in-out;animation-iteration-count:infinite;animation-direction:normal,alternate;transform-origin:50% 0}
+@keyframes wpour{to{background-position:0 34px,0 22px,0 0}}
+@keyframes wwob{0%{transform:scaleX(.82) skewX(.6deg)}100%{transform:scaleX(1.06) skewX(-.6deg)}}
+.wsplash{position:absolute;left:30%;width:0;height:0;z-index:2}
+.wsplash::before{content:'';position:absolute;left:-10px;top:-3px;width:20px;height:6px;border-radius:50%;border:1.5px solid rgba(255,255,255,.85);animation:wring .9s ease-out infinite;animation-delay:inherit}
+.wsplash i{position:absolute;left:-1.5px;top:-2px;width:3px;height:3px;border-radius:50%;background:rgba(235,244,253,.95);animation:wdropl ease-out infinite}
+.wsplash i+i{animation-name:wdropr}
+@keyframes wring{0%{transform:scale(.3);opacity:1}100%{transform:scale(1.5);opacity:0}}
+@keyframes wdropl{0%{transform:translate(0,0);opacity:1}50%{transform:translate(-6px,-9px)}100%{transform:translate(-10px,0);opacity:0}}
+@keyframes wdropr{0%{transform:translate(0,0);opacity:1}50%{transform:translate(5px,-11px)}100%{transform:translate(9px,0);opacity:0}}
+html.dark .wpipe{background:linear-gradient(90deg,#4a453d,#8f887b 45%,#514b42)}
 .wbub{position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;border:1px solid rgba(255,255,255,.75);background:rgba(255,255,255,.18);animation:wbub ease-in infinite;opacity:0}
 @keyframes wbub{0%{transform:translateY(0);opacity:0}15%{opacity:.9}100%{transform:translateY(-70px);opacity:0}}
 .tank .vessel b{z-index:2}
 html.dark .wv path{fill:#4f80b4}html.dark .wv.back path{fill:#36597f}html.dark .tank .vessel i.wfill{background:linear-gradient(#4f80b4,#22497a)}
-@media (prefers-reduced-motion:reduce){.wv,.wstream,.wbub{animation:none!important}.wbub{display:none}}
+@media (prefers-reduced-motion:reduce){.wv,.wstream,.wbub,.wsplash::before,.wsplash i{animation:none!important}.wbub,.wsplash{display:none}}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1585,7 +1597,7 @@ function pPower(full){ const s=SIM.src, w=drawW(), v=Math.round(SIM.v), bad=SIM.
 const wph=d=>`animation-duration:${d}s;animation-delay:-${((performance.now()/1000)%d).toFixed(2)}s`;
 const WAVE='M0 6 Q15 1 30 6 T60 6 T90 6 T120 6 T150 6 T180 6 T210 6 T240 6 V13 H0Z';
 function waterFill(t,pumping){ const f=pumping?[1.7,2.9]:[3.6,6.2];
- return `${pumping?`<span class="wstream" style="height:${Math.max(0,100-t)}%;${wph(.6)}"></span>`:''}<i class="wfill" style="height:${t}%">
+ return `${pumping?`<span class="wpipe"></span><span class="wstream" style="height:calc(${Math.max(0,100-t)}% - 3px);${wph(.6)}"></span><span class="wsplash" style="bottom:calc(${t}% + 4px);${wph(.9)}"><i style="${wph(.9)}"></i><i style="${wph(1.1)}"></i></span>`:''}<i class="wfill" style="height:${t}%">
   <svg class="wv back" viewBox="0 0 240 13" preserveAspectRatio="none" aria-hidden="true" style="${wph(f[1])}"><path d="${WAVE}"/></svg>
   <svg class="wv front" viewBox="0 0 240 13" preserveAspectRatio="none" aria-hidden="true" style="${wph(f[0])}"><path d="${WAVE}"/></svg>
   ${pumping?[18,42,66,80,30].map((x,k)=>`<span class="wbub" style="left:${x}%;${wph(2+k*.37)}"></span>`).join(''):''}</i>`; }
@@ -1637,7 +1649,7 @@ function headerHTML(st){ const now=new Date(), h=now.getHours(), greet=h<12?'Goo
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
 function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop);
- const W='.wv,.wstream,.wbub', ta=[...el.querySelectorAll(W)].map(x=>{ const an=x.getAnimations&&x.getAnimations()[0]; return an?[an.currentTime,x.style.animationDelay,x.style.animationDuration]:null; });
+ const W='.wv,.wstream,.wbub,.wsplash i', ta=[...el.querySelectorAll(W)].map(x=>{ const an=x.getAnimations&&x.getAnimations()[0]; return an?[an.currentTime,x.style.animationDelay,x.style.animationDuration]:null; });
  el.innerHTML=denseBody(); postRender(el);
  [...el.querySelectorAll(W)].forEach((x,i)=>{ const o=ta[i]; if(!o||x.style.animationDuration!==o[2]) return; x.style.animationDelay=o[1]; const an=x.getAnimations&&x.getAnimations()[0]; if(an&&o[0]!=null) an.currentTime=o[0]; }); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
 setInterval(()=>{ tick(); sensorTick(); aiTick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
