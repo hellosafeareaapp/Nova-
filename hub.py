@@ -445,7 +445,7 @@ def send_alert(a, cfg):
             _post(cfg["ntfy_server"].rstrip("/") + "/" + cfg["ntfy_topic"],
                   text.encode("utf-8"),
                   {"Title": ("A.D.A. " + site).encode("ascii", "ignore").decode(),
-                   "Priority": {"bad": "high", "warn": "default"}.get(a["level"], "low"),
+                   "Priority": {"bad": "high"}.get(a["level"], "default"),
                    "Tags": {"bad": "rotating_light", "warn": "warning"}.get(a["level"], "white_check_mark")})
             sent.append("ntfy")
         except Exception as err:            # no internet is normal here
