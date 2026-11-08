@@ -499,6 +499,7 @@ class Stats:
         if b is None:
             b = {f: 0 for f in DAY_FIELDS}
             b["batt_min"] = 100.0
+            b["hours"] = [[0, 0, 0, 0] for _ in range(24)]   # per hour: grid, gen, inverter, none minutes
             self.days[self.today_key] = b
         return b
 
@@ -514,6 +515,10 @@ class Stats:
         with self.lock:
             b = self._bucket()
             b["min_" + h.source] += 1
+            hrs = b.get("hours")
+            if not isinstance(hrs, list) or len(hrs) != 24:
+                hrs = b["hours"] = [[0, 0, 0, 0] for _ in range(24)]
+            hrs[h.hour][SOURCES.index(h.source)] += 1
             b["wh"] = round(b["wh"] + (h.draw / 60.0 if h.source != "none" else 0), 1)
             if h.is_on("pump"):
                 b["pump_min"] += 1
@@ -553,19 +558,7 @@ class Stats:
         with self.lock:
             for back in range(7, 0, -1):
                 k = (self.start - timedelta(days=back)).isoformat()
-                grid = rnd.randint(300, 720)
-                gen = rnd.randint(60, 240)
-                none = rnd.randint(0, 40)
-                inv = DAY - grid - gen - none
-                self.days[k] = {
-                    "min_grid": grid, "min_gen": gen, "min_inverter": inv, "min_none": none,
-                    "gen_l": round(gen / 60 * GEN_LPH, 1), "refill_l": 20 if back == 4 else 0,
-                    "drop_l": 6 if back == 2 else 0, "drops": 1 if back == 2 else 0,
-                    "pump_min": rnd.randint(40, 110), "wh": rnd.randint(9000, 16000),
-                    "spikes": rnd.randint(0, 3), "alerts": rnd.randint(0, 4),
-                    "overflow_min": 0, "offline_min": rnd.choice([0, 0, 0, 12]),
-                    "batt_min": rnd.randint(18, 60),
-                }
+                self.days[k] = sample_day(rnd, back)
             self.seeded = True
         self.save()
 
@@ -585,6 +578,38 @@ class Stats:
                 "days": rows, "totals": tot, "seeded": self.seeded,
                 "gen_lph": GEN_LPH, "diesel_cap": DIESEL_CAP,
                 "generated": time.strftime("%Y-%m-%d %H:%M")}
+
+
+def sample_day(rnd, back):
+    """A believable Lagos day, hour by hour: NEPA in blocks, generator in the
+    evening gap, inverter overnight, sometimes a stretch with nothing."""
+    hours = []
+    nepa_from = rnd.choice([5, 6, 7, 8]); nepa_to = nepa_from + rnd.randint(4, 9)
+    gen_from = nepa_to + rnd.randint(0, 3); gen_to = gen_from + rnd.randint(1, 3)
+    eve_nepa = rnd.random() < 0.5
+    flat = rnd.random() < 0.3
+    for hr in range(24):
+        if nepa_from <= hr < nepa_to or (eve_nepa and 19 <= hr < 22):
+            src = 0
+        elif gen_from <= hr < gen_to:
+            src = 1
+        elif flat and hr in (4, 5):
+            src = 3
+        else:
+            src = 2
+        row = [0, 0, 0, 0]
+        row[src] = 60
+        hours.append(row)
+    tot = [sum(r[i] for r in hours) for i in range(4)]
+    return {
+        "min_grid": tot[0], "min_gen": tot[1], "min_inverter": tot[2], "min_none": tot[3],
+        "gen_l": round(tot[1] / 60 * GEN_LPH, 1), "refill_l": 20 if back == 4 else 0,
+        "drop_l": 6 if back == 2 else 0, "drops": 1 if back == 2 else 0,
+        "pump_min": rnd.randint(40, 110), "wh": rnd.randint(9000, 16000),
+        "spikes": rnd.randint(0, 3), "alerts": rnd.randint(0, 4),
+        "overflow_min": 0, "offline_min": rnd.choice([0, 0, 0, 12]),
+        "batt_min": rnd.randint(18, 60), "hours": hours,
+    }
 
 
 STATS = Stats()
