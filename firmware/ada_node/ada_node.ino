@@ -10,6 +10,11 @@
       fail-safe state (pump and kettle off)
     - onboard LED: slow blink = talking to the hub, fast blink = Wi-Fi up but
       no hub, solid = no Wi-Fi
+    - finds the hub by itself: hub.py broadcasts "ADA-HUB <port>" every two
+      seconds, so if your laptop or phone hotspot hands out a new address the
+      node follows it instead of losing the hub
+    - Wi-Fi power saving is off and Wi-Fi reconnects on its own, which is what
+      made the earlier version drop off a phone hotspot
 
   Board: ESP32 Dev Module (WROOM-32). Arduino IDE with the "esp32" boards
   package by Espressif. No extra libraries needed.
@@ -19,11 +24,14 @@
 
 #include <WiFi.h>
 #include <HTTPClient.h>
+#include <WiFiUdp.h>
 
 // ============================== CONFIG ==============================
 const char* WIFI_SSID   = "your-wifi-name";
 const char* WIFI_PASS   = "your-wifi-password";
-const char* HUB_HOST    = "192.168.1.50";   // the address hub.py prints after "(same wifi)"
+// Leave HUB_HOST empty ("") to find the hub automatically (recommended).
+// Or put the address hub.py prints after "(same wifi)", e.g. "192.168.1.50".
+const char* HUB_HOST    = "";
 const int   HUB_PORT    = 8000;
 const char* DEVICE_KEY  = "paste-the-device-key-hub-prints";
 const char* DEVICE_ID   = "ada-node-01";
@@ -44,6 +52,14 @@ const bool RELAY_ACTIVE_LOW = true;
 
 const unsigned long REPORT_MS   = 1000;
 const unsigned long FAILSAFE_MS = 10000;
+const int DISCOVERY_PORT = 41234;
+
+// Optional real readings. Leave at -1 until the sensor is wired; the hub
+// keeps simulating anything that is not sent.
+//   fuel sensor  -> litres in the generator tank
+//   inverter     -> battery percent (from its RS485/Modbus port or a shunt)
+float readFuelLitres()     { return -1; }
+float readBatteryPercent() { return -1; }
 // ====================================================================
 
 const int RELAY_COUNT = sizeof(RELAYS) / sizeof(RELAYS[0]);
@@ -52,6 +68,10 @@ const char* SOURCE_NAMES[] = { "NEPA", "Gen", "Inverter", "No power" };
 int sourceIndex = 0;
 
 unsigned long lastReport = 0, lastHubOk = 0, lastButton = 0;
+WiFiUDP udp;
+String hubAddr = "";           // where reports go: HUB_HOST, or what discovery heard
+int hubPort = HUB_PORT;
+int failCount = 0;
 bool failsafeActive = false, hubOk = false;
 int lastButtonState = HIGH;
 
@@ -95,25 +115,57 @@ void report() {
     json += "\"" + String(RELAYS[i].load) + "\":" + (RELAYS[i].on ? "true" : "false");
     if (i < RELAY_COUNT - 1) json += ",";
   }
-  json += "},\"rssi\":" + String(WiFi.RSSI()) + ",\"uptime\":" + String(millis() / 1000) + "}";
+  json += "},\"rssi\":" + String(WiFi.RSSI()) + ",\"uptime\":" + String(millis() / 1000);
+  float fuel = readFuelLitres(), batt = readBatteryPercent();
+  if (fuel >= 0 || batt >= 0) {
+    json += ",\"readings\":{";
+    if (fuel >= 0) json += "\"fuel_l\":" + String(fuel, 1);
+    if (fuel >= 0 && batt >= 0) json += ",";
+    if (batt >= 0) json += "\"battery\":" + String(batt, 1);
+    json += "}";
+  }
+  json += "}";
+  if (hubAddr.length() == 0) return;   // still listening for the hub
 
   HTTPClient http;
-  http.setTimeout(1500);
-  http.begin(String("http://") + HUB_HOST + ":" + HUB_PORT + "/device");
+  http.setTimeout(3000);
+  http.setReuse(false);
+  http.begin(String("http://") + hubAddr + ":" + hubPort + "/device");
   http.addHeader("Content-Type", "application/json");
   http.addHeader("X-Device-Key", DEVICE_KEY);
   int code = http.POST(json);
   if (code == 200) {
     String body = http.getString();
     if (!hubOk || failsafeActive) Serial.println("[hub] connected");
-    hubOk = true; failsafeActive = false; lastHubOk = millis();
+    hubOk = true; failsafeActive = false; lastHubOk = millis(); failCount = 0;
     applyCmd(body);
   } else {
     if (hubOk) Serial.printf("[hub] lost (%s)\n", code > 0 ? String(code).c_str() : http.errorToString(code).c_str());
     if (code == 403) Serial.println("[hub] 403: DEVICE_KEY doesn't match the key hub.py printed");
     hubOk = false;
+    failCount++;
+    if (failCount == 5) {
+      Serial.printf("[hub] no answer from %s:%d. Is hub.py running? Same Wi-Fi?\n", hubAddr.c_str(), hubPort);
+      if (strlen(HUB_HOST) == 0) { Serial.println("[hub] listening for the hub's address again"); hubAddr = ""; }
+    }
   }
   http.end();
+}
+
+// hub.py broadcasts "ADA-HUB 8000" every two seconds from wherever it is.
+void listenForHub() {
+  int size = udp.parsePacket();
+  if (size <= 0) return;
+  char buf[32] = {0};
+  udp.read(buf, sizeof(buf) - 1);
+  if (strncmp(buf, "ADA-HUB ", 8) != 0) return;
+  String ip = udp.remoteIP().toString();
+  int port = atoi(buf + 8);
+  if (strlen(HUB_HOST) > 0 && !(failCount >= 5)) return;   // a fixed address is set and working
+  if (ip != hubAddr || port != hubPort) {
+    hubAddr = ip; hubPort = port > 0 ? port : HUB_PORT;
+    Serial.printf("[hub] found at %s:%d\n", hubAddr.c_str(), hubPort);
+  }
 }
 
 void ensureWifi() {
@@ -154,6 +206,10 @@ void setup() {
     writeRelay(RELAYS[i], RELAYS[i].failsafeOn);   // start safe until the hub speaks
   }
   WiFi.mode(WIFI_STA);
+  WiFi.setSleep(false);          // power saving made phone hotspots drop the node
+  WiFi.setAutoReconnect(true);
+  WiFi.persistent(false);
+  if (strlen(HUB_HOST) > 0) hubAddr = HUB_HOST;
   ensureWifi();
   lastHubOk = millis();
 }
@@ -165,9 +221,12 @@ void loop() {
     announced = true;
     Serial.print("[wifi] connected, my address is ");
     Serial.println(WiFi.localIP());
+    udp.begin(DISCOVERY_PORT);
+    if (hubAddr.length() == 0) Serial.println("[hub] listening for the hub (run hub.py on the same Wi-Fi)");
   } else if (WiFi.status() != WL_CONNECTED) {
     announced = false;
   }
+  if (WiFi.status() == WL_CONNECTED) listenForHub();
   checkButton();
   if (millis() - lastReport >= REPORT_MS) { lastReport = millis(); report(); }
   if (millis() - lastHubOk > FAILSAFE_MS) applyFailsafe();

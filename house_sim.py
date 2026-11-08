@@ -22,10 +22,13 @@ LOADS = {
     "kettle":     (2000,  False),
     "lights":     (150,   True),
     "fans":       (180,   True),
+    "ac_bed":     (1100,  True),
+    "ac_liv":     (1300,  False),
+    "iron":       (1000,  False),
 }
 
 # Which loads are allowed to run on inverter, and which must never.
-SHEDDABLE = ["kettle", "pump", "tv"]
+SHEDDABLE = ["kettle", "pump", "tv", "ac_bed", "ac_liv", "iron"]
 
 
 class House:

@@ -5,3 +5,7 @@ settings.json.tmp
 assets/*
 !assets/README.md
 device_key.txt
+hub_config.json
+hub_config.json.tmp
+history.json
+history.json.tmp
