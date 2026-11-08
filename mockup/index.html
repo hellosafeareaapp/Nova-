@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<title>GlassHome</title>
+<title>A.D.A. · Always-on Domestic Automation</title>
 <style>
 /* GlassHome mockup. Frosted tiles over a wallpaper; 16 columns wide, 8 on tablet, 4 on phone; one round dock. */
 :root{
@@ -1059,6 +1059,7 @@ body.dense .pn .btn::before,body.dense .pn .btn::after,body.dense .bsh .btn::bef
 .lgcard{width:min(340px,100%);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;color:var(--d-ink,#2a2219)}
 .lgcard h2{margin:0;font-family:var(--serif);font-weight:500;font-size:28px}.lgcard .sub{margin:0}
 .pdots{display:flex;gap:12px;margin:6px 0}.pdots i{width:13px;height:13px;border-radius:50%;border:2px solid var(--d-ink,#2a2219);transition:background .15s}.pdots i.on{background:var(--d-ink,#2a2219)}.pdots i.opt{opacity:.25}
+.lgbrand{margin:10px 0 0;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--d-ink3,#8a7f70)}
 .perr{color:var(--d-warn);font-size:13px;font-weight:600}
 .ppad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}.ppad button{height:72px;border-radius:50%;border:1px solid var(--d-line,#ddd);background:rgba(var(--d-pn),.95);font-size:26px;font-weight:500;color:var(--d-ink,#2a2219);display:grid;place-items:center;transition:transform .1s}
 .ppad button:active{transform:scale(.93)}.ppad button.ok{background:var(--d-ink,#2a2219);color:var(--d-bg,#fff);border-color:var(--d-ink)}
@@ -1383,7 +1384,7 @@ function settingsView(){ const who=S.people.find(p=>p.id===S.accessWho), opts=k=
    <div style="display:flex;flex-direction:column;gap:8px">${DASH.slice(1).concat([DASH[0]]).map(([k,n])=>`<div class="arow"><span>${n}</span><div class="tri" role="group" aria-label="${esc(who.name)} · ${n}">${['Off','View','Edit'].map((l,i)=>`<button aria-pressed="${lv(who.id,k)===i}" data-act="acc" data-p="${who.id}" data-d="${k}" data-v="${i}">${l}</button>`).join('')}</div></div>`).join('')}</div>
   </section>
   <section class="card g wallcard" data-act="accounts" role="button" tabindex="0" aria-label="Wall tablet accounts">${slot('settings-wall','fill ph-room')}<div class="grad"></div>
-   ${pic('settings-wall')?'':'<div class="tab" aria-hidden="true"><span style="font-size:8px;opacity:.7">GlassHome Dash</span><b>Welcome<br>back.</b><i></i><i></i><i style="background:rgba(80,170,200,.6)"></i></div>'}
+   ${pic('settings-wall')?'':'<div class="tab" aria-hidden="true"><span style="font-size:8px;opacity:.7">A.D.A. Dash</span><b>Welcome<br>back.</b><i></i><i></i><i style="background:rgba(80,170,200,.6)"></i></div>'}
    <div class="over"><span style="font-size:16px;font-weight:600">Wall tablet</span><h2>Sign in with a name and password</h2><p>Add them to your account in Settings.</p></div></section>
   <section class="card g"><h2>Easier setup</h2><p>Finds your Home Assistant by itself.</p>
    <div class="radar"><i></i><i></i><i></i><span class="ring"></span><div class="hub">${haI(60)}<span class="ok">${ic('check',16,3)}</span></div></div>
@@ -1437,7 +1438,7 @@ function browser(){ const t=S.btab; let body='';
  else if(t==='materials'){ body=`<div class="mats">${Object.entries(MATS).map(([k,m])=>`<button class="mc" aria-pressed="${S.look.mat===k}" data-act="mat" data-v="${k}">${matPrev(k)}<span class="nmm">${ic(m.icon,14)} ${m.label}</span><span class="sub" style="margin-top:-6px;font-size:12px">Built in</span></button>`).join('')}</div>
   <div style="display:flex;flex-direction:column;gap:12px;max-width:520px">${sliders()}</div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="share" data-v="material">${ic('send',16)} Share this material</button><button class="btn sec" data-act="resetmat">Reset</button></div>`; }
  else { body=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px">${DASH.map(([k,n])=>`<div class="wire"><div class="bar0"></div><div class="gg">${sorted(k,'monitor').map(w=>`<i style="grid-column:span ${Math.max(1,Math.min(8,Math.round(w.sz.monitor[0]/2)))};grid-row:span ${Math.max(1,w.sz.monitor[1])}"></i>`).join('')}</div><div style="display:flex;justify-content:space-between;align-items:center"><span><b style="font-size:14px">${n}</b><br><span style="font-size:12px;color:#5a6170">Built in</span></span><button class="inst" data-act="share" data-v="dash:${k}">Share</button></div></div>`).join('')}</div><p class="sub" style="margin:0">7 starter dashboards, ready to use. More shared by other homes.</p>`; }
- return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid wide bwr" role="dialog" aria-label="Browse" style="padding:26px;gap:20px"><div class="sh" style="align-items:flex-start"><div><div class="ttl">One browser</div><div class="lead" style="margin-top:10px">Widgets, materials and dashboards, from GlassHome and other homes.</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid wide bwr" role="dialog" aria-label="Browse" style="padding:26px;gap:20px"><div class="sh" style="align-items:flex-start"><div><div class="ttl">One browser</div><div class="lead" style="margin-top:10px">Widgets, materials and dashboards, from A.D.A. and other homes.</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <div class="segbig" role="group" aria-label="Browse"><div class="row">${[['widgets','Widgets','puzzle'],['materials','Materials','layers'],['dashboards','Dashboards','grid']].map(([k,n,i])=>`<button aria-pressed="${t===k}" data-act="btab" data-v="${k}" aria-label="${n}">${ic(i,30,1.7)}</button>`).join('')}</div><div class="labs"><span>Widgets</span><span>Materials</span><span>Dashboards</span></div></div>${body}</div></div>`; }
 
 function share(){ let name,desc,prev,slug,off;
@@ -1462,7 +1463,7 @@ function accounts(){ return `<div class="scrim t-fade" data-act="scrim"><div cla
   <form id="acctform" style="display:flex;gap:8px;flex-wrap:wrap"><input class="field2" id="an" placeholder="Name" aria-label="Name" required><input class="field2" id="ap" type="password" placeholder="Password" aria-label="Password" required><button class="btn sec">Add</button></form>
   <button class="btn pri" data-act="signin">Show the sign-in screen</button></div></div>`; }
 
-function setup(){ const done=S.setupDone; return `<div class="scrim t-fade"><div class="sheet t-modal solid" role="dialog" aria-label="Setup" style="padding:24px"><div class="sh"><h2>Set up GlassHome</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+function setup(){ const done=S.setupDone; return `<div class="scrim t-fade"><div class="sheet t-modal solid" role="dialog" aria-label="Setup" style="padding:24px"><div class="sh"><h2>Set up A.D.A.</h2><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
   <div class="radar"><i></i><i></i><i></i><span class="ring"></span><div class="hub">${haI(60)}${done?`<span class="ok">${ic('check',16,3)}</span>`:''}</div></div>
   <p style="margin:0;text-align:center;font-size:17px">${done?'Found Home Assistant at <b>homeassistant.local:8123</b>':'Looking for Home Assistant on your network…'}</p>${done?'<button class="btn pri" data-act="close">Connect</button>':''}</div></div>`; }
 
@@ -2185,7 +2186,7 @@ table{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:
 @media (max-width:640px){.pg{padding:22px 16px}.kp{grid-template-columns:repeat(2,1fr)}.top{flex-direction:column}table{font-size:11px}th,td{padding:5px 3px}}
 @media print{body{background:#fff}.pg{padding:0;max-width:none}.bar{display:none}@page{size:A4;margin:14mm}h2{break-after:avoid}table{break-inside:auto}tr{break-inside:avoid}}
 </style></head><body><div class="pg">
-<div class="top"><div><div class="brand">A.D.A. · Power &amp; water report</div><h1>${esc(r.site)}</h1><div class="sub">${longD(r.from)} – ${longD(r.to)} · ${ds.length} day${ds.length===1?'':'s'} of data${ds.length<r.days_requested?` (of ${r.days_requested} requested)`:''}</div></div>
+<div class="top"><div><div class="brand">A.D.A. · Always-on Domestic Automation</div><div class="sub" style="margin-top:2px">Power &amp; water report</div><h1>${esc(r.site)}</h1><div class="sub">${longD(r.from)} – ${longD(r.to)} · ${ds.length} day${ds.length===1?'':'s'} of data${ds.length<r.days_requested?` (of ${r.days_requested} requested)`:''}</div></div>
 <div class="bar"><button onclick="print()">Print / save as PDF</button><button class="s" onclick="close()">Close</button></div></div>
 ${r.seeded?`<div class="sample"><b>Contains sample data.</b> ${r.demo?'This report was made from the dashboard demo, not a real building.':'Days before the hub started were filled with sample figures for demonstration.'}</div>`:''}
 <h2>Summary</h2>
@@ -2289,7 +2290,7 @@ function loginView(){ const n=(S.pin||'').length, site=(LIVE.cfg&&LIVE.cfg.site_
   <div class="pdots t-input ${S.pinErr?'is-shaking':''}" aria-live="polite">${[0,1,2,3,4,5].map(i=>`<i class="${i<n?'on':''}${i>=4&&i>=n?' opt':''}"></i>`).join('')}</div>
   ${S.pinErr?`<div class="perr">${esc(S.pinErr)}</div>`:''}
   <div class="ppad">${['1','2','3','4','5','6','7','8','9','del','0','ok'].map(k=>`<button data-act="${k==='del'?'pindel':k==='ok'?'pinok':'pin'}" data-v="${k}" aria-label="${k==='del'?'Delete':k==='ok'?'Sign in':k}" class="${k==='ok'?'ok':''}">${k==='del'?ic('x',18):k==='ok'?ic('arrow',18,2.4):k}</button>`).join('')}</div>
-  <p class="sub" style="font-size:11.5px;margin:0">${L('Forgot it? The owner can set a new one under People.','You forget am? Owner fit give you new one for People.')}</p></div></div>`; }
+  <p class="sub" style="font-size:11.5px;margin:0">${L('Forgot it? The owner can set a new one under People.','You forget am? Owner fit give you new one for People.')}</p><p class="lgbrand">A.D.A. · Always-on Domestic Automation</p></div></div>`; }
 async function pinSubmit(){ const pin=S.pin||''; if(pin.length<4){ S.pinErr=L('PINs are 4 to 8 digits','PIN na 4 to 8 numbers'); update(); return; }
  try{ const r=await fetch(LIVE.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})}); const j=await r.json().catch(()=>({}));
   if(r.ok){ LIVE.token=j.token; try{ localStorage.setItem(tokKey(),j.token); }catch(e){} S.ov=null; S.pin=''; S.pinErr=''; await liveMe(); toast(L(`Welcome, ${j.name} (${j.label})`,`Welcome, ${j.name}`)); liveTick(); liveExtras(); update(); }

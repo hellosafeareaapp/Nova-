@@ -1,4 +1,4 @@
-# A.D.A. node (ESP32)
+# A.D.A. node (ESP32) — Always-on Domestic Automation
 
 The ESP32 that replaces `house_sim`'s pretend hardware. It reports to
 `hub.py` once a second, and the hub tells it which loads should be on.

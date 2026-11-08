@@ -1,5 +1,5 @@
 """
-A.D.A. hub: house_sim running behind a local web server.
+A.D.A. (Always-on Domestic Automation) hub: house_sim behind a local web server.
 
 The dashboard that used to live here was deleted; what remains is the API
 and the settings engine it will be rebuilt on. GET / says as much.
@@ -1384,7 +1384,7 @@ class Hub(BaseHTTPRequestHandler):
 
 STUB = """<!doctype html>
 <meta charset="utf-8">
-<title>The house</title>
+<title>A.D.A. hub</title>
 <h1>The house</h1>
 <p>No front end. The server is running.</p>
 <ul>
@@ -1433,7 +1433,7 @@ def main():
         sys.exit("cannot bind port {}: {}\ntry: python hub.py {}".format(
             port, err, port + 1))
 
-    print("A.D.A. hub")
+    print("A.D.A. hub - Always-on Domestic Automation")
     print("  http://127.0.0.1:{}".format(port))
     HUB_URLS.append("http://127.0.0.1:{}".format(port))
     try:

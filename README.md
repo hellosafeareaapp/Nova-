@@ -1,4 +1,4 @@
-# A.D.A. hub
+# A.D.A. hub — Always-on Domestic Automation
 
 `house_sim.py` running behind a local web server.
 
