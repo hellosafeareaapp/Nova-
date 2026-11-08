@@ -16,6 +16,7 @@ and every switch decision still goes through house_sim.run_rules.
 """
 
 import contextlib
+import hashlib
 import json
 import os
 import posixpath
@@ -351,6 +352,51 @@ class HubHouse(house_sim.House):
             STATS.add("drops", 1)
             self.event("DIESEL DROP", "{:.1f} L while gen off".format(lost))
             self.fuel_base = litres
+
+
+# ---------------------------------------------------------------- people & PINs
+# Nobody has a PIN until the owner sets one; until then the hub is open, as it
+# always was. Once anyone has a PIN, every reading and switch needs a login.
+
+USERS_FILE = os.path.join(HERE, "users.json")
+ROLES = {"resident": 1, "caretaker": 2, "manager": 3, "owner": 4}
+ROLE_LABEL = {"resident": "Resident", "caretaker": "Caretaker", "manager": "Manager", "owner": "Owner"}
+NEEDS = {  # minimum role level per route
+    ("GET", "/state"): 1, ("GET", "/report.json"): 1, ("GET", "/alerts"): 1,
+    ("GET", "/config"): 1, ("GET", "/settings"): 1, ("GET", "/users"): 3,
+    ("POST", "/switch"): 2, ("POST", "/source"): 2, ("POST", "/fuel"): 2,
+    ("POST", "/service"): 2, ("POST", "/delivery"): 2,
+    ("POST", "/config"): 3, ("POST", "/notify/test"): 3, ("POST", "/settings"): 3,
+    ("POST", "/users"): 3, ("POST", "/logout"): 1,
+}
+USERS_LOCK = threading.Lock()
+LOGIN_FAILS = {}                 # ip -> [count, locked_until]
+
+
+def load_users():
+    try:
+        with open(USERS_FILE, "r", encoding="utf-8") as fh:
+            raw = json.load(fh)
+    except (OSError, ValueError):
+        raw = {}
+    users = [u for u in raw.get("users", []) if isinstance(u, dict) and u.get("role") in ROLES]
+    sessions = raw.get("sessions") if isinstance(raw.get("sessions"), dict) else {}
+    return {"users": users, "sessions": sessions}
+
+
+def save_users(db):
+    tmp = USERS_FILE + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump(db, fh, indent=1)
+    os.replace(tmp, USERS_FILE)
+
+
+def pin_hash(pin, salt):
+    return hashlib.pbkdf2_hmac("sha256", pin.encode(), bytes.fromhex(salt), 120000).hex()
+
+
+def public_users(db):
+    return [{"name": u["name"], "role": u["role"], "label": ROLE_LABEL[u["role"]]} for u in db["users"]]
 
 
 # ---------------------------------------------------------------- config file
@@ -894,12 +940,111 @@ class Hub(BaseHTTPRequestHandler):
     def _json(self, code, payload):
         self._send(code, json.dumps(payload), "application/json; charset=utf-8")
 
+    def _who(self):
+        """(name, role) for this request, or ("", "owner") while no PINs exist."""
+        db = load_users()
+        if not db["users"]:
+            return "", "owner", False
+        tok = self.headers.get("X-ADA-Token", "")
+        s = db["sessions"].get(tok) if tok else None
+        if s and any(u["name"] == s["name"] and u["role"] == s["role"] for u in db["users"]):
+            return s["name"], s["role"], True
+        return None, None, True
+
+    def _allowed(self, method, route):
+        need = NEEDS.get((method, route))
+        if need is None:
+            return True
+        name, role, locked = self._who()
+        self.who = (name, role)
+        if role is None:
+            self._json(401, {"error": "login needed", "login": True}); return False
+        if ROLES[role] < need:
+            self._json(403, {"error": "a {} can't do that".format(ROLE_LABEL[role].lower())}); return False
+        return True
+
+    def _login(self, body):
+        ip = self.client_address[0]
+        fails = LOGIN_FAILS.get(ip, [0, 0])
+        if time.monotonic() < fails[1]:
+            self._json(429, {"error": "too many wrong PINs, wait a minute"}); return
+        pin = str(body.get("pin") or "")
+        with USERS_LOCK:
+            db = load_users()
+            for u in db["users"]:
+                if secrets.compare_digest(pin_hash(pin, u["salt"]), u["hash"]):
+                    tok = secrets.token_hex(16)
+                    db["sessions"][tok] = {"name": u["name"], "role": u["role"], "at": time.strftime("%Y-%m-%d %H:%M")}
+                    # keep the newest 50 sessions
+                    if len(db["sessions"]) > 50:
+                        for k in list(db["sessions"])[:-50]:
+                            del db["sessions"][k]
+                    save_users(db)
+                    LOGIN_FAILS.pop(ip, None)
+                    self._json(200, {"token": tok, "name": u["name"], "role": u["role"], "label": ROLE_LABEL[u["role"]]})
+                    return
+        fails[0] += 1
+        if fails[0] >= 5:
+            fails = [0, time.monotonic() + 60]
+        LOGIN_FAILS[ip] = fails
+        self._json(401, {"error": "wrong PIN"})
+
+    def _logout(self, _body):
+        tok = self.headers.get("X-ADA-Token", "")
+        with USERS_LOCK:
+            db = load_users()
+            db["sessions"].pop(tok, None)
+            save_users(db)
+        self._json(200, {"ok": True})
+
+    def _users(self, body):
+        """Add or remove a person. Managers can't create or remove owners, and
+        there is always at least one owner once PINs exist."""
+        name, role, _ = self._who()
+        action = body.get("action")
+        with USERS_LOCK:
+            db = load_users()
+            if action == "add":
+                who = str(body.get("name") or "").strip()[:30]
+                new_role = body.get("role")
+                pin = str(body.get("pin") or "")
+                if not who or new_role not in ROLES:
+                    self._json(400, {"error": "name and role needed"}); return
+                if not (pin.isdigit() and 4 <= len(pin) <= 8):
+                    self._json(400, {"error": "PIN must be 4 to 8 digits"}); return
+                if not db["users"] and new_role != "owner":
+                    self._json(400, {"error": "the first person must be the owner"}); return
+                if ROLES[new_role] > ROLES[role]:
+                    self._json(403, {"error": "you can't create someone above your own role"}); return
+                for u in db["users"]:
+                    if secrets.compare_digest(pin_hash(pin, u["salt"]), u["hash"]):
+                        self._json(400, {"error": "that PIN is already used by someone else"}); return
+                db["users"] = [u for u in db["users"] if u["name"].lower() != who.lower()]
+                salt = secrets.token_hex(8)
+                db["users"].append({"name": who, "role": new_role, "salt": salt, "hash": pin_hash(pin, salt)})
+            elif action == "remove":
+                who = str(body.get("name") or "")
+                target = next((u for u in db["users"] if u["name"] == who), None)
+                if not target:
+                    self._json(404, {"error": "no such person"}); return
+                if ROLES[target["role"]] > ROLES[role]:
+                    self._json(403, {"error": "you can't remove someone above your own role"}); return
+                rest = [u for u in db["users"] if u is not target]
+                if rest and not any(u["role"] == "owner" for u in rest):
+                    self._json(400, {"error": "keep at least one owner"}); return
+                db["users"] = rest
+                db["sessions"] = {k: v for k, v in db["sessions"].items() if v.get("name") != who}
+            else:
+                self._json(400, {"error": "action must be add or remove"}); return
+            save_users(db)
+        self._json(200, {"users": public_users(db)})
+
     def do_OPTIONS(self):
         try:
             self.send_response(204)
             self.send_header("Access-Control-Allow-Origin", "*")
             self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-            self.send_header("Access-Control-Allow-Headers", "Content-Type")
+            self.send_header("Access-Control-Allow-Headers", "Content-Type, X-ADA-Token")
             self.send_header("Content-Length", "0")
             self.end_headers()
         except (BrokenPipeError, ConnectionResetError):
@@ -924,6 +1069,16 @@ class Hub(BaseHTTPRequestHandler):
             return
         if path == "/api":
             self._send(200, STUB, "text/html; charset=utf-8")
+            return
+        if path == "/me":
+            name, role, locked = self._who()
+            self._json(200, {"name": name, "role": role, "label": ROLE_LABEL.get(role or "", ""),
+                             "pins": locked, "logged_in": role is not None and (not locked or bool(name))})
+            return
+        if not self._allowed("GET", path):
+            return
+        if path == "/users":
+            self._json(200, {"users": public_users(load_users())})
             return
         if path == "/report.json":
             days = 7
@@ -986,6 +1141,20 @@ class Hub(BaseHTTPRequestHandler):
 
     def do_POST(self):
         route = self.path.split("?", 1)[0]
+        if route in ("/login", "/logout", "/users"):
+            try:
+                body = self._body()
+            except (ValueError, TypeError):
+                self._json(400, {"error": "expected a JSON object"}); return
+            if route == "/login":
+                self._login(body); return
+            # the very first owner can be created while the hub is still open
+            if not self._allowed("POST", route):
+                return
+            getattr(self, "_" + route.strip("/"))(body)
+            return
+        if route != "/device" and not self._allowed("POST", route):
+            return
         if route == "/settings":
             try:
                 length = int(self.headers.get("Content-Length") or 0)

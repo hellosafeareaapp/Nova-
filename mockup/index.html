@@ -1053,6 +1053,18 @@ body.dense .pn .btn::before,body.dense .pn .btn::after,body.dense .bsh .btn::bef
 .bldg{display:grid;grid-template-columns:1fr 1fr;gap:12px}.bldg .alf:first-child{grid-column:1/-1}
 .alf .u{text-transform:none;letter-spacing:0;font-weight:600;opacity:.8}.alf .hint{font-size:11.5px;color:var(--d-ink2,#6b6052)}
 @media (max-width:719px){.bldg{grid-template-columns:1fr}}
+
+.me-pill{cursor:pointer;gap:5px}.me-pill.warn{border-color:var(--d-warn);color:var(--d-warn)}
+.lgwrap{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:16px;background:var(--d-bg,#efe9df)}
+.lgcard{width:min(340px,100%);display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;color:var(--d-ink,#2a2219)}
+.lgcard h2{margin:0;font-family:var(--serif);font-weight:500;font-size:28px}.lgcard .sub{margin:0}
+.pdots{display:flex;gap:12px;margin:6px 0}.pdots i{width:13px;height:13px;border-radius:50%;border:2px solid var(--d-ink,#2a2219);transition:background .15s}.pdots i.on{background:var(--d-ink,#2a2219)}.pdots i.opt{opacity:.25}
+.perr{color:var(--d-warn);font-size:13px;font-weight:600}
+.ppad{display:grid;grid-template-columns:repeat(3,72px);gap:12px}.ppad button{height:72px;border-radius:50%;border:1px solid var(--d-line,#ddd);background:rgba(var(--d-pn),.95);font-size:26px;font-weight:500;color:var(--d-ink,#2a2219);display:grid;place-items:center;transition:transform .1s}
+.ppad button:active{transform:scale(.93)}.ppad button.ok{background:var(--d-ink,#2a2219);color:var(--d-bg,#fff);border-color:var(--d-ink)}
+.pav{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--d-box);border:1px solid var(--d-line);font-weight:700;font-size:13px;flex:none}
+.ppl .mini-b.on{background:var(--d-ink);color:var(--d-bg);border-color:var(--d-ink)}
+.psel{height:42px;border-radius:11px;border:1px solid var(--d-line,#ddd);background:var(--d-box,#fff);padding:0 10px;font-size:14px;color:var(--d-ink,#222);width:100%}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1352,6 +1364,8 @@ function overlays(){ let o='';
  if(S.ov==='ask') o+=askPanel();
  if(S.ov==='bld') o+=bldSheet();
  if(S.ov==='alerts') o+=alertsSheet();
+ if(S.ov==='people') o+=peopleSheet();
+ if(S.ov==='login') o+=loginView();
  if(S.ov==='building') o+=buildingSheet();
  if(S.ov==='delivery') o+=deliverySheet();
  return o; }
@@ -1584,12 +1598,21 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
 function headerHTML(st){ const now=new Date(), h=now.getHours(), greet=h<12?'Good morning':h<16?'Good afternoon':'Good evening';
  return ` <header class="dh"><div class="clock2"><b>${hhmm()}</b></div><div class="when"><b>${greet}, ${esc(S.people.find(p=>p.id===S.me).name)}</b><br>${now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} · Lekki, Lagos</div>
   <div class="right"><span class="pill live-pill" title="${LIVE.on?'Data from the hub':'Demo data, not a real house'}"><span class="dot"></span>${LIVE.on?(st?'Hub not answering':'Live from hub'):(st?'Not live':'Demo')} · ${ago()} ago</span>${LIVE.on?`<span class="pill dev-pill ${LIVE.dev&&LIVE.dev.online?'on':''}"><span class="dot"></span>${!LIVE.dev||!LIVE.dev.id?'No controller':LIVE.dev.online?'Controller online':'Controller offline'}</span>`:''}<span class="pill src-${SIM.src}"><span class="dot"></span>${SRC[SIM.src][0]} · ${SIM.src==='off'?'—':Math.round(SIM.v)+' V'}</span>
-  <button class="askbtn" data-act="askopen">${ic('sparkle',13)} Ask A.D.A.</button><span class="avs" aria-label="Alex and Ada are home, Tobi is out"><span>A<i></i></span><span>Ad<i></i></span><span class="away">T<i></i></span></span>
+  ${mePill()}<button class="askbtn" data-act="askopen">${ic('sparkle',13)} Ask A.D.A.</button><span class="avs" aria-label="Alex and Ada are home, Tobi is out"><span>A<i></i></span><span>Ad<i></i></span><span class="away">T<i></i></span></span>
   <button class="iconbtn" data-act="dark" data-v="${isDark()?'false':'true'}" aria-label="Switch to ${isDark()?'light':'dark'}">${ic(isDark()?'sun':'moon',15)}</button><button class="iconbtn" data-act="studio" aria-label="Creator Studio">${ic('palette',15)}</button></div></header>`; }
 function denseView(){ return `<div id="dense">${denseBody()}</div>`; }
 function refreshDense(){ const el=document.getElementById('dense'); if(!el) return; const sc=[...el.querySelectorAll('.log')].map(x=>x.scrollTop); el.innerHTML=denseBody(); postRender(el); el.querySelectorAll('.log').forEach((x,i)=>x.scrollTop=sc[i]||0); }
 setInterval(()=>{ tick(); sensorTick(); aiTick(); tickEstate(); if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)&&!S.sliding&&!drag&&!pinch&&!S.sheet&&!S.ov&&!S.share&&!S.studio) refreshDense(); else document.body.classList.toggle('stale',isStale()); },1000);
 function denseAct(a,v){
+ if(a==='pin'){ if((S.pin||'').length<8){ S.pin=(S.pin||'')+v; S.pinErr=''; } return true; }
+ if(a==='pindel'){ S.pin=(S.pin||'').slice(0,-1); return true; }
+ if(a==='pinok'){ pinSubmit(); return 'done'; }
+ if(a==='pplopen'){ S.ov='people'; peopleLoad().then(()=>{ if(S.ov==='people') update(); }); return true; }
+ if(a==='ppladd'){ peopleAdd(); return 'done'; }
+ if(a==='pplrm'){ peopleRemove(v); return 'done'; }
+ if(a==='logout'){ S.ov=null; logout(); return true; }
+ if(a==='demoas'){ DEMO_ME=v; toast(L(`Now viewing as ${ROLE_NM[v]}`,`You be ${ROLE_NM[v]} now`)); return true; }
+ if(gate(a)) return 'done';
  if(['dload','dlight','dlall','dgate'].includes(a)&&isStale()){ toast('The hub isn’t answering, so nothing was switched or queued'); return true; }
  if(a==='dsrc'){ if(LIVE.on){ hubFetch('/source',{source:SRCREV[v]}).then(r=>{ if(r.ok){ applyHub(r.j); refreshDense(); } else toast(r.status===409?'The controller is reporting the power source. Press BOOT on the ESP32 to change it.':(r.j.error||'Refused')); }).catch(()=>toast('The hub didn’t answer')); return 'done'; } setSrc(v); return true; }
  if(a==='doff'&&LIVE.on){ toast('Live mode: stop hub.py to see what happens when the hub goes quiet'); return 'done'; }
@@ -1936,8 +1959,9 @@ function hubEv(e){ const m=/^(ON|OFF)\s+(\S+)$/.exec(e.what), what=m?`${m[1]==='
  const cls=BAD_EV.test(e.what)?'bad':/^(shed|spike|tank|restored)/.test(e.why||'')?'rule':'';
  return {t:e.time,what,why:e.why||'',cls,hub:1}; }
 async function hubFetch(path,body){ const ctl=new AbortController(), to=setTimeout(()=>ctl.abort(),3000);
- try{ const r=await fetch(LIVE.base+path,body===undefined?{signal:ctl.signal,cache:'no-store'}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body),signal:ctl.signal});
-  const j=await r.json().catch(()=>({})); return {ok:r.ok,status:r.status,j}; } finally{ clearTimeout(to); } }
+ const hd=LIVE.token?{'X-ADA-Token':LIVE.token}:{};
+ try{ const r=await fetch(LIVE.base+path,body===undefined?{signal:ctl.signal,cache:'no-store',headers:hd}:{method:'POST',headers:Object.assign({'Content-Type':'application/json'},hd),body:JSON.stringify(body),signal:ctl.signal});
+  const j=await r.json().catch(()=>({})); if(r.status===401&&j.login) needLogin(); return {ok:r.ok,status:r.status,j}; } finally{ clearTimeout(to); } }
 function applyHub(d){
  SIM.src=SRCMAP[d.source]||'off'; SIM.v=d.voltage; SIM.vh.push(d.voltage); if(SIM.vh.length>60) SIM.vh.shift();
  SIM.batt=d.battery; SIM.tank=d.tank; if(typeof d.fuel==='number') SIM.fuel=d.fuel/(d.diesel_cap||DIESEL_CAP)*100;
@@ -1955,16 +1979,18 @@ function applyHub(d){
  if(LIVE.first){ LIVE.seenAlert=al.length?al[0].id:0; LIVE.first=false; }
  else al.filter(a=>a.id>LIVE.seenAlert).reverse().forEach(a=>{ toast(`${a.level==='ok'?'✓':'⚠'} ${a.title}${a.body?': '+a.body:''}`); LIVE.seenAlert=Math.max(LIVE.seenAlert,a.id); });
  SIM.lastOk=Date.now(); SIM.offline=false; }
-async function liveTick(){ if(!LIVE.on||LIVE.busy) return; LIVE.busy=true;
+async function liveTick(){ if(!LIVE.on||LIVE.busy||LIVE.authing||S.ov==='login') return; LIVE.busy=true;
  try{ const r=await hubFetch('/state'); if(r.ok&&r.j&&r.j.loads) applyHub(r.j); }catch(e){ /* stays stale; the bar says so */ } finally{ LIVE.busy=false; } }
 async function liveExtras(){ if(!LIVE.on) return;
- try{ const c=await hubFetch('/config'); if(c.ok){ LIVE.cfg=c.j; applyBuilding(); } }catch(e){}
+ liveMe(); try{ const c=await hubFetch('/config'); if(c.ok){ LIVE.cfg=c.j; applyBuilding(); } }catch(e){}
  for(const n of [7,30]){ try{ const r=await hubFetch('/report.json?days='+n); if(r.ok) LIVE.rep[n]=r.j; }catch(e){} } }
 async function liveStart(){
  const q=new URLSearchParams(location.search).get('hub');
  if(q) LIVE.base=q.replace(/\/$/,''); else if(!/^https?:$/.test(location.protocol)||/github\.io$/.test(location.hostname)) return;
- try{ const r=await hubFetch('/state'); if(!(r.ok&&r.j&&r.j.loads&&'source' in r.j)) return; LIVE.on=true; S.liveSeen=1;
-  SIM.log=[]; SIM.fuelLog=[]; applyHub(r.j); SIM.socH=[SIM.batt,SIM.batt]; SIM.socMin=SIM.batt; liveExtras(); setInterval(liveTick,1000); setInterval(liveExtras,30000);
+ try{ LIVE.token=localStorage.getItem(tokKey())||''; }catch(e){}
+ try{ const r=await hubFetch('/state'), locked=r.status===401&&r.j&&r.j.login; if(!locked&&!(r.ok&&r.j&&r.j.loads&&'source' in r.j)) return; LIVE.on=true; S.liveSeen=1;
+  SIM.log=[]; SIM.fuelLog=[]; if(!locked){ applyHub(r.j); } SIM.socH=[SIM.batt,SIM.batt]; SIM.socMin=SIM.batt; await liveMe(); liveExtras(); setInterval(liveTick,1000); setInterval(liveExtras,30000);
+  if(locked){ needLogin(); return; }
   toast(LIVE.base?`Connected to the hub at ${LIVE.base}`:'Connected to the hub: live data');
   if(S.view==='dash'&&DENSE_PAGES.includes(S.dash)) refreshDense(); }
  catch(e){ if(q){ LIVE.on=true; SIM.lastOk=0; setInterval(liveTick,1000); setInterval(liveExtras,30000); } } }
@@ -2189,6 +2215,55 @@ async function serviceDone(){ if(LIVE.on){ try{ const r=await hubFetch('/service
  DEMO_GEN.services.push({date:new Date().toISOString().slice(0,10),at_h:DEMO_GEN.total,note:'serviced'}); DEMO_GEN.at=DEMO_GEN.total; slog('GEN SERVICED',''); toast(L('Service logged. Countdown restarted.','Service don log.')); }
 
 applyBuilding();
+
+/* ============ people, PINs and roles ============ */
+const ROLE_LV={resident:1,caretaker:2,manager:3,owner:4}, ROLE_NM={resident:'Resident',caretaker:'Caretaker',manager:'Manager',owner:'Owner'};
+const ROLE_CAN={resident:L('See everything, switch nothing','See everything, no fit switch'),caretaker:L('Switch things, log deliveries and services','Switch things, log delivery and service'),manager:L('Everything, plus setup, alerts and people','Everything, plus setup, alerts and people'),owner:L('Everything','Everything')};
+const NEED={dload:2,dlight:2,dlall:2,dgate:2,acset:2,rscene:2,aido:2,aiundo:2,dsrc:2,frefill:2,ftheft:2,svcdone:2,dlvopen:2,dlvsave:2,bldopen:3,bldsave:3,alsave:3,altest:3,aimode:3,aiallow:3};
+const DEMO_PEOPLE=[{name:'Alex',role:'owner'},{name:'Ada',role:'manager'},{name:'Musa',role:'caretaker'},{name:'Tolu',role:'resident'}];
+let DEMO_ME='owner';
+const tokKey=()=>'ada-token-'+(LIVE.base||location.host);
+function myRole(){ if(!LIVE.on) return DEMO_ME; if(!LIVE.me||!LIVE.me.pins) return 'owner'; return LIVE.me.role||'resident'; }
+function gate(a){ const need=NEED[a]; if(!need) return false; const r=myRole(); if(ROLE_LV[r]>=need) return false;
+ toast(L(`Signed in as ${ROLE_NM[r]}: you can't do that. Ask a ${need>=3?'manager':'caretaker'}.`,`You be ${ROLE_NM[r]}: you no fit do am. Ask ${need>=3?'manager':'caretaker'}.`)); return true; }
+async function liveMe(){ try{ const r=await hubFetch('/me'); if(r.ok) LIVE.me=r.j; }catch(e){} }
+function needLogin(){ if(LIVE.authing) return; if(S.ov!=='login'){ S.ov='login'; S.pin=''; update(); } }
+function loginView(){ const n=(S.pin||'').length, site=(LIVE.cfg&&LIVE.cfg.site_name)||'A.D.A.';
+ return `<div class="lgwrap t-fade" role="dialog" aria-label="Sign in"><div class="lgcard t-modal">
+  <span class="aiav">${ic('shield',18)}</span><h2>${esc(site)}</h2><p class="sub">${L('Enter your PIN','Enter your PIN')}</p>
+  <div class="pdots t-input ${S.pinErr?'is-shaking':''}" aria-live="polite">${[0,1,2,3,4,5].map(i=>`<i class="${i<n?'on':''}${i>=4&&i>=n?' opt':''}"></i>`).join('')}</div>
+  ${S.pinErr?`<div class="perr">${esc(S.pinErr)}</div>`:''}
+  <div class="ppad">${['1','2','3','4','5','6','7','8','9','del','0','ok'].map(k=>`<button data-act="${k==='del'?'pindel':k==='ok'?'pinok':'pin'}" data-v="${k}" aria-label="${k==='del'?'Delete':k==='ok'?'Sign in':k}" class="${k==='ok'?'ok':''}">${k==='del'?ic('x',18):k==='ok'?ic('arrow',18,2.4):k}</button>`).join('')}</div>
+  <p class="sub" style="font-size:11.5px;margin:0">${L('Forgot it? The owner can set a new one under People.','You forget am? Owner fit give you new one for People.')}</p></div></div>`; }
+async function pinSubmit(){ const pin=S.pin||''; if(pin.length<4){ S.pinErr=L('PINs are 4 to 8 digits','PIN na 4 to 8 numbers'); update(); return; }
+ try{ const r=await fetch(LIVE.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin})}); const j=await r.json().catch(()=>({}));
+  if(r.ok){ LIVE.token=j.token; try{ localStorage.setItem(tokKey(),j.token); }catch(e){} S.ov=null; S.pin=''; S.pinErr=''; await liveMe(); toast(L(`Welcome, ${j.name} (${j.label})`,`Welcome, ${j.name}`)); liveTick(); liveExtras(); update(); }
+  else { S.pin=''; S.pinErr=j.error||'Wrong PIN'; update(); } }
+ catch(e){ S.pinErr=L('The hub didn’t answer','Hub no answer'); update(); } }
+async function logout(){ try{ await hubFetch('/logout',{}); }catch(e){} LIVE.token=''; try{ localStorage.removeItem(tokKey()); }catch(e){} await liveMe(); if(LIVE.me&&LIVE.me.pins) needLogin(); else update(); }
+function peopleSheet(){ const me=myRole(), canEdit=ROLE_LV[me]>=3, ppl=LIVE.on?(LIVE.people||[]):DEMO_PEOPLE, open=LIVE.on&&LIVE.me&&!LIVE.me.pins;
+ const roles=Object.keys(ROLE_LV).filter(r=>ROLE_LV[r]<=ROLE_LV[me]);
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid bsh" role="dialog" aria-label="People">
+  <div class="sh"><div><h2>${L('People & PINs','People & PINs')}</h2><div class="sub">${LIVE.on?(open?L('No PINs yet: anyone on this Wi-Fi can control the house.','No PIN yet: anybody for this Wi-Fi fit control the house.'):L(`Signed in as ${esc(LIVE.me.name)} · ${ROLE_NM[me]}`,`You be ${esc(LIVE.me.name)} · ${ROLE_NM[me]}`)):L('Demo: pick who you are to see what each role can do.','Demo: pick who you be make you see wetin each role fit do.')}</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+  ${open?`<div class="bst">${L('<b>Set an owner PIN first.</b> After that, everyone needs a PIN to see or switch anything.','<b>Set owner PIN first.</b> After that, everybody go need PIN.')}</div>`:''}
+  <div class="rows2 ppl">${ppl.map(p=>`<div class="r2"><span class="pav">${esc(p.name[0]||'?')}</span><span class="t"><b>${esc(p.name)}</b><span>${ROLE_NM[p.role]} · ${ROLE_CAN[p.role]}</span></span>${!LIVE.on?`<button class="mini-b ${DEMO_ME===p.role?'on':''}" data-act="demoas" data-v="${p.role}">${DEMO_ME===p.role?L('You','You'):L('Be','Be')}</button>`:canEdit&&ROLE_LV[p.role]<=ROLE_LV[me]&&!(LIVE.me&&p.name===LIVE.me.name)?`<button class="mini-b" data-act="pplrm" data-v="${esc(p.name)}">${L('Remove','Remove')}</button>`:''}</div>`).join('')||`<p class="sub" style="font-size:13px">${L('Nobody yet.','Nobody yet.')}</p>`}</div>
+  ${LIVE.on&&(canEdit||open)?`<div class="pnh" style="min-height:0"><span class="lb">${ic('sparkle',14,2)}${open?L('Create the owner','Create the owner'):L('Add someone','Add person')}</span></div>
+  <div class="alf two"><div><label for="p-name">${L('Name','Name')}</label><input id="p-name" autocomplete="off" placeholder="${open?'Your name':'e.g. Musa'}"></div><div><label for="p-pin">${L('PIN (4–8 digits)','PIN (4–8 numbers)')}</label><input id="p-pin" inputmode="numeric" autocomplete="off" type="password" maxlength="8"></div></div>
+  ${open?'<input type="hidden" id="p-role" value="owner">':`<div class="alf"><label for="p-role">${L('Role','Role')}</label><select id="p-role" class="psel">${roles.map(r=>`<option value="${r}" ${r==='caretaker'?'selected':''}>${ROLE_NM[r]}: ${ROLE_CAN[r]}</option>`).join('')}</select></div>`}
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="ppladd">${open?L('Create owner','Create owner'):L('Add','Add')}</button>${LIVE.me&&LIVE.me.pins?`<button class="btn sec" data-act="logout">${L('Sign out','Sign out')}</button>`:''}</div>`:LIVE.on&&LIVE.me&&LIVE.me.pins?`<div><button class="btn sec" data-act="logout">${L('Sign out','Sign out')}</button></div>`:''}
+  </div></div>`; }
+async function peopleLoad(){ if(!LIVE.on) return; try{ const r=await hubFetch('/users'); if(r.ok) LIVE.people=r.j.users; }catch(e){} }
+async function peopleAdd(){ const g=id=>(document.getElementById(id)||{}).value||'', body={action:'add',name:g('p-name').trim(),pin:g('p-pin').trim(),role:g('p-role')||'owner'};
+ const first=LIVE.me&&!LIVE.me.pins; if(first) LIVE.authing=true;
+ try{ const r=await hubFetch('/users',body); if(!r.ok){ toast(r.j.error||'Could not add'); return; } LIVE.people=r.j.users; if(!first) peopleLoad(); toast(L(`${body.name} added`,`${body.name} don enter`));
+  if(first){ const l=await fetch(LIVE.base+'/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({pin:body.pin})}).then(x=>x.json()); if(l.token){ LIVE.token=l.token; try{ localStorage.setItem(tokKey(),l.token); }catch(e){} } await liveMe(); }
+  }catch(e){ toast('The hub didn’t answer'); } finally{ if(first){ LIVE.authing=false; if(S.ov==='login') S.ov='people'; } update(); } }
+async function peopleRemove(name){ try{ const r=await hubFetch('/users',{action:'remove',name}); if(r.ok){ LIVE.people=r.j.users; toast(L(`${name} removed`,`${name} don comot`)); update(); } else toast(r.j.error||'Could not remove'); }catch(e){ toast('The hub didn’t answer'); } }
+function mePill(){ const r=myRole();
+ if(LIVE.on&&LIVE.me&&!LIVE.me.pins) return `<button class="pill me-pill warn" data-act="pplopen">${ic('shield',12,2)} ${L('No PINs','No PIN')}</button>`;
+ const nm=LIVE.on?(LIVE.me&&LIVE.me.name)||'':(DEMO_PEOPLE.find(p=>p.role===DEMO_ME)||{}).name;
+ return `<button class="pill me-pill" data-act="pplopen" aria-label="People and sign-in">${ic('shield',12,2)} ${esc(nm||'')} · ${ROLE_NM[r]}</button>`; }
+
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their
 // previous state and flipped after a reflow. AN remembers the last value per key.
@@ -2400,7 +2475,7 @@ document.addEventListener('click',e=>{
  }
  update();
 });
-document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape'&&(S.sheet||S.ov||S.share)){ const ms=[...document.querySelectorAll('#layer .t-modal, #layer .si')]; closeAnim(ms[ms.length-1],()=>{ if(S.share) S.share=null; else { S.sheet=null; S.ov=null; } }); } });
+document.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target.matches('[role=button][data-act]')){ e.preventDefault(); e.target.click(); } if(e.key==='Escape'&&S.ov!=='login'&&(S.sheet||S.ov||S.share)){ const ms=[...document.querySelectorAll('#layer .t-modal, #layer .si')]; closeAnim(ms[ms.length-1],()=>{ if(S.share) S.share=null; else { S.sheet=null; S.ov=null; } }); } });
 let knobStart=null;
 document.addEventListener('input',e=>{ const t=e.target;
  if(t.classList.contains('gs')) t.style.setProperty('--p',((t.value-t.min)/(t.max-t.min)*100)+'%');

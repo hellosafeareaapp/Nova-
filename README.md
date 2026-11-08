@@ -30,6 +30,25 @@ Live today: power source, voltage, battery, water tank, diesel, every load
 the report. Still demo-only in live mode: prepaid meter units, solar,
 cameras, weather and the estate view's other buildings.
 
+## People, PINs and roles
+
+Until anyone has a PIN the hub is open, as before, and the header says
+**No PINs**. Tap it, create the owner with a 4–8 digit PIN, and from then on
+every phone needs a PIN to see or switch anything (the ESP32 is unaffected,
+it uses the device key).
+
+| role | can |
+|---|---|
+| Resident | see everything, switch nothing |
+| Caretaker | switch loads, log diesel deliveries, mark the generator serviced |
+| Manager | all of that, plus building setup, phone alerts and adding people |
+| Owner | everything; there is always at least one owner |
+
+Nobody can create or remove someone above their own role. PINs are stored
+hashed (PBKDF2) in `users.json` next to `hub.py` (not committed); five wrong
+PINs lock that device out for a minute. In the demo, **People** lets you
+switch between roles to show what each one can do.
+
 ## Phone alerts
 
 Diesel dropping while the generator is off, diesel low or finished, battery
@@ -98,6 +117,10 @@ Both files must sit in the same folder.
 | `GET /config` | site name, diesel price, whether phone alerts are set up (no secrets) |
 | `POST /config` | `site_name`, `diesel_price`, `diesel_cap`, `gen_lph`, `battery_kwh`, `service_hours`, `alert_diesel_l`, `alert_battery_pct`, `alert_tank_pct`, `ntfy_topic`, `telegram_token`, `telegram_chat` |
 | `POST /notify/test` | sends a test alert |
+| `GET /me` | who this request is signed in as, and whether PINs are on |
+| `POST /login` | `{"pin": "2468"}` returns a token; send it as `X-ADA-Token` |
+| `POST /logout` | ends this token's session |
+| `GET /users`, `POST /users` | managers and owners: list, `{"action": "add", "name", "role", "pin"}` or `{"action": "remove", "name"}` |
 | `POST /delivery` | `{"litres": 50, "price": 1300, "vendor": "Sunny Oil"}`; checked against the measured refill |
 | `POST /service` | `{"note": "oil + filter"}`; restarts the generator service countdown |
 | `POST /source` | demo: `{"source": "inverter"}`; refused while the ESP32 reports the source |

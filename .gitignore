@@ -9,3 +9,5 @@ hub_config.json
 hub_config.json.tmp
 history.json
 history.json.tmp
+users.json
+users.json.tmp
