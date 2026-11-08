@@ -1,0 +1,121 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>A.D.A. — Pilot parts list</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;600&display=swap"><style>
+@page{size:A4;margin:0}
+:root{--ink:#0b1b2b;--ink2:#4a5562;--ink3:#8a939e;--line:#dfe3e7;--paper:#ffffff;--soft:#f3f5f7;--sig:#f5b800;--ok:#1e8e5a;--warn:#c8462c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Archivo,"Liberation Sans",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);page-break-after:always;padding:13mm 15mm 16mm;display:flex;flex-direction:column;gap:5.5mm}
+.page:last-child{page-break-after:auto}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.run{position:absolute;left:15mm;right:15mm;bottom:8mm;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--ink3);border-top:1px solid var(--line);padding-top:2.5mm}
+.mark{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-stretch:85%;font-size:13pt;letter-spacing:.06em}
+.mark .sq{width:6mm;height:6mm;background:var(--sig);display:grid;place-items:center;font-size:8pt;font-weight:900;color:var(--ink)}
+.kicker{font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+h2{margin:0;font-size:21pt;font-weight:800;font-stretch:80%;line-height:1.05;letter-spacing:-.005em}
+h3{margin:0 0 1.5mm;font-size:11pt;font-weight:700}
+p{margin:0;font-size:9.8pt;line-height:1.5;color:var(--ink2)}
+.rule{height:1.2mm;width:16mm;background:var(--sig)}
+.sec{display:flex;flex-direction:column;gap:3mm}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.item{border-top:1.5px solid var(--ink);padding-top:2.5mm}
+.item p{font-size:9.2pt}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;vertical-align:top;padding:2.4mm 2mm;border-bottom:1px solid var(--line);font-size:9.2pt;line-height:1.4}
+th{font-size:7.5pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700;border-bottom:1.5px solid var(--ink)}
+td:first-child{font-weight:700;width:34%;color:var(--ink)}
+td{color:var(--ink2)}
+.img{border:1px solid var(--line)}
+.img img{display:block;width:100%}
+.cap{font-size:7.8pt;color:var(--ink3);margin-top:1.5mm}
+.note{font-size:7.8pt;color:var(--ink3)}
+/* cover */
+.cover{padding:0;gap:0}
+.cover .top{padding:14mm 15mm 0;display:flex;justify-content:space-between;align-items:center}
+.cover .hero{padding:16mm 15mm 0}
+.cover h1{margin:0;font-size:44pt;font-weight:900;font-stretch:78%;line-height:.98;letter-spacing:-.01em;max-width:170mm}
+.cover h1 span{background:linear-gradient(transparent 62%,var(--sig) 62%,var(--sig) 92%,transparent 92%)}
+.cover .sub{margin-top:6mm;font-size:12.5pt;line-height:1.45;color:var(--ink2);max-width:150mm}
+.cover .facts{margin:9mm 15mm 0;display:grid;grid-template-columns:repeat(3,1fr);border-top:1.5px solid var(--ink)}
+.cover .facts div{padding:3mm 4mm 0 0;font-size:9pt;line-height:1.4;color:var(--ink2)}
+.cover .facts b{display:block;font-size:10.5pt;color:var(--ink);margin-bottom:.8mm}
+.cover .shot{margin-top:auto;background:var(--ink);padding:9mm 15mm 0;position:relative}
+.cover .shot img{display:block;width:100%;border-top-left-radius:2mm;border-top-right-radius:2mm;box-shadow:0 -2mm 8mm rgba(0,0,0,.4)}
+.cover .prep{position:absolute;top:3mm;left:15mm;right:15mm;display:flex;justify-content:space-between;font-size:8pt;color:#c9d1da;letter-spacing:.06em}
+.cover .prep b{color:var(--sig);font-weight:700}
+/* diagram */
+.flow{display:grid;grid-template-columns:1fr 6mm 1.15fr 6mm 1.1fr 6mm 1fr;align-items:stretch}
+.node{border:1.5px solid var(--ink);padding:3mm;display:flex;flex-direction:column;gap:1mm}
+.node b{font-size:10pt}
+.node span{font-size:8.3pt;line-height:1.35;color:var(--ink2)}
+.node.key{background:var(--ink);color:#fff}
+.node.key span{color:#c9d1da}
+.arr{display:grid;place-items:center;color:var(--ink);font-weight:900}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:5mm}
+.bubble{padding:3mm 3.5mm;font-size:9pt;line-height:1.45}
+.q{background:var(--sig);font-weight:700;color:var(--ink);margin-bottom:1.5mm}
+.a{background:var(--soft);color:var(--ink2)}
+.report{border:1.5px solid var(--ink)}
+.report .hd{background:var(--ink);color:#fff;padding:2.5mm 4mm;display:flex;justify-content:space-between;font-size:8.5pt;letter-spacing:.06em}
+.report .bd{padding:3.5mm 4mm;display:grid;grid-template-columns:repeat(4,1fr);gap:3mm}
+.report .k{font-size:7.3pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:700}
+.report .v{font-size:17pt;font-weight:800;font-stretch:85%}
+.report .s{font-size:8pt;color:var(--ink2)}
+.report .ft{padding:0 4mm 3.5mm;font-size:8.6pt;color:var(--ink2);line-height:1.45}
+.tl{display:grid;grid-template-columns:repeat(4,1fr);border-top:1.5px solid var(--ink)}
+.tl div{padding:3mm 3mm 0 0;position:relative}
+.tl div::before{content:"";position:absolute;top:-2.1mm;left:0;width:3mm;height:3mm;background:var(--sig);border:1.5px solid var(--ink)}
+.tl b{display:block;font-size:8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:1mm}
+.tl h3{font-size:10pt}
+.tl p{font-size:8.8pt}
+.st{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.st ul{margin:0;padding:0;list-style:none}
+.st li{font-size:9pt;line-height:1.4;color:var(--ink2);padding:1.6mm 0 1.6mm 5mm;border-bottom:1px solid var(--line);position:relative}
+.st li::before{content:"";position:absolute;left:0;top:2.9mm;width:2.2mm;height:2.2mm}
+.st .done li::before{background:var(--ok)}
+.st .next li::before{border:1.5px solid var(--ink)}
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:3.5mm 6mm}
+.faq h3{font-size:9.8pt;margin-bottom:.8mm}
+.faq p{font-size:8.9pt;line-height:1.42}
+.contact{margin-top:auto;background:var(--ink);color:#fff;padding:6mm 7mm;display:flex;justify-content:space-between;align-items:flex-end}
+.contact .nm{font-size:18pt;font-weight:800;font-stretch:85%}
+.contact .rl{font-size:9pt;color:#c9d1da}
+.contact .dt{text-align:right;font-size:10pt;line-height:1.6}
+.contact .dt b{color:var(--sig)}
+
+.dochd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1.5px solid var(--ink);padding-bottom:4mm}
+.dochd .t{text-align:right}.dochd .t b{display:block;font-size:12pt}.dochd .t span{font-size:8.5pt;color:var(--ink3)}
+.big{color:var(--ink);font-size:20pt;font-weight:900;font-stretch:80%;line-height:1.02;margin:0}
+td,th{padding:1.5mm 1.8mm!important;font-size:8.3pt!important}
+td:first-child{width:58%!important}
+.pu{font-size:7.8pt;color:var(--ink2);font-weight:400;margin-top:.3mm}
+.g{display:none}
+td,th{padding:1.3mm 1.8mm!important}
+.page{gap:4mm!important}
+.g{font-size:6.8pt;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-weight:700;margin-top:.4mm}
+td.p{font-family:"IBM Plex Mono",monospace;font-weight:600;color:var(--ink);white-space:nowrap}
+td.src{white-space:nowrap;font-size:7.3pt!important;color:var(--ink3)}
+tr.sum td{border-top:1.5px solid var(--ink);border-bottom:none;font-weight:800;color:var(--ink);font-size:9.5pt!important}
+.tot{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}
+.tot div{border-top:1.5px solid var(--ink);padding-top:2mm}
+.tot b{display:block;font-size:13pt;font-weight:800;font-stretch:85%}
+.tot span{font-size:8.3pt;color:var(--ink2)}
+.box{background:var(--soft);padding:3.5mm 4.5mm}.box p{font-size:8.6pt}
+.run{position:static!important;margin-top:auto}
+</style></head><body><section class="page">
+<div class="dochd"><div class="mark"><span class="sq">A</span>A.D.A.</div><div class="t"><b>Pilot parts list</b><span>One building · November 2026 · prices to be confirmed</span></div></div>
+<p class="big">Hardware for a one-building pilot</p>
+<p>Everything needed to monitor the power source and voltage, measure the tank and switch the borehole pump. All parts are sold by Nigerian electronics sellers (Computer Village, Jumia, Hub360). A.D.A. configures everything; mains work is done by a qualified electrician.</p>
+<table><tr><th>Item</th><th>Qty</th><th>Price (₦)</th><th>Source</th></tr>
+<tr class=""><td>ESP32 development board (WROOM-32)<div class="pu">The controller: Wi-Fi, reports to the hub, drives the relays</div><div class="g">Controller</div></td><td>1</td><td class="p">₦15,000</td><td class="src">Hub360 listing</td></tr><tr class=""><td>5 V power supply (HLK-PM01 module or 5 V 2 A adapter)<div class="pu">Powers the controller from mains</div><div class="g">Controller</div></td><td>1</td><td class="p">₦2,500 – 5,000</td><td class="src">estimate</td></tr><tr class=""><td>4-channel 5 V relay module (optocoupled)<div class="pu">Low-voltage switching signals; drives the contactor coil</div><div class="g">Switching</div></td><td>1</td><td class="p">₦5,100 – 7,500</td><td class="src">Hub360 / Jumia</td></tr><tr class=""><td>Contactor, 25 A, 2-pole, 230 V coil<div class="pu">Switches the pump motor safely (one per heavy load); fitted by electrician</div><div class="g">Switching</div></td><td>1</td><td class="p">₦15,000 – 35,000</td><td class="src">estimate</td></tr><tr class=""><td>PZEM-004T v3 energy meter (100 A, with CT)<div class="pu">Isolated mains voltage, current, power and energy</div><div class="g">Sensing</div></td><td>1</td><td class="p">₦19,000 – 25,000</td><td class="src">Microscale listing</td></tr><tr class=""><td>220 V AC detection module (optocoupler)<div class="pu">Tells NEPA from generator: one on each supply</div><div class="g">Sensing</div></td><td>2</td><td class="p">₦3,000 – 5,000 ea.</td><td class="src">estimate</td></tr><tr class=""><td>JSN-SR04T waterproof ultrasonic sensor<div class="pu">Overhead tank level</div><div class="g">Sensing</div></td><td>1</td><td class="p">₦5,700 – 10,000</td><td class="src">Microscale listing</td></tr><tr class=""><td>IP65 ABS enclosure (about 200 × 150 × 75 mm)<div class="pu">Houses the controller near the distribution board</div><div class="g">Enclosure</div></td><td>1</td><td class="p">₦8,000 – 15,000</td><td class="src">estimate</td></tr><tr class=""><td>DIN rail, terminal blocks, cable glands<div class="pu">Neat, safe terminations</div><div class="g">Enclosure</div></td><td>1 set</td><td class="p">₦5,000 – 10,000</td><td class="src">estimate</td></tr><tr class=""><td>6 A MCB or fused spur for the controller supply<div class="pu">Protects the controller circuit</div><div class="g">Protection</div></td><td>1</td><td class="p">₦4,000 – 8,000</td><td class="src">estimate</td></tr><tr class=""><td>Signal cable for tank sensor (alarm/CAT5, 20–30 m)<div class="pu">Tank on the roof to the controller</div><div class="g">Wiring</div></td><td>1 run</td><td class="p">₦6,000 – 15,000</td><td class="src">estimate</td></tr><tr class=""><td>1.5 mm² cable, jumpers, sundries<div class="pu">Internal wiring</div><div class="g">Wiring</div></td><td>—</td><td class="p">₦5,000 – 10,000</td><td class="src">estimate</td></tr>
+<tr class="sum"><td>Core parts subtotal</td><td></td><td class="p">≈ ₦96,000 – 166,000</td><td class="src"></td></tr>
+</table>
+<p class="note" style="font-size:8.4pt;color:var(--ink2)"><b style="color:var(--ink)">Optional, depending on the site:</b> always-on hub device, e.g. Raspberry Pi or spare Android phone (₦0 – 120,000; a laptop or phone can run the hub during the pilot) · Wi-Fi router or MiFi if the building has none (₦20,000 – 40,000) · spare ESP32 board (₦15,000).</p>
+<div class="tot">
+ <div><span>Core parts</span><b>₦96k – 166k</b><span>controller, sensing, switching, enclosure</span></div>
+ <div><span>Electrician (installation)</span><b>₦20k – 50k</b><span>estimate; varies by site and scope</span></div>
+ <div><span>Expected pilot total</span><b>≈ ₦116k – 216k</b><span>before optional items</span></div>
+</div>
+<div class="box"><p><b style="color:var(--ink)">About these prices.</b> Named sources are Nigerian seller listings seen in November 2026 (some were out of stock); "estimate" means a typical market range to confirm with a supplier. Each extra switched load (e.g. an AC) adds one contactor. Who buys and funds the parts is agreed before installation.</p></div>
+<div class="run"><span>A.D.A. · Pilot parts list</span><span>Ajala David · +234 916 107 8549</span></div>
+</section></body></html>
