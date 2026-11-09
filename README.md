@@ -83,6 +83,15 @@ within two simulated hours); a gap of 5% or more (2 L at least) raises a
 "delivery came up short" alert. Deliveries and the shortfall are in the
 report.
 
+## Smart Access (future addition)
+
+The design for door and gate locks connected to A.D.A. is in
+[`docs/smart-lock/DESIGN.md`](docs/smart-lock/DESIGN.md): PIN, card, phone and
+WhatsApp visitor codes, locks on their own 12 V battery so they work through
+outages and when the hub is down, roles reused from People, and alerts for
+forced or left-open doors. The Security page has a **Locks** preview in the
+demo; nothing is wired to real locks yet.
+
 ## Installer setup
 
 **Power → Building setup → Installer setup** walks a new building through

@@ -1103,6 +1103,21 @@ html.dark .wpipe{background:linear-gradient(90deg,#4a453d,#8f887b 45%,#514b42)}
 .tank .vessel b{z-index:2}
 html.dark .wv path{fill:#4f80b4}html.dark .wv.back path{fill:#36597f}html.dark .tank .vessel i.wfill{background:linear-gradient(#4f80b4,#22497a)}
 @media (prefers-reduced-motion:reduce){.wv,.wstream,.wbub,.wsplash::before,.wsplash i{animation:none!important}.wbub,.wsplash{display:none}}
+
+.lkgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.lk{display:flex;flex-direction:column;gap:6px;padding:11px 12px;border-radius:13px;border:1px solid var(--d-line);background:var(--d-box);transition:background .25s,border-color .25s}
+.lk.un{border-color:var(--d-amber);background:rgba(var(--d-amber-rgb),.12)}.lk.bad{border-color:var(--d-warn);background:rgba(194,82,44,.12)}
+.lk-h{display:flex;align-items:center;gap:9px;min-width:0}.lk-h .t{min-width:0}.lk-h b{display:block;font-size:13.5px}.lk-h .t span{font-size:12px;color:var(--d-ink2)}
+.lk-ic{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;background:rgba(var(--d-pn),.9);border:1px solid var(--d-line);flex:none;color:var(--d-ok)}
+.lk.un .lk-ic{color:var(--d-amber)}.lk.bad .lk-ic,.lk.bad .lk-h .t span{color:var(--d-warn)}
+.lk-s{font-size:11.5px;color:var(--d-ink2)}
+.lk-f{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.lkb{display:inline-flex;align-items:center;gap:3px;font-size:11.5px;color:var(--d-ink2)}.lkb.low{color:var(--d-warn);font-weight:700}
+.lk .mini-b.on{background:var(--d-ink);color:var(--d-bg);border-color:var(--d-ink)}.lk .mini-b:disabled{opacity:.4}
+.mono{font-family:ui-monospace,Menlo,Consolas,monospace;letter-spacing:.06em}
+.vcbig{font-size:40px;font-weight:700;text-align:center;padding:14px;border-radius:14px;background:var(--d-box);border:1px dashed var(--d-line)}
+a.btn{display:inline-flex;align-items:center;text-decoration:none}
+@media (max-width:719px){.lkgrid{grid-template-columns:1fr}}
 .binv{display:flex;align-items:center;justify-content:space-between;gap:14px}
 .bbig{display:flex;flex-direction:column;gap:2px}
 .bbig .ser{font-size:44px;line-height:1}
@@ -1403,6 +1418,8 @@ function overlays(){ let o='';
  if(S.ov==='bld') o+=bldSheet();
  if(S.ov==='alerts') o+=alertsSheet();
  if(S.ov==='people') o+=peopleSheet();
+ if(S.ov==='lkcode') o+=codeSheet();
+ if(S.vcShare) o+=shareSheet();
  if(S.ov==='install') o+=installSheet();
  if(S.ov==='login') o+=loginView();
  if(S.ov==='building') o+=buildingSheet();
@@ -1637,7 +1654,7 @@ function denseBody(){ const dv=curDev(), pg=S.dash, now=new Date(), h=now.getHou
   home:{monitor:[[()=>pPower(),pInverter,pWater],[pForecast,pAutopilot,pDiesel,pLights,pClimate],[pAlerts,()=>pSecurity(),pReport,pLog,pWeather]],tablet:[[()=>pPower(),pAlerts,pInverter,pForecast,pWater],[pAutopilot,pDiesel,pReport,pLights,pClimate,()=>pSecurity(),pLog,pWeather]],phone:[[pAlerts,pForecast,pAutopilot,()=>pPower(),pInverter,pDiesel,pReport,pWater,pLights,pClimate,pWeather,()=>pSecurity(),pLog]]},
   power:{monitor:[[()=>pPower(true),pInverter,pSetup],[pDiesel,pAlerts,pForecast],[pReport,pLoads,pLog,pNet]],tablet:[[()=>pPower(true),pInverter,pDiesel,pReport],[pAlerts,pSetup,pForecast,pLoads,pLog,pNet]],phone:[[()=>pPower(true),pAlerts,pInverter,pDiesel,pReport,pSetup,pForecast,pLoads,pLog,pNet]]},
   water:{monitor:[[pWater],[pLog]],tablet:[[pWater],[pLog]],phone:[[pWater,pLog]]},
-  security:{monitor:[[()=>pSecurity(true)],[pLights],[pLog]],tablet:[[()=>pSecurity(true)],[pLights,pLog]],phone:[[()=>pSecurity(true),pLights,pLog]]}
+  security:{monitor:[[()=>pSecurity(true)],[pLocks,pLights],[pLog]],tablet:[[()=>pSecurity(true),pLocks],[pLights,pLog]],phone:[[()=>pSecurity(true),pLocks,pLights,pLog]]}
  }[pg][dv];
  const tmpl={monitor:'minmax(0,1.15fr) minmax(0,1fr) minmax(0,1fr)',tablet:'minmax(0,1fr) minmax(0,1fr)',phone:'minmax(0,1fr)'}[dv];
  return `<div class="stalebar" role="alert"><b>Not live.</b> Last reading ${ago()} ago. Switches are paused until the hub answers again, nothing gets queued.</div>
@@ -1664,6 +1681,12 @@ function denseAct(a,v){
  if(a==='logout'){ S.ov=null; logout(); return true; }
  if(a==='demoas'){ DEMO_ME=v; toast(L(`Now viewing as ${ROLE_NM[v]}`,`You be ${ROLE_NM[v]} now`)); return true; }
  if(gate(a)) return 'done';
+ if(a==='lkopen'){ lockAct(v); return true; }
+ if(a==='lkforce'){ lockForced(); return true; }
+ if(a==='lkcode'){ S.ov='lkcode'; return true; }
+ if(a==='vcdoor'){ const b=document.querySelector(`[data-act="vcdoor"][data-v="${v}"]`); if(b) b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true'); return 'done'; }
+ if(a==='vcsave'){ codeSave(); return 'done'; }
+ if(a==='vcdone'){ S.vcShare=null; return true; }
  if(a==='instopen'){ instOpen(); return 'done'; }
  if(a==='instgo'){ instGo(+v); return 'done'; }
  if(a==='rtest'){ relayTest(v); return 'done'; }
@@ -1997,7 +2020,7 @@ function runScene(room,k){ if(isStale()){ toast('The hub isn’t answering, so n
  const over=SIM.log.slice(0,4).find(l=>/shed: on inverter/.test(l.why));
  toast(over?L(`${name} on, but the ${lc(over.what.replace(/^OFF\s+/,''))} stays off on inverter`,`${name} don on, but ${lc(over.what.replace(/^OFF\s+/,''))} go stay off for inverter`):L(`${name} on`,`${name} don on`)); }
 
-Object.assign(P,{clock:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',alert:'M12 3l10 18H2zM12 10v5M12 18h.01',bell:'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0'});
+Object.assign(P,{key:'M15 7a4 4 0 1 1-3.9 4.9L4 19v-3h2v-2h2l1.1-1.1A4 4 0 0 1 15 7zM16 9.5h.01',clock:'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7v5l3 2',alert:'M12 3l10 18H2zM12 10v5M12 18h.01',bell:'M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 20a2 2 0 0 0 4 0'});
 
 /* ============ live hub connection: real data when served by hub.py ============ */
 // Opened from the hub (http://<hub>:8000) or with ?hub=http://<ip>:8000, the
@@ -2364,6 +2387,61 @@ async function instGo(d){ if(d>0&&INST.step===1){ await buildingSave(); S.ov='in
 async function relayTest(k){ INST.testing=k; update();
  if(LIVE.on){ await hubSwitch(k,true,hubName(k)); setTimeout(async()=>{ await hubSwitch(k,false,hubName(k)); INST.testing=''; update(); },3000); }
  else { const id=HUBREV[k]||k; SIM.on[id]=1; setTimeout(()=>{ SIM.on[id]=0; INST.testing=''; update(); },3000); } }
+
+
+/* ============ A.D.A. Smart Access: lock preview (future addition, demo only) ============ */
+// Design: docs/smart-lock/DESIGN.md. Nothing here talks to real locks yet; the
+// panel is a preview so the flow can be shown and argued about.
+const LOCKS=[
+ {id:'gate',n:'Pedestrian gate',lock:'Fail-secure strike · keypad + card',st:'locked',open:false,batt:94,who:'Musa · card',at:'18:02',roles:['owner','manager','caretaker','resident']},
+ {id:'front',n:'Front door',lock:'Motorised deadbolt',st:'locked',open:false,batt:88,who:'Alex · PIN',at:'17:40',roles:['owner','manager','resident']},
+ {id:'back',n:'Kitchen door',lock:'Electric strike',st:'locked',open:false,batt:91,who:'Ada · phone',at:'13:15',roles:['owner','manager','resident']},
+ {id:'bq',n:"Boys' quarters",lock:'Electric strike · keypad',st:'locked',open:false,batt:23,who:'Musa · PIN',at:'07:05',roles:['owner','manager','caretaker']}
+];
+const VCODES=[{name:'Emeka (plumber)',doors:['gate'],code:'482 913',until:'Today 16:00',uses:'1 of 2 left'}];
+const LKT={};
+const lockById=id=>LOCKS.find(l=>l.id===id);
+function lockMayOpen(l){ return l.roles.includes(myRole()); }
+function lockAct(id){ const l=lockById(id); if(!l) return;
+ if(!lockMayOpen(l)){ toast(L(`${ROLE_NM[myRole()]}s can't open the ${l.n.toLowerCase()}`,`${ROLE_NM[myRole()]} no fit open ${l.n.toLowerCase()}`)); return; }
+ if(l.st==='unlocked'){ l.st='locked'; clearTimeout(LKT[id]); slog(`LOCKED ${l.n.toLowerCase()}`,'from dashboard'); return; }
+ l.st='unlocked'; l.who=(LIVE.on&&LIVE.me&&LIVE.me.name)||(DEMO_PEOPLE.find(p=>p.role===DEMO_ME)||{}).name||'You'; l.who+=' · phone'; l.at=hhmm();
+ slog(`UNLOCKED ${l.n.toLowerCase()}`,`${l.who.replace(' · phone','')} from the dashboard, relocks in 5 s`);
+ clearTimeout(LKT[id]); LKT[id]=setTimeout(()=>{ l.st='locked'; slog(`LOCKED ${l.n.toLowerCase()}`,'auto-relock'); if(S.view==='dash') refreshDense(); },5000); }
+function lockForced(){ const l=lockById('back'); l.open=true; l.st='locked';
+ slog('DOOR FORCED OPEN',`${l.n.toLowerCase()} opened without a valid unlock`,'bad'); toast(L(`🚨 Kitchen door forced open${DEMO_NTFY.topic?'. Phone alert sent':''}`,'🚨 Kitchen door don open by force'));
+ if(!LIVE.on&&typeof demoPush==='function'&&DEMO_NTFY.topic) demoPush('Door forced open',`${l.n} opened without a valid unlock at ${hhmm()}`,'high','rotating_light');
+ setTimeout(()=>{ l.open=false; if(S.view==='dash') refreshDense(); },8000); }
+function pLocks(){ const lowB=LOCKS.filter(l=>l.batt<30);
+ return `<section class="pn g" aria-label="Locks">${pnh('lock',L('Locks','Locks'),`<span class="badge2" style="margin-right:6px">${L('Preview','Preview')}</span>${LOCKS.filter(l=>l.st==='locked'&&!l.open).length}/${LOCKS.length} ${L('locked','locked')}`,`<button class="mini-b" data-act="lkcode">${ic('key',12)} ${L('Visitor code','Visitor code')}</button>`)}
+  <div class="lkgrid">${LOCKS.map(l=>{ const un=l.st==='unlocked', bad=l.open&&!un; return `<div class="lk ${un?'un':''} ${bad?'bad':''}">
+   <div class="lk-h"><span class="lk-ic">${ic(un||bad?'unlock':'lock',16,2)}</span><span class="t"><b>${l.n}</b><span>${bad?L('OPEN · forced','OPEN · by force'):un?L('Unlocked · relocks in 5 s','Unlocked'):L('Locked','Locked')}</span></span></div>
+   <div class="lk-s">${L('Last','Last')}: ${esc(l.who)} · ${l.at}</div>
+   <div class="lk-f"><span class="lkb ${l.batt<30?'low':''}" title="Lock battery">${ic('battery',11,2)} ${l.batt}%</span><button class="mini-b ${un?'on':''}" data-act="lkopen" data-v="${l.id}" ${lockMayOpen(l)?'':'disabled'}>${un?L('Lock now','Lock now'):L('Unlock','Unlock')}</button></div></div>`; }).join('')}</div>
+  ${VCODES.length?`<div class="rows2">${VCODES.map(c=>`<div class="r2"><span class="fdot use">${ic('key',13,2)}</span><span class="t"><b>${esc(c.name)} · <span class="mono">${c.code}</span></b><span>${c.doors.map(d=>lockById(d).n).join(', ')} · ${L('until','until')} ${esc(c.until)} · ${esc(c.uses)}</span></span></div>`).join('')}</div>`:''}
+  ${lowB.length?`<div class="falert">${ic('battery',14,2.2)}<span><b>${lowB.map(l=>l.n).join(', ')}</b> ${L('lock battery is low. It still works; charge or replace it this week.','lock battery dey low.')}</span></div>`:''}
+  <div class="demo"><span>${L('Demo:','Demo:')}</span><button data-act="lkforce">${L('Force the kitchen door','Force kitchen door')}</button></div>
+  <div class="fcnote">${ic('shield',12)} ${L('Future addition. Locks run on their own 12 V battery so they work through NEPA cuts and keep their PINs if the hub is down. Inside handles and keys always open.','E never ready. Locks get their own 12 V battery, dem go work even when light no dey.')}</div></section>`; }
+function codeSheet(){ const can=LOCKS.filter(lockMayOpen);
+ return `<div class="scrim t-fade" data-act="scrim"><div class="sheet t-modal solid bsh" role="dialog" aria-label="Visitor code">
+  <div class="sh"><div><h2>${L('New visitor code','New visitor code')}</h2><div class="sub">${L('For a driver, artisan or guest. It only works on the doors and times you pick.','For driver, artisan or guest.')}</div></div><button class="xb" data-act="close" aria-label="Close">${ic('x',16)}</button></div>
+  <div class="alf"><label for="vc-name">${L('Who is it for?','Who e be for?')}</label><input id="vc-name" placeholder="e.g. Emeka (plumber)"></div>
+  <div class="alf"><label>${L('Doors','Doors')}</label><div class="aiallow">${can.map(l=>`<button type="button" aria-pressed="${l.id==='gate'}" data-act="vcdoor" data-v="${l.id}">${ic('check',11,3)} ${l.n}</button>`).join('')}</div></div>
+  <div class="alf two"><div><label for="vc-until">${L('Valid until','Valid until')}</label><select id="vc-until" class="psel"><option>Today 18:00</option><option>Tomorrow 18:00</option><option>In 3 hours</option><option>This week</option></select></div><div><label for="vc-uses">${L('Uses','Uses')}</label><select id="vc-uses" class="psel"><option>1</option><option selected>2</option><option>5</option><option>Unlimited</option></select></div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn pri" data-act="vcsave">${L('Create code','Create code')}</button><button class="btn sec" data-act="close">${L('Cancel','Cancel')}</button></div>
+  <p class="sub" style="margin:0;font-size:12px">${L('The code is stored on each lock, so it works even if the internet is down. Cancel it any time.','The code dey inside each lock, e go work even if internet no dey.')}</p></div></div>`; }
+function codeSave(){ const g=id=>(document.getElementById(id)||{}).value||'', doors=[...document.querySelectorAll('[data-act="vcdoor"][aria-pressed="true"]')].map(b=>b.dataset.v);
+ const name=g('vc-name').trim()||L('Visitor','Visitor'); if(!doors.length){ toast(L('Pick at least one door','Pick one door at least')); return; }
+ const n=String(100000+Math.floor(Math.random()*900000)), code=n.slice(0,3)+' '+n.slice(3), until=g('vc-until'), uses=g('vc-uses');
+ VCODES.unshift({name,doors,code,until,uses:uses==='Unlimited'?'unlimited':`${uses} of ${uses} left`}); VCODES.length=Math.min(VCODES.length,4);
+ slog('VISITOR CODE',`${name} · ${doors.map(d=>lockById(d).n.toLowerCase()).join(', ')} · until ${until}`);
+ const msg=`Your A.D.A. access code is ${code} for the ${doors.map(d=>lockById(d).n.toLowerCase()).join(' and ')}. Valid until ${until.toLowerCase()} (${uses==='Unlimited'?'unlimited uses':uses+' use'+(uses==='1'?'':'s')}). Type it on the keypad and press #.`;
+ S.ov=null; S.vcShare={code,msg}; update(); }
+function shareSheet(){ const v=S.vcShare; if(!v) return '';
+ return `<div class="scrim t-fade" data-act="vcdone"><div class="sheet t-modal solid bsh" role="dialog" aria-label="Code created">
+  <div class="sh"><div><h2>${L('Code ready','Code ready')}</h2><div class="sub">${L('Send it to your visitor.','Send am give your visitor.')}</div></div><button class="xb" data-act="vcdone" aria-label="Close">${ic('x',16)}</button></div>
+  <div class="vcbig mono">${v.code}</div><p style="margin:0;font-size:14px">${esc(v.msg)}</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn pri" href="https://wa.me/?text=${encodeURIComponent(v.msg)}" target="_blank" rel="noopener">${L('Share on WhatsApp','Share for WhatsApp')}</a><button class="btn sec" data-act="copykey" data-v="${esc(v.code.replace(' ',''))}">${L('Copy code','Copy code')}</button><button class="btn sec" data-act="vcdone">${L('Done','Done')}</button></div></div></div>`; }
 
 /* ============ transitions (transitions-dev) ============ */
 // The app re-renders with innerHTML, so animated attributes are rendered in their
