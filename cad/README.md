@@ -61,3 +61,26 @@ rail spacing, duct size) and run it again.
 python ada_lock.py
 blender -b -P blender_lock.py
 ```
+
+# A.D.A. house model
+
+`blender_house.py` builds a Nigerian duplex in its compound, cut open at the
+front, with A.D.A. in place: the panel from `ada_panel.py` on the inverter-room
+wall, inverter and batteries, NEPA pole and line to the meter, generator house,
+borehole, overhead tank on a steel stand, solar on the kept roof, fence, sliding
+gate and the pedestrian gate with the Smart Access keypad. Glowing lines show
+what is feeding the house (NEPA yellow, generator amber, inverter blue, water
+cyan); idle ones turn grey, and the house wiring takes the colour of the
+active source.
+
+| render | |
+|---|---|
+| `out/house/renders/ada_house_day_nepa.png` | day: NEPA on, pump filling the tank |
+| `out/house/renders/ada_house_night_inverter.png` | night: NEPA and generator off, house on inverter, essential lights only |
+| `out/house/renders/ada_house_inverter_room.png` | close-up: A.D.A. panel, inverter and batteries |
+| `out/house/ada_house.blend` | the scene, to open in Blender 4.2+ |
+
+```
+python ada_panel.py            # the panel it places on the wall
+blender -b -P blender_house.py
+```
