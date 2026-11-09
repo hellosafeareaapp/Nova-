@@ -40,3 +40,24 @@ blender -b -P blender_render.py -- --fast
 ```
 Everything is parametric: change a size at the top of `ada_panel.py` (enclosure,
 rail spacing, duct size) and run it again.
+
+# A.D.A. Smart Access hardware (future addition)
+
+`ada_lock.py` models the lock kit from `docs/smart-lock/DESIGN.md`;
+`blender_lock.py` renders it. Outputs in `out/lock/`.
+
+| file | what |
+|---|---|
+| `ada_smart_access_kit.step` | the whole kit, every part separate (SolidWorks: File → Open → STEP, import as assembly) |
+| `ada_gate_keypad_reader.step` | outdoor keypad + card reader with rain hood and back plate |
+| `ada_electric_strike.step` | fail-secure strike: faceplate, body, keeper |
+| `ada_lock_node_box.step` | node enclosure with ESP32 board, MOSFET driver, 12 V 7 Ah battery, charger, glands, clear lid |
+| `ada_exit_button.step` | inside exit button |
+| `ada_door_contact.step` | magnetic door contact (reed switch + magnet) |
+| `ada_smart_deadbolt.step` | front-door deadbolt: outside keypad + key cylinder, inside motor unit with thumb-turn |
+| `ada_smart_access.blend`, `renders/*.png` | studio kit shot, keypad close-up, keypad installed on a gate pillar |
+
+```
+python ada_lock.py
+blender -b -P blender_lock.py
+```
