@@ -1,0 +1,201 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>A.D.A. — System architecture &amp; specification</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,400..900&family=IBM+Plex+Mono:wght@400;600&display=swap"><style>
+@page{size:A4;margin:0}
+:root{--ink:#0b1b2b;--ink2:#4a5562;--ink3:#8a939e;--line:#dfe3e7;--paper:#ffffff;--soft:#f3f5f7;--sig:#f5b800;--ok:#1e8e5a;--warn:#c8462c}
+*{box-sizing:border-box}
+body{margin:0;font-family:Archivo,"Liberation Sans",Arial,sans-serif;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{width:210mm;height:297mm;position:relative;overflow:hidden;background:var(--paper);page-break-after:always;padding:13mm 15mm 16mm;display:flex;flex-direction:column;gap:5.5mm}
+.page:last-child{page-break-after:auto}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.run{position:absolute;left:15mm;right:15mm;bottom:8mm;display:flex;justify-content:space-between;font-size:7.5pt;color:var(--ink3);border-top:1px solid var(--line);padding-top:2.5mm}
+.mark{display:flex;align-items:center;gap:2.5mm;font-weight:800;font-stretch:85%;font-size:13pt;letter-spacing:.06em}
+.mark .sq{width:6mm;height:6mm;background:var(--sig);display:grid;place-items:center;font-size:8pt;font-weight:900;color:var(--ink)}
+.kicker{font-size:8pt;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
+h2{margin:0;font-size:21pt;font-weight:800;font-stretch:80%;line-height:1.05;letter-spacing:-.005em}
+h3{margin:0 0 1.5mm;font-size:11pt;font-weight:700}
+p{margin:0;font-size:9.8pt;line-height:1.5;color:var(--ink2)}
+.rule{height:1.2mm;width:16mm;background:var(--sig)}
+.sec{display:flex;flex-direction:column;gap:3mm}
+.cols2{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:5mm}
+.cols4{display:grid;grid-template-columns:repeat(4,1fr);gap:4mm}
+.item{border-top:1.5px solid var(--ink);padding-top:2.5mm}
+.item p{font-size:9.2pt}
+table{border-collapse:collapse;width:100%}
+td,th{text-align:left;vertical-align:top;padding:2.4mm 2mm;border-bottom:1px solid var(--line);font-size:9.2pt;line-height:1.4}
+th{font-size:7.5pt;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:700;border-bottom:1.5px solid var(--ink)}
+td:first-child{font-weight:700;width:34%;color:var(--ink)}
+td{color:var(--ink2)}
+.img{border:1px solid var(--line)}
+.img img{display:block;width:100%}
+.cap{font-size:7.8pt;color:var(--ink3);margin-top:1.5mm}
+.note{font-size:7.8pt;color:var(--ink3)}
+
+.page{gap:4.2mm!important}
+h1{margin:0;font-size:26pt;font-weight:900;font-stretch:80%;line-height:1.02}
+.sub0{font-size:10.5pt;color:var(--ink2);margin-top:1.5mm}
+.n{display:inline-grid;place-items:center;width:6mm;height:6mm;background:var(--sig);font-weight:900;font-size:9pt;margin-right:2mm;vertical-align:1px}
+svg text{font-family:Archivo,"Liberation Sans",Arial,sans-serif}
+.dg{border:1px solid var(--line);padding:2mm}
+.lg{display:flex;flex-wrap:wrap;gap:5mm;font-size:8pt;color:var(--ink2)}
+.lg span{display:inline-flex;align-items:center;gap:1.5mm}
+.lg i{display:inline-block;width:9mm;height:0;border-top:2.2px solid}
+table.sp td,table.sp th{font-size:8.1pt;padding:1.6mm 1.6mm}
+table.sp td:first-child{width:auto}
+table.sp td.m{font-family:"IBM Plex Mono",monospace;font-size:7.6pt;color:var(--ink)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+.box2{background:var(--soft);padding:3.2mm 4mm;display:flex;flex-direction:column;gap:1.4mm}
+.box2 p,.box2 li{font-size:8.8pt;line-height:1.45;color:var(--ink2)}
+.box2 ul{margin:0;padding-left:4.5mm}
+.ok{color:var(--ok);font-weight:800}.nx{color:#b07a00;font-weight:800}
+</style></head><body>
+<div class="page"><div style="display:flex;justify-content:space-between;align-items:center"><div class="mark"><span class="sq">A</span>A.D.A.<span style="font-weight:600;font-stretch:100%;font-size:7.6pt;letter-spacing:.05em;opacity:.75;margin-left:1.2mm">Always-on Domestic Automation</span></div><span class="kicker">ADA-ARCH-01 · rev A · November 2026</span></div>
+ <div><div class="rule"></div><h1 style="margin-top:3mm">System architecture &amp; specification</h1><div class="sub0">How A.D.A. is connected, what each device measures, and how the data reaches the dashboard and the manager's phone.</div></div>
+ <div class="sec"><h3><span class="n">1</span>The system at a glance</h3>
+ <div class="dg"><svg viewBox="0 0 720 330" width="100%">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#0b1b2b"/></marker></defs>
+<!-- zones -->
+<rect x="4" y="4" width="252" height="322" fill="#f3f5f7"/><text x="14" y="22" font-size="10" font-weight="800" letter-spacing="1.5" fill="#4a5562">THE BUILDING</text>
+<rect x="268" y="4" width="196" height="322" fill="#fff8e0" stroke="#f5b800" stroke-width="1.5"/><text x="278" y="22" font-size="10" font-weight="800" letter-spacing="1.5" fill="#4a5562">A.D.A. PANEL (ADA-PNL-01)</text>
+<rect x="476" y="4" width="240" height="322" fill="#f3f5f7"/><text x="486" y="22" font-size="10" font-weight="800" letter-spacing="1.5" fill="#4a5562">LOCAL NETWORK · OPTIONAL INTERNET</text>
+<!-- building items -->
+<g font-size="10.5" font-weight="700" fill="#0b1b2b">
+<rect x="16" y="36" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="68" y="55" text-anchor="middle">NEPA supply</text>
+<rect x="16" y="76" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="68" y="95" text-anchor="middle">Generator</text>
+<rect x="16" y="116" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="68" y="135" text-anchor="middle">Inverter + battery</text>
+<rect x="140" y="76" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="192" y="95" text-anchor="middle">Changeover</text>
+<rect x="140" y="126" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="192" y="145" text-anchor="middle">House DB</text>
+<rect x="16" y="180" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="68" y="199" text-anchor="middle">Diesel tank</text>
+<rect x="16" y="222" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="68" y="241" text-anchor="middle">Overhead water tank</text>
+<rect x="140" y="222" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="192" y="241" text-anchor="middle">Borehole pump</text>
+<rect x="140" y="268" width="104" height="30" fill="#fff" stroke="#0b1b2b"/><text x="192" y="287" text-anchor="middle">ACs / heavy loads</text>
+</g>
+<g stroke="#8a5a2b" stroke-width="2.2" fill="none">
+<path d="M120 51 H130 V86 H140"/><path d="M120 91 H140"/><path d="M192 106 V126"/><path d="M120 131 H130 V141 H140"/>
+</g>
+<!-- panel items -->
+<g font-size="9.5" fill="#0b1b2b">
+<rect x="280" y="34" width="172" height="26" fill="#fff" stroke="#0b1b2b"/><text x="288" y="51" font-weight="700">U2 / U3 AC detect</text><text x="444" y="51" text-anchor="end" fill="#4a5562">NEPA, GEN</text>
+<rect x="280" y="66" width="172" height="26" fill="#fff" stroke="#0b1b2b"/><text x="288" y="83" font-weight="700">PM1 PZEM-004T + CT</text><text x="444" y="83" text-anchor="end" fill="#4a5562">V, A, W, kWh</text>
+<rect x="280" y="98" width="172" height="26" fill="#fff" stroke="#0b1b2b"/><text x="288" y="115" font-weight="700">RS485 transceiver</text><text x="444" y="115" text-anchor="end" fill="#4a5562">inverter data</text>
+<rect x="280" y="130" width="172" height="26" fill="#fff" stroke="#0b1b2b"/><text x="288" y="147" font-weight="700">4–20 mA → 16-bit ADC</text><text x="444" y="147" text-anchor="end" fill="#4a5562">fuel level</text>
+<rect x="280" y="162" width="172" height="26" fill="#fff" stroke="#0b1b2b"/><text x="288" y="179" font-weight="700">Ultrasonic interface</text><text x="444" y="179" text-anchor="end" fill="#4a5562">tank level</text>
+<rect x="296" y="200" width="140" height="44" fill="#0b1b2b"/><text x="366" y="219" text-anchor="middle" font-weight="800" fill="#fff" font-size="11">A1 · ESP32 controller</text><text x="366" y="234" text-anchor="middle" fill="#c9d1da" font-size="9">reads every 1 s · 4 relays</text>
+<rect x="280" y="258" width="80" height="26" fill="#fff" stroke="#0b1b2b"/><text x="320" y="275" text-anchor="middle" font-weight="700">K1 contactor</text>
+<rect x="372" y="258" width="80" height="26" fill="#fff" stroke="#0b1b2b"/><text x="412" y="275" text-anchor="middle" font-weight="700">K2 contactor</text>
+<rect x="280" y="292" width="172" height="24" fill="#fff" stroke="#0b1b2b"/><text x="366" y="308" text-anchor="middle" font-weight="700">PS1 24 V DC supply → 5 V</text>
+</g>
+<!-- sensing lines building->panel -->
+<g stroke="#b07a00" stroke-width="1.6" fill="none" stroke-dasharray="4 3">
+<path d="M120 46 H128 Q132 46 132 30 H262 V47 H280"/><path d="M120 86 H124 V26 H266 V47"/>
+<path d="M244 141 H262 V79 H280"/><path d="M120 131 H134 V118 H262 V111 H280"/>
+<path d="M120 195 H262 V143 H280"/><path d="M120 237 H132 V214 H262 V175 H280"/>
+</g>
+<g stroke="#0b1b2b" stroke-width="1.4" fill="none">
+<path d="M366 188 V200" /><path d="M452 47 H460 V222 H436"/><path d="M452 79 H460"/><path d="M452 111 H460"/><path d="M452 143 H460"/><path d="M452 175 H460"/>
+<path d="M330 244 V258"/><path d="M402 244 V258"/>
+</g>
+<!-- switching lines panel->loads -->
+<g stroke="#8a5a2b" stroke-width="2.2" fill="none"><path d="M280 271 H262 V237 H244" marker-end="url(#a)"/><path d="M372 283 H368 V318 H262 V283 H244" marker-end="url(#a)"/></g>
+<!-- network side -->
+<g font-size="10" fill="#0b1b2b">
+<rect x="492" y="196" width="100" height="34" fill="#fff" stroke="#0b1b2b"/><text x="542" y="211" text-anchor="middle" font-weight="700">Wi-Fi router</text><text x="542" y="224" text-anchor="middle" font-size="8.5" fill="#4a5562">2.4 GHz, building LAN</text>
+<rect x="492" y="96" width="210" height="62" fill="#0b1b2b"/><text x="597" y="115" text-anchor="middle" font-weight="800" fill="#fff" font-size="11">Hub · mini-PC (Python)</text><text x="597" y="130" text-anchor="middle" fill="#c9d1da" font-size="8.5">rules · event log · history · reports</text><text x="597" y="143" text-anchor="middle" fill="#c9d1da" font-size="8.5">users &amp; roles · API · serves dashboard</text>
+<rect x="612" y="196" width="90" height="34" fill="#fff" stroke="#0b1b2b"/><text x="657" y="211" text-anchor="middle" font-weight="700">Dashboards</text><text x="657" y="224" text-anchor="middle" font-size="8.5" fill="#4a5562">phone · laptop · wall</text>
+<rect x="492" y="36" width="96" height="34" fill="#fff" stroke="#0b1b2b" stroke-dasharray="3 2"/><text x="540" y="51" text-anchor="middle" font-weight="700">Internet</text><text x="540" y="64" text-anchor="middle" font-size="8.5" fill="#4a5562">optional</text>
+<rect x="606" y="36" width="96" height="34" fill="#fff" stroke="#0b1b2b"/><text x="654" y="51" text-anchor="middle" font-weight="700">Manager's phone</text><text x="654" y="64" text-anchor="middle" font-size="8.5" fill="#4a5562">ntfy / Telegram alert</text>
+<rect x="492" y="262" width="210" height="52" fill="#fff" stroke="#0b1b2b" stroke-dasharray="3 2"/><text x="597" y="282" text-anchor="middle" font-weight="700">Other buildings / lock nodes</text><text x="597" y="297" text-anchor="middle" font-size="8.5" fill="#4a5562">each panel reports to the same hub (estate view)</text>
+</g>
+<g stroke="#2b6cb0" stroke-width="1.8" fill="none">
+<path d="M436 214 H480 V213 H492" marker-end="url(#a)"/><path d="M542 196 V158" marker-end="url(#a)"/><path d="M657 158 V196" marker-end="url(#a)"/><path d="M542 262 V230" marker-end="url(#a)"/>
+<path d="M540 96 V70" marker-end="url(#a)" stroke-dasharray="4 3"/><path d="M588 53 H606" marker-end="url(#a)" stroke-dasharray="4 3"/>
+</g>
+<g font-size="8" fill="#2b6cb0" font-weight="700"><text x="440" y="208">HTTP/JSON 1 s</text><text x="546" y="182">LAN</text><text x="661" y="182">HTTP</text><text x="545" y="86">HTTPS</text></g>
+</svg></div><div class="lg"><span><i style="border-color:#8a5a2b"></i>230 V power</span><span><i style="border-color:#b07a00;border-top-style:dashed"></i>sensing (isolated)</span><span><i style="border-color:#0b1b2b;border-top-width:1.4px"></i>low-voltage signal inside the panel</span><span><i style="border-color:#2b6cb0"></i>network (Wi-Fi / LAN)</span><span><i style="border-color:#2b6cb0;border-top-style:dashed"></i>internet, optional (alerts only)</span></div></div>
+ <div class="two">
+  <div class="box2"><h3 style="margin:0">Three layers</h3><ul><li><b>Measure</b>: isolated sensors on the supply, the inverter, the diesel tank and the water tank.</li><li><b>Decide</b>: the hub runs the rules and keeps the log; the controller switches contactors.</li><li><b>Show &amp; alert</b>: the dashboard on any phone or laptop on the building network; alerts to the manager's phone.</li></ul></div>
+  <div class="box2"><h3 style="margin:0">Design principles</h3><ul><li><b>Local first</b>: everything runs in the building. Internet is only used to push alerts.</li><li><b>Fail-safe</b>: if the controller loses the hub for 10 s, relays drop to safe states and the building runs as it does today.</li><li><b>Mains is isolated</b>: no 230 V reaches the controller; all mains work by a qualified electrician.</li></ul></div>
+ </div>
+ <div class="run"><span>A.D.A. (Always-on Domestic Automation) · System architecture &amp; specification · prepared for Max-Migold</span><span>1 / 4</span></div></div>
+
+<div class="page"><div style="display:flex;justify-content:space-between;align-items:center"><div class="mark"><span class="sq">A</span>A.D.A.<span style="font-weight:600;font-stretch:100%;font-size:7.6pt;letter-spacing:.05em;opacity:.75;margin-left:1.2mm">Always-on Domestic Automation</span></div><span class="kicker">ADA-ARCH-01 · rev A · November 2026</span></div>
+ <div class="sec"><h3><span class="n">2</span>The controller and how each device connects</h3>
+ <div class="dg"><svg viewBox="0 0 720 250" width="100%">
+<rect x="270" y="20" width="180" height="210" fill="#0b1b2b"/><text x="360" y="44" text-anchor="middle" font-weight="800" fill="#fff" font-size="12">A1 · ESP32-WROOM-32E</text>
+<text x="360" y="60" text-anchor="middle" fill="#c9d1da" font-size="8.5">3.3 V logic · Wi-Fi 2.4 GHz · 240 MHz</text>
+<g font-family="IBM Plex Mono,monospace" font-size="8.5" fill="#f5b800">
+<text x="280" y="86">GPIO16/17 UART2</text><text x="280" y="108">GPIO32/13/14 UART1</text><text x="280" y="130">GPIO21/22 I²C</text><text x="280" y="152">GPIO23/39 trig/echo</text><text x="280" y="174">GPIO34 / GPIO35 in</text>
+<text x="440" y="86" text-anchor="end">GPIO26 R1</text><text x="440" y="108" text-anchor="end">GPIO27 R2</text><text x="440" y="130" text-anchor="end">GPIO25 R3</text><text x="440" y="152" text-anchor="end">GPIO33 R4</text><text x="440" y="174" text-anchor="end">GPIO2 LED</text>
+</g>
+<text x="360" y="212" text-anchor="middle" fill="#c9d1da" font-size="8.5">5 V in (from 24 V via buck) · fail-safe after 10 s</text>
+<g font-size="9.5" fill="#0b1b2b">
+<g><rect x="10" y="72" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="18" y="87"><tspan font-weight="700">PM1 PZEM-004T</tspan> · Modbus-RTU 9600</text></g>
+<g><rect x="10" y="97" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="18" y="112"><tspan font-weight="700">Inverter</tspan> · RS485 Modbus (MAX3485)</text></g>
+<g><rect x="10" y="122" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="18" y="137"><tspan font-weight="700">Fuel sensor</tspan> · 4–20 mA → ADS1115</text></g>
+<g><rect x="10" y="147" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="18" y="162"><tspan font-weight="700">Tank sensor</tspan> · JSN-SR04T ultrasonic</text></g>
+<g><rect x="10" y="172" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="18" y="187"><tspan font-weight="700">U2 / U3</tspan> · opto-isolated AC detect</text></g>
+<g><rect x="510" y="72" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="518" y="87"><tspan font-weight="700">R1 → K1</tspan> pump contactor coil</text></g>
+<g><rect x="510" y="97" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="518" y="112"><tspan font-weight="700">R2 → K2</tspan> AC circuit contactor</text></g>
+<g><rect x="510" y="122" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="518" y="137"><tspan font-weight="700">R3</tspan> spare (e.g. security lights)</text></g>
+<g><rect x="510" y="147" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="518" y="162"><tspan font-weight="700">R4</tspan> spare (e.g. gen start signal)</text></g>
+<g><rect x="510" y="172" width="200" height="22" fill="#fff" stroke="#0b1b2b"/><text x="518" y="187"><tspan font-weight="700">Status LED</tspan> · hub link state</text></g>
+</g>
+<g stroke="#0b1b2b" stroke-width="1.3"><path d="M210 83 H270"/><path d="M210 108 H270"/><path d="M210 133 H270"/><path d="M210 158 H270"/><path d="M210 183 H270"/>
+<path d="M450 83 H510"/><path d="M450 108 H510"/><path d="M450 133 H510"/><path d="M450 158 H510"/><path d="M450 183 H510"/></g>
+<text x="110" y="62" text-anchor="middle" font-size="9" font-weight="800" letter-spacing="1.2" fill="#4a5562">INPUTS (MEASURE)</text>
+<text x="610" y="62" text-anchor="middle" font-size="9" font-weight="800" letter-spacing="1.2" fill="#4a5562">OUTPUTS (SWITCH)</text>
+</svg></div>
+ <p>Every input reaches the ESP32 at low voltage through an isolating module: optocouplers for AC presence, the PZEM's isolated interface for power, an RS485 transceiver for the inverter, a 4–20 mA current loop for the fuel probe (robust over long cable runs from the generator house) and a level-shifted echo line for the ultrasonic tank sensor. Outputs drive relay coils, and the relays drive contactor coils: the controller never carries load current.</p></div>
+ <div class="sec"><h3><span class="n">3</span>Device and sensor specifications</h3>
+ <table class="sp"><thead><tr><th>Device</th><th>Type</th><th>Measures / does</th><th>Interface</th><th>Range / accuracy</th><th>Power</th><th>Location</th></tr></thead><tbody><tr><td>A1 Controller</td><td>ESP32-WROOM-32E on DIN carrier, 4 opto-isolated relays</td><td>Reads every sensor, runs fail-safe, reports to hub</td><td class="m">Wi-Fi 2.4 GHz; HTTP/JSON</td><td>240 MHz dual-core; 520 KB RAM</td><td>5 V, ≈ 1 W</td><td>Panel, rail 2</td></tr><tr><td>PS1 Power supply</td><td>DIN-rail 230 V AC → 24 V DC, 30 W, + buck to 5 V</td><td>Powers controller, relays, sensors</td><td class="m">—</td><td>Isolated, short-circuit protected</td><td>Input 85–264 V AC</td><td>Panel, rail 1</td></tr><tr><td>PM1 Power meter</td><td>PZEM-004T v3.0 with 100 A split-core CT</td><td>Voltage, current, power, energy, frequency, power factor of the house supply</td><td class="m">UART Modbus-RTU, 9600 baud</td><td>V 80–260 V ±0.5%; A 0–100 A ±0.5%</td><td>Self-powered from mains side</td><td>Panel; CT on house live</td></tr><tr><td>U2 / U3 Source detect</td><td>Opto-isolated 230 V AC presence modules</td><td>Is NEPA present? Is the generator running? (before the changeover)</td><td class="m">Digital input, isolated</td><td>Response < 50 ms</td><td>From mains side</td><td>Panel, rail 1</td></tr><tr><td>Inverter link</td><td>MAX3485 RS485 transceiver (or shunt + INA226 where no port)</td><td>Battery %, battery V and A, output load, inverter mode</td><td class="m">RS485 Modbus-RTU (brand register map) / I²C</td><td>As reported by the inverter; shunt ±0.1%</td><td>3.3 V</td><td>Panel → inverter data port</td></tr><tr><td>Fuel level sensor</td><td>Capacitive diesel probe, cut to tank depth, 4–20 mA</td><td>Litres in the generator tank; refills, use, drops while gen off</td><td class="m">4–20 mA → 165 Ω → ADS1115 16-bit ADC (I²C)</td><td>±1% of full scale; ≈ ±0.5 L on a 50 L tank</td><td>24 V loop</td><td>Generator tank lid</td></tr><tr><td>Tank level sensor</td><td>JSN-SR04T waterproof ultrasonic</td><td>Water level in the overhead tank (%) for pump control</td><td class="m">Trigger / echo GPIO (echo level-shifted)</td><td>Range 25–450 cm, ±1 cm</td><td>5 V</td><td>Tank lid, cable to panel</td></tr><tr><td>K1 / K2 Contactors</td><td>Modular 2-pole, 25 A AC-1, 24 V coil</td><td>Switch the borehole pump and the AC circuit</td><td class="m">Coil driven by relay R1 / R2</td><td>Rated for motor and AC loads; size to the actual pump</td><td>Coil ≈ 2–3 W</td><td>Panel, rail 2</td></tr><tr><td>Hub</td><td>Small always-on mini-PC (or laptop for the pilot)</td><td>Rules, event log, history, alerts, users and roles; serves the dashboard</td><td class="m">LAN HTTP; outbound HTTPS for alerts only</td><td>Python 3 standard library, no cloud dependency</td><td>10–15 W</td><td>Office or panel room, on inverter</td></tr><tr><td>Network</td><td>Building Wi-Fi router, 2.4 GHz</td><td>Connects controller, hub and phones</td><td class="m">Wi-Fi / Ethernet</td><td>Controller always connects out to the hub</td><td>Router on inverter</td><td>Building</td></tr></tbody></table>
+ <p class="note">Typical figures for the class of device; final models are confirmed against each building (inverter brand and port, tank sizes, pump rating) during the site survey.</p></div>
+ <div class="run"><span>A.D.A. (Always-on Domestic Automation) · System architecture &amp; specification · prepared for Max-Migold</span><span>2 / 4</span></div></div>
+
+<div class="page"><div style="display:flex;justify-content:space-between;align-items:center"><div class="mark"><span class="sq">A</span>A.D.A.<span style="font-weight:600;font-stretch:100%;font-size:7.6pt;letter-spacing:.05em;opacity:.75;margin-left:1.2mm">Always-on Domestic Automation</span></div><span class="kicker">ADA-ARCH-01 · rev A · November 2026</span></div>
+ <div class="sec"><h3><span class="n">4</span>How the data flows</h3>
+ <div class="dg"><svg viewBox="0 0 720 150" width="100%">
+<defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#0b1b2b"/></marker></defs>
+<g font-size="9.5" fill="#0b1b2b">
+<rect x="6" y="40" width="110" height="64" fill="#fff" stroke="#0b1b2b"/><text x="61" y="60" text-anchor="middle" font-weight="800">1 · Sensors</text><text x="61" y="76" text-anchor="middle" font-size="8.5" fill="#4a5562">volts, amps, litres,</text><text x="61" y="88" text-anchor="middle" font-size="8.5" fill="#4a5562">battery %, tank %</text>
+<rect x="148" y="40" width="120" height="64" fill="#0b1b2b"/><text x="208" y="60" text-anchor="middle" font-weight="800" fill="#fff">2 · Controller</text><text x="208" y="76" text-anchor="middle" font-size="8.5" fill="#c9d1da">samples &amp; filters,</text><text x="208" y="88" text-anchor="middle" font-size="8.5" fill="#c9d1da">sends JSON every 1 s</text>
+<rect x="300" y="40" width="130" height="64" fill="#0b1b2b"/><text x="365" y="60" text-anchor="middle" font-weight="800" fill="#fff">3 · Hub</text><text x="365" y="76" text-anchor="middle" font-size="8.5" fill="#c9d1da">validates, runs rules,</text><text x="365" y="88" text-anchor="middle" font-size="8.5" fill="#c9d1da">logs, stores history</text>
+<rect x="462" y="8" width="120" height="44" fill="#fff" stroke="#0b1b2b"/><text x="522" y="27" text-anchor="middle" font-weight="800">4a · Command</text><text x="522" y="41" text-anchor="middle" font-size="8.5" fill="#4a5562">relay states in reply</text>
+<rect x="462" y="58" width="120" height="44" fill="#fff" stroke="#0b1b2b"/><text x="522" y="77" text-anchor="middle" font-weight="800">4b · Dashboard</text><text x="522" y="91" text-anchor="middle" font-size="8.5" fill="#4a5562">polls /state every 1 s</text>
+<rect x="462" y="108" width="120" height="38" fill="#fff" stroke="#0b1b2b"/><text x="522" y="125" text-anchor="middle" font-weight="800">4c · Alert</text><text x="522" y="138" text-anchor="middle" font-size="8.5" fill="#4a5562">push to phone</text>
+<rect x="612" y="40" width="102" height="64" fill="#fff8e0" stroke="#f5b800" stroke-width="1.5"/><text x="663" y="60" text-anchor="middle" font-weight="800">5 · Report</text><text x="663" y="76" text-anchor="middle" font-size="8.5" fill="#4a5562">per-day history →</text><text x="663" y="88" text-anchor="middle" font-size="8.5" fill="#4a5562">weekly / monthly PDF</text>
+</g>
+<g stroke="#0b1b2b" stroke-width="1.5" fill="none"><path d="M116 72 H148" marker-end="url(#b)"/><path d="M268 72 H300" marker-end="url(#b)"/>
+<path d="M430 60 H446 V30 H462" marker-end="url(#b)"/><path d="M430 80 H462" marker-end="url(#b)"/><path d="M430 96 H446 V127 H462" marker-end="url(#b)"/><path d="M582 80 H612" marker-end="url(#b)"/>
+<path d="M462 22 H446" stroke-dasharray="3 2"/></g>
+<text x="208" y="122" text-anchor="middle" font-size="8.5" fill="#4a5562">ADC · UART · RS485 · GPIO</text><text x="284" y="34" text-anchor="middle" font-size="8.5" fill="#2b6cb0" font-weight="700">POST /device</text>
+</svg></div>
+ <div class="two">
+  <div class="box2"><h3 style="margin:0">Every second</h3><ul><li>The controller samples each sensor, filters noise (e.g. averages the fuel probe over 30 s so sloshing is not read as theft) and sends one JSON report to the hub: <span class="mono" style="font-family:IBM Plex Mono,monospace;font-size:8pt">{"source":"grid","readings":{"fuel_l":31.5,"battery":64,"tank":48,"voltage":228},"relays":{"pump":false}}</span></li><li>The hub runs the rules and replies with the relay states the controller must apply.</li><li>Dashboards poll the hub every second; if a reading is older than 5 s they say <b>Not live</b> and refuse to switch.</li></ul></div>
+  <div class="box2"><h3 style="margin:0">On events</h3><ul><li>Each change (source, switch, spike, refill, drop, delivery, offline) is written to the event log with its time and reason.</li><li>Alerts (diesel drop, short delivery, low diesel, low battery, low tank with no power, spike, controller offline, generator service due) are pushed to the manager's phone; once per hour per alert.</li><li>Per-minute totals roll up into a per-day history that builds the weekly and monthly reports.</li></ul></div>
+ </div></div>
+ <div class="sec"><h3><span class="n">5</span>What the dashboard shows, and where it comes from</h3>
+ <table class="sp"><thead><tr><th>On the dashboard</th><th>Measured by</th><th>Shown in</th></tr></thead><tbody><tr><td>Source (NEPA / Gen / Inverter / None)</td><td>U2, U3 + PM1 voltage</td><td>Power panel, header pill, 24-hour source strip, report timelines</td></tr><tr><td>Voltage and safe band 200–250 V</td><td>PM1</td><td>Power panel gauge and sparkline; spike alert above 260 V</td></tr><tr><td>Load in watts, energy in kWh</td><td>PM1</td><td>Power panel, appliances list, report energy total</td></tr><tr><td>Battery %, V, A, time left</td><td>Inverter link</td><td>Inverter & battery panel, forecast, low-battery alert</td></tr><tr><td>Diesel litres, used today, run time left</td><td>Fuel sensor</td><td>Generator & diesel panel; drop and short-delivery alerts; report</td></tr><tr><td>Generator hours</td><td>U3 run time</td><td>Service countdown; service-due alert</td></tr><tr><td>Tank %, pump state</td><td>Tank sensor + R1</td><td>Water panel; pump auto start 20% / stop 95%; low-tank alert</td></tr><tr><td>Relay and load states</td><td>A1 relay feedback</td><td>Appliances, rooms, event log with the reason for each switch</td></tr><tr><td>Controller online, Wi-Fi strength</td><td>A1 report</td><td>Header pill, installer screen; offline alert after 5 s</td></tr></tbody></table></div>
+ <div class="run"><span>A.D.A. (Always-on Domestic Automation) · System architecture &amp; specification · prepared for Max-Migold</span><span>3 / 4</span></div></div>
+
+<div class="page"><div style="display:flex;justify-content:space-between;align-items:center"><div class="mark"><span class="sq">A</span>A.D.A.<span style="font-weight:600;font-stretch:100%;font-size:7.6pt;letter-spacing:.05em;opacity:.75;margin-left:1.2mm">Always-on Domestic Automation</span></div><span class="kicker">ADA-ARCH-01 · rev A · November 2026</span></div>
+ <div class="sec"><h3><span class="n">6</span>Software components</h3>
+ <table class="sp"><thead><tr><th>Component</th><th>Built with</th><th>Responsibilities</th></tr></thead><tbody>
+ <tr><td>Firmware</td><td>C++ (Arduino core for ESP32)</td><td>Wi-Fi with auto-reconnect and automatic hub discovery; sensor drivers; 1 s report; applies relay commands; fail-safe after 10 s without the hub; status LED.</td></tr>
+ <tr><td>Hub</td><td>Python 3, standard library only</td><td>Device API; rules engine; event log; per-day history; alerts (ntfy / Telegram); building settings; users, PINs and roles; serves the dashboard and reports.</td></tr>
+ <tr><td>Dashboard</td><td>One self-contained web page</td><td>Live panels for power, inverter, diesel, water, security and rooms; switching with confirmation of the hub's result; estate view; installer setup; works on phone, tablet and wall screen; no app to install.</td></tr>
+ <tr><td>Reports</td><td>Generated from the hub's history</td><td>Weekly / monthly: hours per source, diesel used and cost, unexplained loss, deliveries, generator service, lowest battery; printable to PDF.</td></tr>
+ </tbody></table></div>
+ <div class="two">
+  <div class="box2"><h3 style="margin:0">Security and access</h3><ul><li>Controller must present a per-building device key.</li><li>People log in with PINs; roles: owner, manager, caretaker, resident. Five wrong PINs lock a device out.</li><li>No inbound internet access is needed; alerts go out over HTTPS.</li><li>Every switch is logged with who or which rule did it.</li></ul></div>
+  <div class="box2"><h3 style="margin:0">When something fails</h3><ul><li><b>Wi-Fi or hub down</b>: relays go to safe states; dashboard shows Not live.</li><li><b>Internet down</b>: everything works; alerts are sent when it returns, and show on the dashboard meanwhile.</li><li><b>Sensor fault</b>: reading marked missing, not guessed; the hub keeps working on the rest.</li><li><b>Power cut</b>: hub and router on the inverter; the controller reports the outage itself.</li></ul></div>
+ </div>
+ <div class="sec"><h3><span class="n">7</span>Status today</h3>
+ <table class="sp"><thead><tr><th>Part</th><th>Status</th><th>Notes</th></tr></thead><tbody>
+ <tr><td>Controller ↔ hub link, relays, fail-safe, hub discovery</td><td class="ok">Working</td><td>Tested on an ESP32 with relay outputs</td></tr>
+ <tr><td>Rules, event log, history, reports, alerts to phone</td><td class="ok">Working</td><td>Demonstrated live</td></tr>
+ <tr><td>Dashboard, roles and PINs, building setup, installer screen</td><td class="ok">Working</td><td>Runs from the hub on any phone or laptop</td></tr>
+ <tr><td>PZEM power meter, AC source detection</td><td class="nx">Next</td><td>Standard modules; first items on the pilot build</td></tr>
+ <tr><td>Fuel probe, tank ultrasonic, inverter RS485</td><td class="nx">Next</td><td>Hub already accepts these readings; inverter register map per brand</td></tr>
+ </tbody></table></div>
+ <div class="box2" style="background:#fff8e0"><p style="margin:0"><b>Proposed next step:</b> a site survey of one Max-Migold building (distribution board, changeover, generator, inverter brand, tanks), then a fixed parts list and a 4–6 week pilot with weekly reports.</p></div>
+ <div class="run"><span>A.D.A. (Always-on Domestic Automation) · System architecture &amp; specification · prepared for Max-Migold</span><span>4 / 4</span></div></div>
+</body></html>
